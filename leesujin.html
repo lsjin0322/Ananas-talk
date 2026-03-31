@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <title>회원 가입</title>
+    <style>
+      #container {
+        width:600px;
+        margin:10px auto;
+      }
+    </style>
+    <link rel="stylesheet" href="css/register.css">
+  </head>
+  <body> 
+    <div id="container">
+      <h1>헬스장 이용 신청서</h1>
+
+      <form>
+
+        <fieldset>
+            <legend><b>사용자 정보</b></legend>
+                <ul>
+                    <li>
+                        <label for="user-name">이름</label>
+                        <input type="text" id="user-name"placeholder="4자~10자 사이, 공백없이."required/>
+                    </li>
+                    <li>
+                        <label for="pwd1">주민번호앞자리</label>
+                        <input type="password" id="password" placeholder="주민번호 앞자리를 입력하세요."required/>
+                    </li>
+                </ul>
+        </fieldset>
+
+      
+        <fieldset>
+            <legend><b>방문날짜/시간 지정하기</b></legend>
+                <ul>
+                <li>
+                    <p><label for="date">날짜</label></p>
+                    <p><input type="date" id="date"required/></p>
+                </li>
+                <li>
+                    <label for="time">시간</label>
+                    <input type="time" id="time">
+                </li>
+                </ul>
+        </fieldset>
+
+       
+        <fieldset>
+            <legend><b>이용목적(다중선택가능)</b></legend>
+            <label for="p1"><b>목적</b></label><br/>
+                <select multiple size="4" style="height:auto;"> 
+                    <option value="s_3" >다이어트</option  >
+                    <option value="s_5" >근력</option>
+                    <option value="f_3" >건강</option> 
+                    <option value="f_5" >취미</option> 
+                </select>   
+
+                    <p><b>운동경험(복수 선택가능)</b></p>
+                    <ul>
+                        <li><label><input type="checkbox" name="exp" value="beginner">초보</label></li>
+                        <li><label><input type="checkbox" name="exp" value="middle">중급</label></li>
+                        <li><label><input type="checkbox" name="exp" value="advenced">고급</label></li>
+                    </ul>
+         </fieldset>
+         <fieldset>
+                <legend><p><b>방문경로</b></p></legend>
+                    <ul>
+                        <li><label><input type="radio" name="visit-path" value="referral">지인추천</label></li>
+                        <li><label><input type="radio" name="visit-path" value="internet">인터넷검색</label></li>
+                    </ul>
+        </fieldset>
+
+        <fieldset>
+            <legend><p><b>개인정보 동의서</b></p></legend>
+                <ul>
+                    <li><p><input type="checkbox" name="agree" required>개인정보 수집 및 이용에 동의합니다.</p>
+                    </li>
+                 </ul>
+        </fieldset>
+            <button type="submit">신청하기</button>
+            <button type="reset">다시작성</button>
+        </form>
+        
+     </form>
+        <div id="buttons">
+          
+          
+        </div>
+      </form>
+    </div>           
+  </body>
+</html>

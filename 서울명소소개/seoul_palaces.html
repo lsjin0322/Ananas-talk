@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서울의 숨겨진 장소</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  padding: 10px;
+  background: #fdfcf5;
+  margin: 0;
+}
+
+/* Header - 명소인 남산타워와 롯데타워사진 업로드  */
+.header {
+  padding: 80px 30px;
+  text-align: center;
+
+
+  background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("./images/korea_food.png"); 
+  background-size: cover;
+  background-position: center 40%;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+  background-repeat: no-repeat;
+  background-position: center;
+  }
+
+.header h1 {
+  font-size: clamp(30px, 4vw, 55px);
+  margin: 0;
+  letter-spacing: 5px;
+  text-shadow: 2px 2px 10px rgb(129, 133, 76);
+  color: white;
+}
+
+.header p {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+/* Navigation Bar */
+.topnav {
+  overflow: hidden;
+  background-color: #8E7C9C; /* 어두운 벚쏯 색상 */
+  position: sticky; /* 스크롤 시 상단 고정 */
+  top: 0;
+  z-index: 1000;
+
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 16px 20px;
+  text-decoration: none;
+  transition: 0.3s;
+
+}
+
+.topnav a:hover {
+  background-color: #C75C7C;
+  color: white;
+}
+
+/* Layout Columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.leftcolumn {   
+  float: left;
+  width: 70%;
+}
+
+.rightcolumn {
+  float: left;
+  width: 30%;
+  padding-left: 20px;
+}
+
+/* Image Styling */
+.card img {
+  width: 100%;
+  height: 500px;
+  border-radius: 4px;
+  display: block;
+  object-fit: cover;
+}
+
+.card {
+  background-color: white;
+  padding: 25px;
+  margin-top: 20px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+
+}
+
+.card h2 {
+  font-size: 28px;
+  color: #1a2a3a;
+  border-left: 5px solid #D17A98;
+  padding-left: 15px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  color: #1a2a3a;
+  margin-bottom: 15px;
+}
+
+
+
+/* Footer */
+.footer {
+  padding: 30px;
+  text-align: center;
+  background: #7a5f80;
+  color: #ffffff;
+  margin-top: 30px;
+  line-height: 1.6;
+}
+
+#intro:target {
+  background: #ccafcb;
+  color: white;
+    }
+
+#room1:target,
+#room2:target {
+  box-shadow: 0 0 20px rgba(154, 124, 168, 0.4);
+  border-radius: 12px;
+}
+ 
+/* 위치보기 버튼모양 */
+.map-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #9A7CA8;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.map-btn:hover {
+  background-color: #B08DBD;
+}
+/*레이아웃 고정*/
+.container {
+  width: 1200px;
+  margin: 0 auto;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <h1>서울의 숨겨진 장소</h1>
+  <p>아는 사람만 찾는 조용한 공간, 서울의 또 다른 매력을 발견해보세요</p>
+</div>
+
+<div class="topnav">
+  <a href="#room2">숨겨진 명소 소개</a>
+  <a href="#room1">방문 팁</a>
+  <a href="#intro">위치 검색</a>
+  <a href="#" style="float:right">로그인</a>
+</div>
+
+<div class="row">
+  <div class="leftcolumn">
+    <div class="card">
+      <h2>서울의 숨겨진 공간, 조용한 쉼터</h2>
+      <img src="./images/seoul.png" alt="경복궁 근정전 정면 사진">
+      <p style="line-height: 1.8; margin-top: 20px;">
+        <strong>서울</strong>에는 잘 알려지지 않았지만, 
+        특별한 분위기를 가진 장소들이 있습니다.<br>
+        번잡한 도심을 벗어나 여유를 느낄 수 있는 공간들을 소개합니다.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>천왕산 북카페</h2>
+      <img src="./images/book_cafe.png" alt="벚꽃 핀 경회루 전경">
+      <p style="line-height: 1.8; margin-top: 20px;">
+        천왕산 자락에 위치한 <strong>자연 속 북카페</strong>로, 책과 커피를 함께 즐길 수 있는 힐링 공간입니다.
+        <br>창밖으로 보이는 숲 풍경과 함께 조용한 분위기 속에서 독서를 즐기기에 좋습니다.<br>
+        도심의 소음에서 벗어나 자연과 어우러진 공간에서
+        여유롭게 시간을 보내고 싶은 사람들에게 추천되는 장소입니다.
+    </div>
+  </div>
+
+  <div class="rightcolumn">
+    <div id="room1" class="card">
+      <h3>방문 팁</h3>
+      <ul>
+        <li>오전 시간대에 방문하면 가장 조용한 분위기를 즐길 수 있습니다.</li>
+        <li>주말보다는 평일 방문을 추천합니다.</li>
+        <li>편한 신발을 신고 가면 산책하기 좋습니다.</li>
+        <li>사진 촬영은 자연광이 좋은 낮 시간이 가장 예쁩니다.</li>
+      </ul>
+    </div>
+    <div id="room2" class="card">
+      <h3>숨겨진 명소 리스트</h3>
+      <ul style="padding-left: 20px; line-height: 2;">
+        <li>천왕산 북카페</li>
+        <li>서촌 골목</li>
+        <li>성수동 카페거리</li>
+        <li>한강 노을 명소</li>
+      </ul>
+    </div>
+    <div id="intro" class="card">
+      <h3>위치검색</h3>
+      <p><a 
+        href="https://map.naver.com" 
+        target="_blank" 
+        class="map-btn">
+  📍 위치 보기
+</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <h4><strong>방문 정보</strong></h4>
+  <p>서울 및 경기권에 위치한 자연·감성 공간으로,
+<br>대중교통 또는 자차로 방문할 수 있습니다.</p>
+</div>
+</div>
+</body>
+</html>

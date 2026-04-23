@@ -1,15 +1,26 @@
-## 🐍 Language: [web]
-> **Focus**: 핵심 문법 내재화 및 기초 알고리즘 구현
+## 🌐 Language: Web
+> **Focus**: HTML/CSS/JavaScript 기반 웹 구조 이해 및 UI 구현 능력 향상
+
+---
 
 ### 📖 Learning Scope
-- [x] Basic Syntax & Data Types
-- [x] Object-Oriented Programming (OOP)
-- [ ] Advanced Libraries (ex. Flet, OpenCV)
+- [x] HTML5 구조 및 시맨틱 태그
+- [x] CSS 기본 스타일링 및 선택자
+- [x] Flexbox / Grid 레이아웃
+- [ ] Responsive Web Design (반응형)
+- [ ] JavaScript 기본 문법 및 DOM 조작
+- [ ] 간단한 인터랙션 구현
+
+---
 
 ### 📂 Directory Structure
-- `/basics`: 입출력, 제어문 등 기초 예제
-- `/oop`: 클래스, 상속, 인터페이스 실습
-- `/practice`: 작은 기능 단위의 구현 연습
+- `/html-css`: 기본 마크업 및 스타일링 실습
+- `/layout`: Flexbox, Grid 레이아웃 구현
+- `/responsive`: 반응형 웹 디자인 실습
+- `/javascript`: DOM 조작 및 이벤트 처리
+- `/mini-project`: 정적 웹 페이지 및 간단한 인터랙션 프로젝트
+
+---
 
 ### 📘 Deep Dive (Notion)
-- [[언어명] 핵심 이론 아카이브 바로가기 ↗️](본인의_노션_링크)
+- [Web 핵심 이론 아카이브 바로가기 ↗️](본인의_노션_링크)

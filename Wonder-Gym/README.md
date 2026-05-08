@@ -7,7 +7,8 @@
 ## 📸 프로젝트 미리보기
 | 메인 등록 화면 | 던전 입장 팝업 (Modal) |
 | :---: | :---: |
-|(./Gym.png) | (./Gym1.png) |
+|<img width="713" height="1523" alt="Gym" src="https://github.com/user-attachments/assets/91a3d216-314f-4684-81c7-537358bd9a82" /> |  <img width="668" height="668" alt="Gym1" src="https://github.com/user-attachments/assets/40fd8b99-170d-4ec8-800c-f7a1ff758b1e" />|
+
 | *신규 플레이어 정보를 입력하는 메인 UI* | *등록 완료 시 나타나는 입장 연출* |
 
 ---

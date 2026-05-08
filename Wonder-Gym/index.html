@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WONDER GYM - 회원 등록 퀘스트</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00d4ff;
+            --neon-purple: #9d50bb;
+            --neon-pink: #ff00c1;
+            --dark-surface: #1a1a2e;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #0f0c29;
+            background-image: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* 메인 프레임 */
+        #container {
+            width: 100%;
+            max-width: 540px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .header { text-align: center; margin-bottom: 35px; }
+        .header span { font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: 5px; color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+        h1 { font-size: 32px; font-weight: 900; margin-top: 5px; background: linear-gradient(to bottom, #fff 40%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* 폼 섹션 */
+        .form-section { background: rgba(0, 0, 0, 0.35); padding: 22px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s ease; }
+        .form-section:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 212, 255, 0.1); transform: translateY(-2px); }
+        .section-title { font-size: 14px; font-weight: 800; color: var(--neon-blue); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+        label { font-size: 11px; color: #888; margin: 12px 0 6px 5px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+
+        input, select { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: #fff; font-size: 14px; transition: 0.3s; }
+        input:focus { outline: none; border-color: var(--neon-purple); background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 15px rgba(157, 80, 187, 0.2); }
+
+        /* 칩 선택 */
+        .chip-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .chip-item input { display: none; }
+        .chip-label { display: block; padding: 13px 5px; text-align: center; background: rgba(255, 255, 255, 0.05); border-radius: 12px; font-size: 13px; font-weight: 700; color: #666; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+        .chip-item input:checked + .chip-label { background: rgba(0, 212, 255, 0.1); color: var(--neon-blue); border-color: var(--neon-blue); box-shadow: 0 0 12px rgba(0, 212, 255, 0.2); }
+
+        /* 하단 버튼 */
+        .btn-group { display: flex; gap: 12px; margin-top: 10px; }
+        button { flex: 1; padding: 18px; border: none; border-radius: 15px; font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
+        .btn-submit { background: linear-gradient(45deg, var(--neon-purple), #6e48aa); color: #fff; box-shadow: 0 5px 20px rgba(110, 72, 170, 0.4); flex: 2; }
+        .btn-submit:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(157, 80, 187, 0.6); }
+        .btn-reset { background: rgba(255, 255, 255, 0.07); color: #777; }
+        .btn-reset:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+
+        /* [추가] 팝업창 스타일 */
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 1000; justify-content: center; align-items: center; }
+        #quest-modal { background: #1a1a2e; border: 2px solid var(--neon-blue); border-radius: 30px; padding: 40px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 0 50px var(--neon-blue); animation: modal-up 0.4s ease-out; }
+        @keyframes modal-up { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-title { font-family: 'Orbitron', sans-serif; color: var(--neon-pink); font-size: 18px; margin-bottom: 20px; text-shadow: 0 0 10px var(--neon-pink); }
+        .modal-msg { font-size: 20px; font-weight: 700; margin-bottom: 10px; line-height: 1.4; }
+        .modal-btn { background: var(--neon-blue); color: #000; padding: 12px 30px; margin-top: 25px; border-radius: 10px; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div class="header">
+            <span>Wonder Gym Membership</span>
+            <h1>신규 육성 등록</h1>
+        </div>
+
+        <form onsubmit="return startQuest(event)">
+            <div class="form-section">
+                <div class="section-title">👤 플레이어 프로필</div>
+                <label>닉네임 (본명)</label>
+                <input type="text" placeholder="성함을 입력하세요 (4~10자)" required>
+                <label>식별 코드 (주민번호 앞자리)</label>
+                <input type="password" placeholder="6자리 숫자를 입력하세요" maxlength="6" required>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">🕒 퀘스트 상담 일정</div>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1">
+                        <label>방문 날짜</label>
+                        <input type="date" required>
+                    </div>
+                    <div style="flex:1">
+                        <label>방문 시간</label>
+                        <input type="time">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">🎯 전직 목표 (중복 가능)</div>
+                <label>희망하는 성장 스탯을 선택하세요</label>
+                <select multiple>
+                    <option value="1">🔥 체지방 커트 (다이어트)</option>
+                    <option value="2">💪 벌크업 가이 (근력 증진)</option>
+                    <option value="3">🏃 무한 동력 (체력 강화)</option>
+                    <option value="4">🧘 멘탈 케어 (스트레스 해소)</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">⚔️ 전투 숙련도</div>
+                <div class="chip-group">
+                    <div class="chip-item">
+                        <input type="checkbox" id="e1" name="exp">
+                        <label for="e1" class="chip-label">뉴비</label>
+                    </div>
+                    <div class="chip-item">
+                        <input type="checkbox" id="e2" name="exp">
+                        <label for="e2" class="chip-label">미들러</label>
+                    </div>
+                    <div class="chip-item">
+                        <input type="checkbox" id="e3" name="exp">
+                        <label for="e3" class="chip-label">랭커</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">🔎 유입 경로</div>
+                <div class="chip-group">
+                    <div class="chip-item" style="grid-column: span 1.5;">
+                        <input type="radio" id="p1" name="path">
+                        <label for="p1" class="chip-label">동료 추천</label>
+                    </div>
+                    <div class="chip-item" style="grid-column: span 1.5;">
+                        <input type="radio" id="p2" name="path">
+                        <label for="p2" class="chip-label">커뮤니티 검색</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="agree-box">
+                <label style="cursor:pointer">
+                    <input type="checkbox" required> 플레이어 정보 수집에 동의합니다.
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-submit">모험 시작</button>
+                <button type="reset" class="btn-reset">초기화</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="modal-overlay">
+        <div id="quest-modal">
+            <div class="modal-title">QUEST CLEAR!</div>
+            <div class="modal-msg">
+                <p style="font-size: 40px; margin-bottom: 15px;">⚔️</p>
+                새로운 던전에 들어오신 것을<br>환영합니다!
+            </div>
+            <p style="color: #888; font-size: 14px;">당신의 한계를 시험할 준비가 되셨나요?</p>
+            <button class="modal-btn" onclick="closeModal()">던전 입장</button>
+        </div>
+    </div>
+
+    <script>
+        function startQuest(e) {
+            e.preventDefault();
+            document.getElementById('modal-overlay').style.display = 'flex';
+            return false;
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>

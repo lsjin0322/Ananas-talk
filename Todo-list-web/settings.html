@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>어플 설정</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="phone-container settings-page-container" id="app-container">
+        
+        <header class="settings-header-block">
+            <div class="settings-title-group">
+                <h1 class="settings-logo-title">어플 설정</h1>
+                <p class="settings-sub-title">테마 컬러 및 개인 최적화</p>
+            </div>
+            <img src="./images/day.png" alt="달력" class="settings-calendar-icon-img">
+        </header>
+
+        <div class="settings-form-wrapper">
+            
+            <div class="settings-input-unit">
+                <label class="settings-input-label">어플 테마 색상 (5가지 파스텔 톤)</label>
+                <div class="theme-palette-group" id="theme-palette">
+                    <button class="theme-circle-btn color-orange" data-theme="orange" title="오렌지"></button>
+                    <button class="theme-circle-btn color-pink" data-theme="pink" title="핑크"></button>
+                    <button class="theme-circle-btn color-blue" data-theme="blue" title="블루"></button>
+                    <button class="theme-circle-btn color-green" data-theme="green" title="그린"></button>
+                    <button class="theme-circle-btn color-purple" data-theme="purple" title="퍼플"></button>
+                </div>
+            </div>
+
+            <div class="settings-input-unit">
+                <label class="settings-input-label">폰트 스타일</label>
+                <select class="settings-select-dark" id="font-style-select">
+                    <option value="system">시스템 기본 고딕체</option>
+                    <option value="cute">동글동글 귀여운 쿠키체</option>
+                    <option value="myeongjo">단정한 감성 명조체</option>
+                </select>
+            </div>
+
+            <div class="settings-input-unit">
+                <label class="settings-input-label">Q&A로 문의 남기기</label>
+                <textarea class="settings-input-dark" id="qa-textarea" rows="3" placeholder="개선 사항이나 오류 제보 내용을 입력해 주세요."></textarea>
+            </div>
+
+            <div class="settings-input-unit" style="margin-top: 5px;">
+                <label class="settings-input-label">데이터 관리</label>
+                <button id="clear-data-btn" class="status-btn" style="background-color: #e74c3c; width: 100%; border: 2px solid #4a3e35; color: white;">⚠️ 모든 투두 데이터 초기화하기</button>
+            </div>
+
+        </div>
+
+        <button class="save-btn" id="settings-save-btn">변경사항 저장하기</button>
+
+        <nav class="bottom-nav">
+            <button class="nav-item" onclick="location.href='index.html'" title="홈">🏠</button>
+            <button class="nav-item" onclick="localStorage.removeItem('current-edit-id'); location.href='detail.html';" title="세부 일정 관리">📋</button>
+            <button class="nav-item active" onclick="location.href='settings.html'" title="설정">⚙️</button>
+        </nav>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const palette = document.getElementById('theme-palette');
+            const saveBtn = document.getElementById('settings-save-btn');
+            const clearBtn = document.getElementById('clear-data-btn');
+            const fontSelect = document.getElementById('font-style-select');
+            const qaInput = document.getElementById('qa-textarea');
+
+            const savedTheme = localStorage.getItem('app-custom-theme') || 'orange';
+            const savedFont = localStorage.getItem('app-custom-font') || 'system';
+            
+            document.body.setAttribute('data-theme', savedTheme);
+            const activeCircle = document.querySelector(`[data-theme="${savedTheme}"]`);
+            if (activeCircle) activeCircle.classList.add('selected');
+
+            fontSelect.value = savedFont;
+
+            palette.addEventListener('click', (e) => {
+                const targetBtn = e.target.closest('.theme-circle-btn');
+                if (!targetBtn) return;
+                document.querySelectorAll('.theme-circle-btn').forEach(btn => btn.classList.remove('selected'));
+                targetBtn.classList.add('selected');
+                const selectedTheme = targetBtn.getAttribute('data-theme');
+                document.body.setAttribute('data-theme', selectedTheme);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                if (!confirm('그동안 작성된 모든 할 일 목록이 영구적으로 삭제됩니다. 계속하시겠습니까?')) return;
+                localStorage.removeItem('my-todo-items');
+                alert('모든 할 일 데이터가 초기화되었습니다.');
+                location.href = 'index.html';
+            });
+
+            saveBtn.addEventListener('click', () => {
+                const currentSelectedTheme = document.querySelector('.theme-circle-btn.selected').getAttribute('data-theme');
+                const currentSelectedFont = fontSelect.value;
+                localStorage.setItem('app-custom-theme', currentSelectedTheme);
+                localStorage.setItem('app-custom-font', currentSelectedFont);
+                if (qaInput.value.trim()) alert('Q&A 문의 사항 접수가 성공적으로 처리되었습니다.');
+                else alert('설정 정보 변경사항이 저장되었습니다.');
+                location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

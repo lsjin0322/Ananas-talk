@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY TODO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="phone-container">
+        <header class="main-header">
+            <div>
+                <h1 class="logo-title">MY TODO</h1>
+                <p class="sub-title">오늘도 귀엽게, 계획적으로!</p>
+            </div>
+            <div class="char-flower-top">
+                <img src="./images/peanut.png" alt="캐릭터" class="header-char-img">
+            </div>
+        </header>
+        <div class="input-box">
+            <span class="input-char">🍀</span>
+            <input type="text" id="todo-input" placeholder="할 일을 입력해 주세요">
+            <button class="add-btn-circle" id="add-btn">+</button>
+        </div>
+        <div class="tab-container">
+            <button class="tab-btn active">전체</button>
+            <button class="tab-btn">오늘</button>
+            <button class="tab-btn">중요</button>
+            <button class="tab-btn">완료</button>
+        </div>
+        <ul class="todo-list" id="todo-list"></ul>
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="location.href='index.html'" title="홈">🏠</button>
+            <button class="nav-item" id="nav-detail-trigger" title="세부 일정 관리">📋</button>
+            <button class="nav-item" onclick="location.href='settings.html'" title="설정">⚙️</button>
+        </nav>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

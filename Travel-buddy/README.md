@@ -95,7 +95,6 @@ Travel Buddy의 캐릭터는 **구름**을 모티브로 제작했습니다.
 | Home | Planner | AI Expense |
 | :---: | :---: | :---: |
 | <img width="417" height="1027" alt="main1" src="https://github.com/user-attachments/assets/4191f0fe-d8b7-4582-9402-06360ba51ec1" /> |<img width="398" height="1029" alt="main2" src="https://github.com/user-attachments/assets/b225ebb4-cb33-43eb-8c81-65c9a992afa8" /> | <img width="404" height="1025" alt="main3" src="https://github.com/user-attachments/assets/4a0755e7-b637-4e0e-a499-32dc2f4b1ff1" />|
-| 메인 화면 (Todo List) | 상세 보기 (Detail)  |
 | Translator | Cloud Buddy |
 | <img width="398" height="1028" alt="main4" src="https://github.com/user-attachments/assets/43945bd0-6446-4912-afeb-a659142086c6" /> | <img width="399" height="1017" alt="main5" src="https://github.com/user-attachments/assets/96860851-3fbe-41e2-a90d-fdc527b98e87" />| 
 

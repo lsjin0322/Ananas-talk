@@ -6,7 +6,7 @@
 
 ## 🌐 라이브 데모 (Live Demo)
 스마트폰과 PC 어디서나 접속하여 실시간으로 기능을 테스트해 볼 수 있습니다.
-* **배포 주소:** [https://web-nu-liard-z1t8z5w7fg.vercel.app](https://web-nu-liard-z1t8z5w7fg.vercel.app)
+* **배포 주소:**(https://web-nu-liard-z1t8z5w71g.vercel.app/)
 
 <br>
 

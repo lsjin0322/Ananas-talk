@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MoodWeather - 감성 날씨 다이어리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.1/kakao.min.js" integrity="sha384-4w0gJa47b6Pqb74wGWXSTa8QeBQEZg8683XUHg7OofK9Hl7yU7pL2N38VwW51N46" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="default" data-fontsize="medium">
+
+    <div class="phone-mockup">
+        <div class="screen-wrapper">
+            
+            <div id="view-home" class="app-screen active">
+                <div class="scroll-container">
+                    <div class="user-welcome">
+                        <h2>오늘도 반가워요, <span id="user-display-name">포근이</span>님 ✨</h2>
+                    </div>
+
+                    <div class="weather-card">
+                        <div class="weather-info">
+                            <span class="temp">23°C</span>
+                            <span class="weather-status">맑고 포근함</span>
+                        </div>
+                        <div class="weather-icon">🌤️</div>
+                    </div>
+
+                    <div class="quote-card-wrapper" onclick="navTo('view-quote')">
+                        <div class="tape-sticker"></div>
+                        <div class="quote-card">
+                            <p class="quote-text" id="home-quote-text">“완벽한 하루가 아니어도 괜찮아요.”</p>
+                            <p class="quote-sub">오늘의 위로 한 조각 보기</p>
+                        </div>
+                    </div>
+
+                    <button class="view-diary-trigger btn-click" onclick="location.href='diary_list.html'">
+                        📖 나만의 일기장 
+                    </button>
+
+                    <div class="recommend-section">
+                        <h3>오늘 추천하는 힐링</h3>
+                        <div class="recommend-item">🌿 따뜻한 녹차 한 잔 마시기</div>
+                        <div class="recommend-item">🎧 플레이리스트 '오후의 산책' 듣기</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-mood" class="app-screen next">
+                <div class="screen-header">
+                    <h2>지금 어떤 마음인가요?</h2>
+                    <p>마음을 고르면 날씨가 위로를 건네줄 거예요</p>
+                </div>
+                
+                <div class="mood-grid">
+                    <button class="mood-btn btn-click" onclick="selectMood('지침')">🌧️ 지침</button>
+                    <button class="mood-btn btn-click" onclick="selectMood('불안함')">☁️ 불안함</button>
+                    <button class="mood-btn btn-click" onclick="selectMood('평온함')">🍵 평온함</button>
+                    <button class="mood-btn btn-click" onclick="selectMood('기분 좋음')">🎈 기분 좋음</button>
+                    <button class="mood-btn btn-click" onclick="selectMood('집중 필요')">✏️ 집중 필요</button>
+                </div>
+                <div class="sticker-deco-frog">🐸⭐</div>
+            </div>
+
+            <div id="view-quote" class="app-screen next">
+                <div class="screen-header back-nav">
+                    <i class="fa-solid fa-chevron-left btn-click" onclick="navTo('view-home')"></i>
+                    <span>오늘의 다이어리</span>
+                </div>
+                
+                <div class="detail-quote-box">
+                    <div class="notebook-line"></div>
+                    <p class="detail-text" id="detail-quote-display">화면 하단의 '감정' 탭에서 현재 기분을 선택하시면 맞춤형 위로 문구가 나타납니다.</p>
+                    <span class="character-sticker">🐸💖</span>
+                </div>
+
+                <div class="action-bar-dual">
+                    <button class="action-btn btn-click" onclick="shareKakao()"><i class="fa-comment fa-solid"></i><span>카톡 공유</span></button>
+                    <button class="action-btn btn-click" onclick="openDiaryModal()"><i class="fa-solid fa-pen"></i><span>일기 쓰기</span></button>
+                </div>
+            </div>
+
+            <div id="view-settings" class="app-screen next">
+                <div class="screen-header">
+                    <h2>다이어리 설정</h2>
+                </div>
+                
+                <div class="settings-list">
+                    <div class="settings-group">
+                        <label class="setting-label"><i class="fa-solid fa-user"></i> 사용자 이름 변경</label>
+                        <div class="name-input-box">
+                            <input type="text" id="name-input" placeholder="이름을 입력하세요" maxlength="8">
+                            <button class="btn-click" onclick="saveName()">저장</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label"><i class="fa-solid fa-palette"></i> 다이어리 스크랩 테마</label>
+                        <div class="theme-selector-grid">
+                            <button class="theme-opt default active" onclick="changeTheme('default')">크림</button>
+                            <button class="theme-opt pink" onclick="changeTheme('pink')">딸기</button>
+                            <button class="theme-opt blue" onclick="changeTheme('blue')">하늘</button>
+                            <button class="theme-opt mint" onclick="changeTheme('mint')">민트</button>
+                            <button class="theme-opt lavender" onclick="changeTheme('lavender')">보라</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label"><i class="fa-solid fa-font"></i> 글꼴 크기 설정</label>
+                        <div class="font-selector-grid">
+                            <button class="font-opt" id="font-small" onclick="changeFontSize('small')">작게</button>
+                            <button class="font-opt active" id="font-medium" onclick="changeFontSize('medium')">보통</button>
+                            <button class="font-opt" id="font-large" onclick="changeFontSize('large')">크게</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="version-info">MoodWeather v2.5.0</div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active btn-click" id="nav-home" onclick="navTo('view-home')">
+                    <i class="fa-solid fa-house"></i><span>홈</span>
+                </div>
+                <div class="nav-item btn-click" id="nav-mood" onclick="navTo('view-mood')">
+                    <i class="fa-solid fa-face-smile"></i><span>감정</span>
+                </div>
+                <div class="nav-item btn-click" id="nav-quote" onclick="navTo('view-quote')">
+                    <i class="fa-solid fa-heart"></i><span>글귀</span>
+                </div>
+                <div class="nav-item btn-click" id="nav-settings" onclick="navTo('view-settings')">
+                    <i class="fa-solid fa-gear"></i><span>설정</span>
+                </div>
+            </div>
+
+            <div id="diary-modal" class="modal-overlay">
+                <div class="modal-box">
+                    <div class="modal-tape"></div>
+                    <h3>오늘의 마음 기록 ✏️</h3>
+                    <textarea id="modal-note-area" placeholder="오늘의 일기를 자유롭게 적어보세요..."></textarea>
+                    <div class="modal-actions">
+                        <button class="modal-btn-cancel btn-click" onclick="closeDiaryModal()">닫기</button>
+                        <button class="modal-btn-save btn-click" onclick="saveDiaryNote()">보관</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="diary.js"></script>
+</body>
+</html>

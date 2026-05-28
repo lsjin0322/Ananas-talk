@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마음 선택</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .emotion-btn {
+            border: none; border-radius: 20px; padding: 25px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center;
+        }
+        .emotion-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-tired { background: var(--tired); }
+        .btn-anxious { background: var(--anxious); }
+        .btn-calm { background: var(--calm); }
+        .btn-happy { background: var(--happy); }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div style="padding: 40px 25px 20px; text-align: center;">
+            <h2 style="color: var(--text);">지금 기분이 어떤가요?</h2>
+        </div>
+
+        <div style="padding: 0 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex: 1;">
+            <button class="emotion-btn btn-tired" onclick="save('지침')">😞<br>지침</button>
+            <button class="emotion-btn btn-anxious" onclick="save('불안함')">😰<br>불안함</button>
+            <button class="emotion-btn btn-calm" onclick="save('평온함')">😌<br>평온함</button>
+            <button class="emotion-btn btn-happy" onclick="save('기분좋음')">😊<br>기분좋음</button>
+        </div>
+
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-item"><i>🌤️</i>오늘</a>
+            <a href="emotion.html" class="nav-item active"><i>❤️</i>마음</a>
+            <a href="setting.html" class="nav-item"><i>⚙️</i>설정</a>
+        </nav>
+    </div>
+    <script>
+        function save(e) {
+            localStorage.setItem('userEmotion', e);
+            location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

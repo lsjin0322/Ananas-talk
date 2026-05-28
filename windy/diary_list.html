@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MoodWeather - 나의 일기 보관함</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="default">
+
+    <div class="phone-mockup">
+        <div class="screen-wrapper">
+            
+            <div class="app-screen active" style="height: 100%;">
+                <div class="screen-header back-nav">
+                    <i class="fa-solid fa-chevron-left btn-click" onclick="location.href='index.html'"></i>
+                    <span>나의 일기 보관함</span>
+                </div>
+                
+                <div class="scroll-container" id="diary-list-render-zone"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="diary.js"></script>
+    <script>
+        // 창이 열리자마자 보관함 배열을 즉시 판독하여 렌더링 지시
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('moodweather_theme') || "default";
+            document.body.setAttribute('data-theme', savedTheme);
+            if (typeof renderDiaryList === 'function') {
+                renderDiaryList();
+            }
+        });
+    </script>
+</body>
+</html>

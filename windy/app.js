@@ -1,15 +1,12 @@
-/**
- * MoodWeather 프로토타입 핵심 로직 엔진 v2.5.2
- */
 
-// 카카오 SDK 초기화 예외 처리
+
 try {
     Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY_HERE');
 } catch(e) {
     console.log("카카오 샌드박스 가상 런타임 진입");
 }
 
-// 100가지 기분 위로 문구 아카이브 데이터
+
 const quoteDatabase = {
     '지침': [
         "지친 하루의 끝에는 항상 내가 서있을게요.", "오늘 하루도 버텨내느라 정말 고생 많았어요.",

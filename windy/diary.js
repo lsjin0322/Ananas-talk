@@ -1,6 +1,3 @@
-/**
- * MoodWeather 수제 다이어리 기록 및 실시간 조회 엔진 v1.5
- */
 
 function openDiaryModal() {
     const textarea = document.getElementById('modal-note-area');
@@ -69,7 +66,7 @@ function renderDiaryList() {
         return;
     }
 
-    // 최신 기록이 맨 위로 오도록 역순 루프 정렬
+
     savedNotes.reverse().forEach((note) => {
         const card = document.createElement('div');
         card.className = 'diary-history-card';
@@ -100,7 +97,7 @@ function deleteDiaryCard(noteId) {
     savedNotes = savedNotes.filter(note => note.id !== noteId);
     localStorage.setItem('moodweather_notes', JSON.stringify(savedNotes));
 
-    renderDiaryList(); // 목록 즉시 리프레시
+    renderDiaryList(); 
 }
 
 function escapeHtml(text) {

@@ -62,7 +62,7 @@ body {
     transition: background-color 0.3s ease; 
 }
 /* ========================================================= */
-/* 📖 나의 일기장 바로가기 버튼 (기존 UI와 통일성 부여) */
+/* 📖 나의 일기장 바로가기 버튼 */
 
 .view-diary-trigger {
     width: 100%;
@@ -91,7 +91,7 @@ body {
 }
 
 /* ========================================================= */
-/* ⭐ [MOBILE AUTO-FIT] 핸드폰으로 직접 링크 접속 시 100% 반응형 전체화면 피팅 모듈 */
+
 @media (max-width: 500px), (max-height: 760px) {
     body { background-image: none; background-color: var(--theme-bg); padding: 0; }
     .phone-mockup { width: 100vw; height: 100vh; border-radius: 0; padding: 0; background: none; box-shadow: none; }

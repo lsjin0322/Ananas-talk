@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>은방울의 모험 - 세계관 완벽 적용판</title>
+    <style>
+        @font-face {
+            font-family: 'DungGeunMo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+        }
+        body {
+            margin: 0; padding: 0; background-color: #0d120e;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; color: white; font-family: 'DungGeunMo', sans-serif; overflow: hidden;
+        }
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 600px;
+        }
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            border: 4px solid #4a5c66; box-shadow: 0 0 20px rgba(0, 0, 0, 0.9); background-color: #87CEEB;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const darkCanvas = document.createElement('canvas');
+        darkCanvas.width = 800; darkCanvas.height = 600;
+        const darkCtx = darkCanvas.getContext("2d");
+
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = 1600; bgCanvas.height = 600;
+        const bgCtx = bgCanvas.getContext("2d");
+
+        let gameState = "START_SCREEN"; 
+        let score = 0, hp = 5;
+        const maxHp = 5;
+        let stamina = 100;
+        const maxStamina = 100;
+
+        let cameraX = 0, targetCameraX = 0;
+        let currentStage = 1;
+        const maxStage = 5;
+        
+        let dialogIndex = 0, animTimer = 0, totalSeeds = 0;
+        let introTimer = 0, introPlayerY = 1000, introPlayerScale = 4;
+
+        let hasFlashlight = false, isLightOn = false;
+        let isStageDark = false, darknessAlpha = 0;
+        let blackoutTimer = 0, blackoutWarningActive = false;
+        let cloudTimer = 0; 
+        
+        let inGameMessage = "", inGameMessageTimer = 0;
+
+        function showMessage(msg) {
+            inGameMessage = msg;
+            inGameMessageTimer = 240; 
+        }
+
+        const palette = {
+            '.': 'transparent', '1': '#FFFFFF', '2': '#FFB6C1', '3': '#3B2F2F', 
+            '4': '#27AE60', '5': '#8E44AD', '6': '#E74C3C', '7': '#3498DB', '8': '#C99B3B',
+            '9': '#EAE6D7', 'A': '#87CEEB', 'B': '#95A5A6', 'C': '#2C3E50', 'D': '#000000', 'E': '#8B4513',
+            'F': '#34495E', 'G': '#7F8C8D', 'H': '#BDC3C7'
+        };
+
+        const playerSprite = [
+            "......11..11....", "......12..21....", "......11..11....", ".....1111111....",
+            ".....1311131....", ".....1211121...4", ".....1111111...4", "......44444....4",
+            ".....1444441..44", ".....1444441..4.", "......44444...4.", "......44444...4.",
+            "......11.11...4.", "......11.11.....", "......11.11.....", "................"
+        ];
+        
+        const playerBackSprite = [
+            "......11..11....", "......11..11....", "......11..11....", ".....1111111....",
+            ".....1111111....", ".....1111111...4", ".....1111111...4", "......44444....4",
+            ".....4444444..44", ".....4444444..4.", "......44444...4.", "......44444...4.",
+            "......11.11...4.", "......11.11.....", "......11.11.....", "................"
+        ];
+
+        const demonSprite = [
+            "....DD....DD....", "...DFGD..DGFD...", "..DFGGFDDFGGFD..", "..FGGFFFFFGGFF..",
+            ".FGDGFFFFFFGDGF.", "FGFGGDDFFDDGGFGF", "FGFFGDFGGFDGFFGF", ".FFFGGGGGFFF...",
+            "..FFGDGGGDGFF...", ".DFGDFFFFFDGFD..", "DDFGDFFFFFFDGFDD", "DD.DFFF..FFFD.DD",
+            "...DFFD..DFFD...", "....DD....DD....", "................", "................"
+        ];
+
+        const insectSprite = [
+            "......DDDD......", ".....D4444D.....", "....D4D44D4D....", "...D4D4444D4D...",
+            "..D4D4DDDD4D4D..", ".D44DD4444DD44D.", "D44D44444444D44D", "DDD444E44E444DDD",
+            "..D444EEEE444D..", "...D44E44E44D...", "....D444444D....", ".....D4DD4D.....",
+            "......D..D......", "......D..D......", "................", "................"
+        ];
+
+        const slimeSprite = [
+            "................", "................", "......7777......", "....77777777....",
+            "...7777777777...", "..771177771177..", ".77711777711777.", ".77777777777777.",
+            ".7777DDDDDD7777.", ".777D777777D777.", "..77DDDDDDDD77..", "...7777777777...",
+            "....77777777....", "................", "................", "................"
+        ];
+
+        const heartSprite = [
+            "................", "................", "................", "................",
+            "....666..666....", "...6666666666...", "..666666666666..", "..666666666666..",
+            "..666666666666..", "...6666666666...", "....66666666....", ".....666666.....",
+            "......6666......", ".......66.......", "................", "................"
+        ];
+
+        const stageDialogs = {
+            1: ["대계단 진입로: 거대한 성의 내부에 들어왔어.", "기괴한 몬스터가 숨어있으니 조심해!", "[Enter] 모험 시작"],
+            2: ["대리석 화랑: 길이 무작위로 변하고 있어.", "무너지지 않는 안전한 발판을 찾아 이동하자!", "[Enter] 모험 시작"],
+            3: ["어두운 홀: 곧 전등이 꺼지는 구간이야.", "화살표가 가리키는 [손전등]을 찾고 암전에 대비해!", "[Enter] 모험 시작"],
+            4: ["비밀 통로: 투사체 관통(X키)을 활용해 다수의 적을 뚫자.", "구름을 타면 공중을 날 수 있어. 단, 시간제한을 조심해!", "[Enter] 모험 시작"],
+            5: ["성주실(보스): 오염된 성의 원흉이야!", "[↓] 키를 눌러 방어하며 기회를 엿보자!", "[Enter] 모험 시작"]
+        };
+
+        const mapNodes = [
+            {x: 100, y: 400}, {x: 250, y: 300}, {x: 400, y: 450}, 
+            {x: 550, y: 250}, {x: 650, y: 400}
+        ];
+
+        const player = {
+            x: 100, y: 300, width: 32, height: 32, vx: 0, vy: 0, speed: 4.5,
+            gravity: 0.6, jumpForce: -14, isGrounded: false, facing: 1,
+            invincible: false, invincibleTimer: 0, attackTimer: 0, isDefending: false
+        };
+
+        let platforms = [], enemies = [], bullets = [], items = [], particles = [], aoeWarnings = [];
+        let boss = null, goal = null;
+        
+        const keysInput = {};
+        const vButtons = {
+            left: {x: 20, y: 530, w: 45, h: 45, pressed: false, label: "◀"},
+            right: {x: 75, y: 530, w: 45, h: 45, pressed: false, label: "▶"},
+            down: {x: 130, y: 530, w: 45, h: 45, pressed: false, label: "▼"},
+            light: {x: 530, y: 530, w: 45, h: 45, pressed: false, label: "L"},
+            z: {x: 585, y: 530, w: 45, h: 45, pressed: false, label: "Z"},
+            x: {x: 640, y: 530, w: 45, h: 45, pressed: false, label: "X"},
+            up: {x: 695, y: 530, w: 45, h: 45, pressed: false, label: "▲"}
+        };
+
+        function cacheBackground() {
+            bgCtx.fillStyle = "#87CEEB"; bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+            // 밝고 화사한 배경 기둥
+            bgCtx.fillStyle = "#FFFFF0"; 
+            for(let i=0; i<8; i++) {
+                let px = (i * 200);
+                bgCtx.fillRect(px, 0, 40, 600); 
+                bgCtx.fillStyle = "#F5F5DC";
+                bgCtx.fillRect(px - 10, 0, 10, 600); 
+                bgCtx.fillRect(px + 40, 0, 10, 600);
+                bgCtx.fillStyle = "#FFFFF0";
+            }
+        }
+        cacheBackground();
+
+        window.addEventListener("keydown", e => {
+            keysInput[e.code] = true;
+            if (e.code === "Enter") {
+                if (gameState === "START_SCREEN") { gameState = "CASTLE_INTRO"; introTimer = 0; introPlayerScale = 4; introPlayerY = 800; }
+                else if (gameState === "CASTLE_INTRO") { gameState = "DIALOG"; }
+                else if (gameState === "DIALOG") {
+                    dialogIndex++;
+                    if (dialogIndex >= stageDialogs[currentStage].length) {
+                        gameState = "PLAY";
+                        if (currentStage === 3) startBlackoutWarning();
+                    }
+                }
+            }
+            if (e.code === "KeyL" && hasFlashlight) isLightOn = !isLightOn;
+            handleActionInputs();
+        });
+        window.addEventListener("keyup", e => { keysInput[e.code] = false; });
+
+        function checkButtons(x, y, isDown) {
+            if (gameState === "START_SCREEN" && isDown) { gameState = "CASTLE_INTRO"; introTimer = 0; introPlayerScale = 4; introPlayerY = 800; return; }
+            if (gameState === "CASTLE_INTRO" && isDown) { gameState = "DIALOG"; return; }
+            if (gameState === "GAME_OVER" || (gameState === "ENDING_ANIM" && animTimer > 800)) {
+                if (isDown && x > 300 && x < 500 && y > 350 && y < 410) {
+                    currentStage = 1; score = 0; hp = maxHp; stamina = maxStamina; totalSeeds = 0;
+                    initStage(); gameState = "START_SCREEN"; return;
+                }
+            }
+
+            for(let key in vButtons) {
+                let btn = vButtons[key];
+                if (x >= btn.x && x <= btn.x + btn.w && y >= btn.y && y <= btn.y + btn.h) {
+                    btn.pressed = isDown;
+                    if (isDown && key === 'light' && hasFlashlight) isLightOn = !isLightOn;
+                }
+            }
+            if (isDown && gameState === "DIALOG" && y > 460 && y < 520) {
+                dialogIndex++;
+                if (dialogIndex >= stageDialogs[currentStage].length) {
+                    gameState = "PLAY";
+                    if (currentStage === 3) startBlackoutWarning();
+                }
+            }
+            handleActionInputs();
+        }
+        
+        canvas.addEventListener("mousedown", e => { const rect = canvas.getBoundingClientRect(); checkButtons(e.clientX - rect.left, e.clientY - rect.top, true); });
+        canvas.addEventListener("mouseup", e => { for(let key in vButtons) vButtons[key].pressed = false; });
+
+        function handleActionInputs() {
+            if (gameState !== "PLAY") return;
+            if ((keysInput["ArrowUp"] || keysInput["KeyC"] || vButtons.up.pressed) && player.isGrounded && !player.isDefending) {
+                player.vy = player.jumpForce; player.isGrounded = false;
+            }
+            if ((keysInput["KeyZ"] || vButtons.z.pressed) && player.attackTimer <= 0 && !player.isDefending) {
+                bullets.push({x: player.facing === 1 ? player.x + player.width : player.x - 20, y: player.y + 10, width: 20, height: 10, vx: player.facing * 10, life: 30, type: "normal", pierce: 1});
+                player.attackTimer = 15;
+            }
+            if ((keysInput["KeyX"] || vButtons.x.pressed) && player.attackTimer <= 0 && !player.isDefending) {
+                bullets.push({x: player.facing === 1 ? player.x + player.width : player.x - 30, y: player.y + 5, width: 30, height: 20, vx: player.facing * 8, life: 40, type: "pierce", pierce: 3});
+                player.attackTimer = 40;
+            }
+        }
+
+        function startBlackoutWarning() {
+            blackoutWarningActive = true;
+            blackoutTimer = 180; 
+        }
+
+        function initStage() {
+            platforms = []; enemies = []; bullets = []; items = []; particles = []; aoeWarnings = [];
+            player.x = 100; player.y = 300; player.vx = 0; player.vy = 0; cameraX = 0; targetCameraX = 0;
+            dialogIndex = 0; boss = null; goal = null; player.isDefending = false;
+            
+            isStageDark = false; darknessAlpha = 0; hasFlashlight = false; isLightOn = false; cloudTimer = 0;
+            blackoutWarningActive = false; blackoutTimer = 0; stamina = maxStamina;
+
+            platforms.push({x: -500, y: 550, w: 5000, h: 50, type: "static"}); // 추락 방지 안전 바닥
+
+            let currentPlatformX = 50;
+            let currentPlatformY = 400;
+            let monsterTypesPool = ["demon", "insect", "slime"];
+            
+            for(let i=0; i<8; i++) {
+                let pWidth = 150 + Math.random() * 150;
+                platforms.push({x: currentPlatformX, y: currentPlatformY, w: pWidth, h: 30, type: "static"});
+                
+                // 정확히 5마리의 몬스터 무작위 배치
+                if (currentStage !== 5 && i < 5) {
+                    let mType = monsterTypesPool[Math.floor(Math.random() * monsterTypesPool.length)];
+                    let mX = currentPlatformX + 50 + Math.random() * (pWidth - 100);
+                    enemies.push({x: mX, y: currentPlatformY - 32, w: 32, h: 32, type: mType, hp: 3, dir: -1, startX: mX, animTick: 0});
+                }
+
+                currentPlatformX += pWidth + 30 + Math.random() * 80;
+                currentPlatformY = Math.max(150, Math.min(450, currentPlatformY + (Math.random() * 100 - 60)));
+            }
+
+            // 탈출 지점을 '문'이 아닌 '구름' 오브젝트로 변경
+            if (currentStage === 5) {
+                boss = {x: currentPlatformX, y: currentPlatformY - 100, w: 96, h: 96, hp: 20, maxHp: 20, attackTimer: 100, dir: -1, speed: 2};
+            } else {
+                goal = {x: currentPlatformX + 100, y: currentPlatformY - 80, w: 60, h: 40}; 
+            }
+
+            // 하트 드롭 조건: 체력 3 이하
+            if (hp <= 3) items.push({x: 300, y: 300, type: "heart"}); 
+            
+            items.push({x: 700, y: 200, type: "seed"}); 
+
+            if (currentStage === 3) items.push({x: platforms[3].x + 50, y: platforms[3].y - 50, type: "flashlight"}); 
+            if (currentStage === 4) items.push({x: platforms[4].x + 50, y: platforms[4].y - 50, type: "cloud"}); 
+        }
+
+        function createParticles(x, y, color) {
+            for(let i=0; i<15; i++) {
+                particles.push({x: x + 16, y: y + 16, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8 - 2, life: 30, color: color, size: Math.random() * 4 + 2});
+            }
+        }
+
+        function update() {
+            if (gameState === "PLAY") {
+                player.isDefending = (keysInput["ArrowDown"] || vButtons.down.pressed) && player.isGrounded && stamina > 0;
+
+                if (player.isDefending) {
+                    player.vx = 0; stamina -= 1.0; 
+                } else {
+                    if (stamina < maxStamina) stamina += 0.5;
+                    if (keysInput["ArrowLeft"] || vButtons.left.pressed) { player.vx = -player.speed; player.facing = -1; }
+                    else if (keysInput["ArrowRight"] || vButtons.right.pressed) { player.vx = player.speed; player.facing = 1; }
+                    else { player.vx = 0; }
+                }
+
+                if (cloudTimer > 0) {
+                    cloudTimer--; player.vy = 0;
+                    if (!player.isDefending) {
+                        if (keysInput["ArrowUp"] || vButtons.up.pressed) player.y -= player.speed;
+                        if (keysInput["ArrowDown"]) player.y += player.speed;
+                    }
+                } else {
+                    player.vy += player.gravity; 
+                }
+
+                player.x += player.vx; player.y += player.vy;
+                if (player.x < 0) player.x = 0;
+
+                targetCameraX = player.x - 350;
+                cameraX += (targetCameraX - cameraX) * 0.1;
+                if (cameraX < 0) cameraX = 0;
+
+                player.isGrounded = false;
+                platforms.forEach(p => {
+                    if (player.vy >= 0 && player.x < p.x + p.w && player.x + player.width > p.x && player.y + player.height >= p.y && player.y + player.height - player.vy <= p.y + 20) {
+                        player.y = p.y - player.height; player.vy = 0; player.isGrounded = true;
+                    }
+                });
+
+                // 탈출 구름에 닿았을 때
+                if (goal && player.x > goal.x && player.x < goal.x + goal.w && player.y + player.height >= goal.y && player.y <= goal.y + goal.h) {
+                    gameState = "STAGE_CLEAR_ANIM"; animTimer = 0; player.vx = 0; player.vy = 0;
+                    player.x = goal.x + 10; player.y = goal.y - player.height + 10; // 구름 위에 탑승
+                }
+
+                if (player.y > 700) { hp--; player.x = cameraX + 50; player.y = 100; player.vy = 0; cloudTimer = 0; if (hp <= 0) gameState = "GAME_OVER"; }
+
+                if (player.attackTimer > 0) player.attackTimer--;
+                if (player.invincible) { player.invincibleTimer--; if (player.invincibleTimer <= 0) player.invincible = false; }
+
+                if (blackoutWarningActive) {
+                    blackoutTimer--;
+                    if (blackoutTimer <= 0) { blackoutWarningActive = false; isStageDark = true; }
+                }
+
+                items.forEach((item, index) => {
+                    if (player.x < item.x + 32 && player.x + player.width > item.x && player.y < item.y + 32 && player.y + player.height > item.y) {
+                        if (item.type === "flashlight") { hasFlashlight = true; isLightOn = true; isStageDark = true; showMessage("전등을 획득했습니다! L키로 조작하세요."); }
+                        if (item.type === "cloud") { cloudTimer = 300; showMessage("구름 획득! 비행이 가능합니다."); }
+                        if (item.type === "heart") { if (hp < maxHp) hp++; }
+                        if (item.type === "seed") { totalSeeds++; }
+                        items.splice(index, 1);
+                    }
+                });
+
+                bullets.forEach(b => { b.x += b.vx; b.life--; }); 
+                bullets = bullets.filter(b => b.life > 0 && b.pierce > 0);
+                
+                particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life--; }); particles = particles.filter(p => p.life > 0);
+
+                aoeWarnings.forEach((aoe, index) => {
+                    aoe.timer--;
+                    if (aoe.timer <= 0) {
+                        if (!player.invincible && player.x < aoe.x + aoe.w && player.x + player.width > aoe.x && player.y < aoe.y + aoe.h && player.y + player.height > aoe.y) applyDamage();
+                        createParticles(aoe.x + aoe.w/2 - 16, aoe.y + aoe.h - 32, "#F1C40F"); aoeWarnings.splice(index, 1);
+                    }
+                });
+
+                enemies.forEach(en => {
+                    en.animTick++;
+                    en.x += 1.5 * en.dir;
+                    if (en.x < en.startX - 80 || en.x > en.startX + 80) en.dir *= -1;
+                    if (en.type === "insect") en.y += Math.sin(en.animTick * 0.2) * 2; 
+                    if (en.type === "slime") en.y += (en.animTick % 20 < 10) ? -1 : 1; // 꿀렁거림
+
+                    bullets.forEach(b => {
+                        if (b.pierce > 0 && b.x < en.x + en.w && b.x + b.width > en.x && b.y < en.y + en.h && b.y + b.height > en.y) {
+                            b.pierce--; en.hp--;
+                            if (en.hp <= 0) { score += 100; createParticles(en.x, en.y, "#E74C3C"); }
+                        }
+                    });
+
+                    if (!player.invincible && player.x < en.x + en.w && player.x + player.width > en.x && player.y < en.y + en.h && player.y + player.height > en.y) applyDamage();
+                });
+
+                if (boss && boss.hp > 0) {
+                    boss.y += Math.sin(Date.now() / 300) * 1.5; 
+                    boss.attackTimer--;
+                    if (boss.attackTimer <= 0) { 
+                        aoeWarnings.push({x: player.x - 15, y: 0, w: 60, h: 600, timer: 45}); 
+                        boss.attackTimer = 100; 
+                    }
+
+                    bullets.forEach(b => {
+                        if (b.pierce > 0 && b.x < boss.x + boss.w && b.x + b.width > boss.x && b.y < boss.y + boss.h && b.y + b.height > boss.y) {
+                            b.pierce--; boss.hp--;
+                            if (boss.hp <= 0) {
+                                score += 1000; createParticles(boss.x + 48, boss.y + 48, "#E74C3C");
+                                gameState = "ENDING_ANIM"; animTimer = 0; isStageDark = false;
+                                showMessage("성공! 성이 정화되었습니다.");
+                            }
+                        }
+                    });
+
+                    if (!player.invincible && player.x < boss.x + boss.w && player.x + player.width > boss.x && player.y < boss.y + boss.h && player.y + player.height > boss.y) applyDamage();
+                }
+
+                enemies = enemies.filter(en => en.hp > 0);
+
+            } else if (gameState === "STAGE_CLEAR_ANIM") {
+                animTimer++; player.y -= 1.5; // 구름 타고 위로 올라감
+                if (animTimer > 120) { gameState = "MAP_TRANSITION"; animTimer = 0; }
+            } else if (gameState === "MAP_TRANSITION") {
+                animTimer++;
+                if (animTimer > 150) { currentStage++; initStage(); gameState = "DIALOG"; }
+            } else if (gameState === "ENDING_ANIM") {
+                animTimer++;
+            }
+        }
+
+        function applyDamage() {
+            if (player.isDefending) {
+                createParticles(player.x + 16, player.y + 16, "#3498DB");
+                return; 
+            }
+            hp--; player.invincible = true; player.invincibleTimer = 90;
+            player.vy = -6; player.x -= 20; cloudTimer = 0;
+            if (hp <= 0) gameState = "GAME_OVER";
+        }
+
+        function drawPixelSprite(targetCtx, spriteData, x, y, sizeMultiplier = 2) {
+            const pixelSize = sizeMultiplier;
+            for (let row = 0; row < spriteData.length; row++) {
+                for (let col = 0; col < spriteData[row].length; col++) {
+                    const char = spriteData[row][col];
+                    if (char !== '.') {
+                        targetCtx.fillStyle = palette[char];
+                        targetCtx.fillRect(x + (col * pixelSize), y + (row * pixelSize), pixelSize, pixelSize);
+                    }
+                }
+            }
+        }
+
+        function drawTrefoilWindow(tCtx, x, y, width, height) {
+            tCtx.fillStyle = "#87CEEB"; // 하늘색 반사
+            tCtx.fillRect(x, y + width/2, width, height - width/2);
+            tCtx.beginPath();
+            tCtx.arc(x + width/2, y + width/4, width/3, 0, Math.PI*2); 
+            tCtx.arc(x + width*0.2, y + width*0.5, width/3.5, 0, Math.PI*2);
+            tCtx.arc(x + width*0.8, y + width*0.5, width/3.5, 0, Math.PI*2);
+            tCtx.fill();
+            
+            tCtx.strokeStyle = "#D2B48C"; tCtx.lineWidth = 3;
+            tCtx.strokeRect(x, y + width/2, width, height - width/2);
+            tCtx.beginPath();
+            tCtx.arc(x + width/2, y + width/4, width/3, Math.PI, 0); 
+            tCtx.stroke();
+        }
+
+        function drawGardenIntro() {
+            // 1단계: 빈 공간 (하늘만 존재)
+            ctx.fillStyle = "#87CEEB"; ctx.fillRect(0, 0, canvas.width, canvas.height); 
+
+            let doorX = canvas.width / 2; 
+            let doorY = 400;
+
+            // 2단계: 성과 정원 서서히 페이드인 (introTimer 200 ~ 400 구간)
+            ctx.save();
+            let fadeAlpha = Math.max(0, Math.min(1, (introTimer - 150) / 100));
+            ctx.globalAlpha = fadeAlpha;
+
+            // 성 외관 (완전 밝은 아이보리/코튼 톤)
+            ctx.fillStyle = "#FFFFF0"; 
+            ctx.fillRect(doorX - 250, doorY - 300, 500, 300); 
+            ctx.fillRect(doorX - 300, doorY - 350, 80, 350);  
+            ctx.fillRect(doorX + 220, doorY - 400, 100, 400); 
+            
+            ctx.fillStyle = "#FFFFF0";
+            for(let i=0; i<15; i++) ctx.fillRect(doorX - 250 + (i*35), doorY - 320, 20, 20);
+            
+            for(let i=0; i<4; i++) {
+                drawTrefoilWindow(ctx, doorX - 200 + (i*120), doorY - 200, 40, 80);
+                drawTrefoilWindow(ctx, doorX - 200 + (i*120), doorY - 100, 40, 80);
+            }
+            drawTrefoilWindow(ctx, doorX - 280, doorY - 280, 40, 100); 
+            drawTrefoilWindow(ctx, doorX + 250, doorY - 300, 40, 120); 
+
+            // 정원 (기하학적 패턴)
+            ctx.fillStyle = "#F5DEB3"; 
+            ctx.fillRect(doorX - 600, doorY, 1200, 600);
+
+            ctx.fillStyle = "#27AE60";
+            ctx.fillRect(doorX - 400, doorY + 20, 300, 150);
+            ctx.fillRect(doorX + 100, doorY + 20, 300, 150);
+            ctx.fillRect(doorX - 400, doorY + 250, 300, 200);
+            ctx.fillRect(doorX + 100, doorY + 250, 300, 200);
+
+            ctx.strokeStyle = "#D2B48C"; ctx.lineWidth = 15;
+            ctx.strokeRect(doorX - 350, doorY + 50, 200, 90);
+            ctx.strokeRect(doorX + 150, doorY + 50, 200, 90);
+            ctx.beginPath(); ctx.arc(doorX - 250, doorY + 350, 50, 0, Math.PI*2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(doorX + 250, doorY + 350, 50, 0, Math.PI*2); ctx.stroke();
+
+            ctx.fillStyle = "#228B22";
+            for(let i=0; i<5; i++) {
+                ctx.beginPath(); ctx.arc(doorX - 300, doorY + 40 + (i*40), 15, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(doorX + 300, doorY + 40 + (i*40), 15, 0, Math.PI*2); ctx.fill();
+            }
+
+            ctx.fillStyle = "#87CEEB";
+            ctx.beginPath(); ctx.arc(doorX, doorY + 120, 60, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = "#BDC3C7"; ctx.lineWidth = 6; ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.fillRect(doorX - 2, doorY + 100 - Math.abs(Math.sin(introTimer*0.2))*15, 4, 30);
+            ctx.restore(); // 투명도 원상복구
+
+            // 유저 걷는 모션 (화면 아래에서부터 천천히 등장)
+            if (introTimer < 600) {
+                introPlayerY -= 0.8;
+                introPlayerScale = Math.max(2, introPlayerScale - 0.003); 
+            }
+            
+            let walkBounce = Math.abs(Math.sin(introTimer * 0.1)) * 4;
+            let py = introPlayerY - walkBounce;
+            
+            if (introTimer < 650) {
+                drawPixelSprite(ctx, playerBackSprite, doorX - (8*introPlayerScale), py, introPlayerScale);
+            }
+            
+            // 암전 처리
+            if (introTimer > 650) {
+                let alpha = Math.min(1, (introTimer - 650) / 50);
+                ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+                ctx.fillRect(0,0,canvas.width, canvas.height);
+                if (introTimer > 720) { gameState = "DIALOG"; introTimer = 0; }
+            }
+        }
+
+        function drawLilyFlower(fX, fY, progress) {
+            ctx.fillStyle = "#27AE60"; 
+            let stemHeight = Math.min(40, progress * 10);
+            ctx.fillRect(fX, fY - stemHeight, 2, stemHeight);
+            
+            if (progress > 4) {
+                ctx.fillStyle = "#2ECC71"; 
+                ctx.beginPath(); ctx.ellipse(fX - 10, fY - 10, 10, 4, Math.PI/4, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(fX + 10, fY - 15, 8, 3, -Math.PI/4, 0, Math.PI*2); ctx.fill();
+            }
+            if (progress > 8) {
+                ctx.fillStyle = "white"; 
+                const drawBell = (bx, by) => {
+                    ctx.fillRect(bx, by, 4, 4);
+                    ctx.fillRect(bx-1, by+2, 6, 3);
+                    ctx.fillRect(bx-2, by+4, 8, 2);
+                };
+                drawBell(fX - 8, fY - 30);
+                drawBell(fX + 4, fY - 20);
+                drawBell(fX - 6, fY - 10);
+            }
+        }
+
+        function drawMapTransition() {
+            ctx.fillStyle = "#2c3e50"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#F1C40F"; ctx.lineWidth = 4; ctx.beginPath();
+            for(let i=0; i<mapNodes.length - 1; i++) {
+                ctx.moveTo(mapNodes[i].x, mapNodes[i].y); ctx.lineTo(mapNodes[i+1].x, mapNodes[i+1].y);
+            }
+            ctx.stroke();
+
+            mapNodes.forEach((node, i) => {
+                ctx.fillStyle = (i + 1 <= currentStage) ? "#E74C3C" : "#34495e";
+                ctx.beginPath(); ctx.arc(node.x, node.y, 15, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = "white"; ctx.font = "16px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText(`ST ${i+1}`, node.x, node.y - 25);
+            });
+
+            let startNode = mapNodes[currentStage - 1]; let endNode = mapNodes[currentStage];
+            let progress = Math.min(animTimer / 100, 1.0); 
+            let px = startNode.x + (endNode.x - startNode.x) * progress;
+            let py = startNode.y + (endNode.y - startNode.y) * progress;
+
+            ctx.save(); ctx.translate(px, py - 16); drawPixelSprite(ctx, playerSprite, -16, -16, 2); ctx.restore();
+
+            ctx.fillStyle = "white"; ctx.font = "30px DungGeunMo"; ctx.textAlign = "center";
+            ctx.fillText("다음 구역으로 이동 중...", 400, 50); ctx.textAlign = "left";
+        }
+
+        function drawUI() {
+            ctx.strokeStyle = "#F1C40F"; ctx.lineWidth = 2;
+            ctx.strokeRect(10, 10, 160, 20);
+            ctx.fillStyle = "white"; ctx.font = "12px DungGeunMo"; ctx.fillText("HP", 15, 24);
+            for(let i=0; i<hp; i++) drawPixelSprite(ctx, heartSprite, 40 + (i * 24), 14, 1);
+            
+            ctx.fillStyle = "#34495e"; ctx.fillRect(10, 35, 160, 10);
+            ctx.fillStyle = "#3498DB"; ctx.fillRect(10, 35, (160 / maxStamina) * stamina, 10);
+            ctx.strokeStyle = "white"; ctx.strokeRect(10, 35, 160, 10);
+
+            const boxes = [`새싹: ${totalSeeds}`, `LV ${currentStage}`];
+            boxes.forEach((txt, i) => {
+                ctx.strokeRect(180 + (i * 70), 10, 60, 20);
+                ctx.fillStyle = "white"; ctx.fillText(txt, 185 + (i * 70), 24);
+            });
+
+            if (cloudTimer > 0) {
+                ctx.fillStyle = "#3498DB";
+                ctx.fillText(`☁ 구름 남은 시간: ${Math.ceil(cloudTimer/60)}초`, 350, 24);
+            }
+
+            if (gameState === "DIALOG") {
+                ctx.strokeStyle = "#F1C40F"; ctx.lineWidth = 2;
+                ctx.strokeRect(30, 460, 740, 60);
+                ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; ctx.fillRect(30, 460, 740, 60);
+                
+                // 캐릭터 모션 (스토리 집중도를 높이는 액션)
+                let miniTick = Date.now() / 200;
+                let miniY = 445 - (Math.abs(Math.sin(miniTick)) * 6); // 점프 모션
+                let miniScaleX = (Math.floor(miniTick / 5) % 2 === 0) ? 1 : -1; // 좌우 두리번
+                
+                ctx.save();
+                ctx.translate(65 + 16, miniY);
+                ctx.scale(miniScaleX, 1);
+                drawPixelSprite(ctx, playerSprite, -16, 0, 1);
+                ctx.restore();
+
+                ctx.fillStyle = "#E74C3C"; ctx.font = "14px DungGeunMo"; ctx.fillText("은방울", 100, 480);
+                ctx.fillStyle = "white"; ctx.fillText(stageDialogs[currentStage][dialogIndex], 100, 505);
+                if (Math.floor(Date.now() / 300) % 2 === 0) ctx.fillText("▼", 750, 505);
+            } else if (gameState === "PLAY" || gameState === "ENDING_ANIM") {
+                ctx.fillStyle = "rgba(241, 196, 15, 0.2)"; ctx.strokeStyle = "#F1C40F";
+                for(let key in vButtons) {
+                    let btn = vButtons[key];
+                    ctx.fillStyle = btn.pressed ? "rgba(241, 196, 15, 0.6)" : "rgba(241, 196, 15, 0.2)";
+                    ctx.fillRect(btn.x, btn.y, btn.w, btn.h); ctx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+                    ctx.fillStyle = "white"; ctx.font = "20px DungGeunMo"; ctx.textAlign = "center";
+                    ctx.fillText(btn.label, btn.x + btn.w/2, btn.y + btn.h/2 + 7);
+                }
+                ctx.textAlign = "left";
+            }
+
+            if (blackoutWarningActive) {
+                ctx.fillStyle = "rgba(231, 76, 60, 0.8)";
+                ctx.fillRect(250, 150, 300, 50);
+                ctx.fillStyle = "white"; ctx.font = "24px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText(`주의: ${Math.ceil(blackoutTimer/60)}초 후 암전!`, 400, 185); ctx.textAlign = "left";
+            }
+        }
+
+        function draw() {
+            if (gameState === "START_SCREEN") {
+                ctx.fillStyle = "#2c3e50"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white"; ctx.font = "bold 40px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText("은방울의 모험", 400, 315);
+                ctx.font = "20px DungGeunMo"; ctx.fillText("터치하여 세계로 입장하세요", 400, 450); ctx.textAlign = "left";
+                return;
+            }
+            
+            if (gameState === "CASTLE_INTRO") { 
+                introTimer++; 
+                drawGardenIntro(); 
+                return; 
+            }
+            if (gameState === "MAP_TRANSITION") { drawMapTransition(); return; }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let bgOffsetX = - (cameraX * 0.3) % 400; 
+            ctx.drawImage(bgCanvas, bgOffsetX, 0);
+
+            if (gameState === "DIALOG") { drawUI(); return; }
+
+            ctx.save(); ctx.translate(-cameraX, 0);
+
+            platforms.forEach(p => {
+                ctx.fillStyle = "#bdc3c7"; ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.fillStyle = "#7f8c8d"; ctx.fillRect(p.x, p.y, p.w, 5); 
+            });
+
+            // 물리적 탈출 '문' 대신 '구름' 오브젝트 렌더링
+            if (goal) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+                ctx.beginPath();
+                ctx.arc(goal.x + 15, goal.y + 20, 15, 0, Math.PI*2);
+                ctx.arc(goal.x + 30, goal.y + 15, 20, 0, Math.PI*2);
+                ctx.arc(goal.x + 45, goal.y + 20, 15, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = "#3498DB"; ctx.font = "14px DungGeunMo"; ctx.fillText("NEXT", goal.x + 15, goal.y + 5);
+            }
+
+            items.forEach(item => {
+                if (item.type === "flashlight") {
+                    ctx.shadowBlur = 10; ctx.shadowColor = "#F1C40F";
+                    ctx.fillStyle = "#F1C40F"; ctx.fillRect(item.x, item.y+10, 20, 10); ctx.fillRect(item.x+20, item.y+5, 10, 20);
+                    ctx.shadowBlur = 0; ctx.fillStyle = "white"; ctx.font = "20px DungGeunMo"; 
+                    ctx.fillText("↓", item.x + 5, item.y - 10 + Math.sin(Date.now()/150)*5); 
+                } else if (item.type === "cloud") {
+                    ctx.fillStyle = "white"; ctx.beginPath();
+                    ctx.arc(item.x+10, item.y+20, 10, 0, Math.PI*2); ctx.arc(item.x+20, item.y+15, 15, 0, Math.PI*2); ctx.arc(item.x+30, item.y+20, 10, 0, Math.PI*2); ctx.fill();
+                } else if (item.type === "heart") {
+                    drawPixelSprite(ctx, heartSprite, item.x, item.y, 2);
+                } else if (item.type === "seed") {
+                    ctx.fillStyle = "#2ECC71"; ctx.beginPath(); ctx.arc(item.x+16, item.y+16, 8, 0, Math.PI*2); ctx.fill();
+                }
+            });
+
+            aoeWarnings.forEach(aoe => {
+                ctx.fillStyle = `rgba(231, 76, 60, ${0.3 + Math.sin(Date.now()/50)*0.2})`; ctx.fillRect(aoe.x, aoe.y, aoe.w, aoe.h);
+                if (aoe.timer < 10) { ctx.fillStyle = "#F1C40F"; ctx.fillRect(aoe.x + aoe.w/2 - 10, aoe.y, 20, aoe.h); }
+            });
+
+            enemies.forEach(en => {
+                ctx.save();
+                ctx.translate(en.x, en.y);
+                if (en.type === "demon") drawPixelSprite(ctx, demonSprite, 0, 0, 2);
+                else if (en.type === "insect") drawPixelSprite(ctx, insectSprite, 0, 0, 2);
+                else if (en.type === "slime") drawPixelSprite(ctx, slimeSprite, 0, 0, 2);
+                ctx.restore();
+                ctx.fillStyle = "#c0392b"; ctx.fillRect(en.x, en.y - 10, en.w, 4);
+                ctx.fillStyle = "#2ecc71"; ctx.fillRect(en.x, en.y - 10, (en.w / 3) * en.hp, 4);
+            });
+
+            if (boss && boss.hp > 0) {
+                ctx.fillStyle = "#F5F5DC"; ctx.fillRect(boss.x, boss.y, boss.w, boss.h); // 보스 외형 밝은 톤
+                ctx.fillStyle = "#c0392b"; ctx.fillRect(boss.x, boss.y - 20, boss.w, 10); 
+                ctx.fillStyle = "#F1C40F"; ctx.fillRect(boss.x, boss.y - 20, (boss.w / boss.maxHp) * boss.hp, 10);
+            }
+
+            bullets.forEach(b => { 
+                if (b.type === "normal") {
+                    ctx.fillStyle = "#E67E22"; ctx.beginPath(); ctx.arc(b.x + b.width/2, b.y + b.height/2, b.height, 0, Math.PI*2); ctx.fill();
+                } else {
+                    ctx.fillStyle = "#3498DB"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.fillStyle = "white"; ctx.fillRect(b.vx > 0 ? b.x + b.width - 5 : b.x, b.y + 5, 5, b.height - 10);
+                }
+            });
+            particles.forEach(p => { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); });
+
+            // 플레이어 렌더링
+            if (gameState !== "ENDING_ANIM" || animTimer < 500) {
+                if (!player.invincible || Math.floor(player.invincibleTimer / 4) % 2 === 0) {
+                    ctx.save(); ctx.translate(player.x + player.width/2, player.y); ctx.scale(player.facing, 1);
+                    if (player.isDefending) {
+                        ctx.strokeStyle = "#3498DB"; ctx.lineWidth = 3;
+                        ctx.beginPath(); ctx.arc(0, 16, 22, -Math.PI/2, Math.PI/2); ctx.stroke();
+                    }
+                    if (cloudTimer > 0 || gameState === "STAGE_CLEAR_ANIM") {
+                        ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.beginPath();
+                        ctx.arc(-10, 30, 15, 0, Math.PI*2); ctx.arc(0, 25, 20, 0, Math.PI*2); ctx.arc(10, 30, 15, 0, Math.PI*2); ctx.fill();
+                    }
+                    drawPixelSprite(ctx, playerSprite, -player.width/2, 0, 2); ctx.restore();
+                }
+            }
+
+            // 구름을 소환하여 날아가는 엔딩 시퀀스
+            if (gameState === "ENDING_ANIM") {
+                let bloomX = player.x + 50;
+                let bloomY = player.y + 32;
+
+                if (animTimer > 100 && animTimer <= 200) {
+                    ctx.fillStyle = "white"; ctx.fillText("새싹을 심는 중...", player.x - 20, player.y - 20);
+                }
+                if (animTimer > 200) {
+                    drawLilyFlower(bloomX, bloomY, (animTimer - 200) / 10);
+                }
+                if (animTimer > 500) {
+                    let escapeX = player.x + (animTimer - 500) * 1.5;
+                    let escapeY = player.y - Math.sin((animTimer - 500)*0.05) * 10 - (animTimer > 600 ? (animTimer-600) : 0);
+                    
+                    ctx.save(); ctx.translate(escapeX + player.width/2, escapeY); ctx.scale(1, 1);
+                    
+                    // 거대한 탈출 구름
+                    ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.beginPath();
+                    ctx.arc(-25, 30, 25, 0, Math.PI*2); ctx.arc(5, 20, 35, 0, Math.PI*2); ctx.arc(35, 30, 25, 0, Math.PI*2); ctx.fill();
+                    
+                    drawPixelSprite(ctx, playerSprite, -player.width/2, 0, 2); ctx.restore();
+                }
+            }
+
+            ctx.restore(); 
+
+            if (isStageDark && gameState !== "ENDING_ANIM") {
+                if (darknessAlpha < 0.95) darknessAlpha += 0.02;
+
+                darkCtx.clearRect(0, 0, darkCanvas.width, darkCanvas.height);
+                darkCtx.fillStyle = `rgba(0, 0, 0, ${darknessAlpha})`;
+                darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height);
+
+                if (isLightOn && darknessAlpha > 0) {
+                    darkCtx.globalCompositeOperation = "destination-out";
+                    let px = player.x + 16 - cameraX; let py = player.y + 16;
+                    
+                    let gradient = darkCtx.createRadialGradient(px, py, 50, px, py, 350);
+                    gradient.addColorStop(0, "rgba(0,0,0,1)");
+                    gradient.addColorStop(0.5, "rgba(0,0,0,0.5)");
+                    gradient.addColorStop(1, "rgba(0,0,0,0)");
+                    
+                    darkCtx.fillStyle = gradient;
+                    darkCtx.beginPath();
+                    
+                    let angle = player.facing === 1 ? 0 : Math.PI;
+                    darkCtx.arc(px, py, 350, angle - 0.6, angle + 0.6); 
+                    darkCtx.fill();
+                    
+                    darkCtx.beginPath(); darkCtx.arc(px, py, 40, 0, Math.PI*2); darkCtx.fill(); 
+                    darkCtx.globalCompositeOperation = "source-over"; 
+                }
+                ctx.drawImage(darkCanvas, 0, 0);
+            }
+
+            drawUI();
+
+            if (inGameMessageTimer > 0) {
+                ctx.fillStyle = "rgba(0,0,0,0.8)"; ctx.fillRect(100, 80, 600, 50);
+                ctx.fillStyle = "white"; ctx.font = "18px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText(inGameMessage, 400, 110); ctx.textAlign = "left";
+                inGameMessageTimer--;
+            }
+
+            if (gameState === "GAME_OVER") {
+                ctx.fillStyle = "rgba(0,0,0,0.8)"; ctx.fillRect(0,0,800,600);
+                ctx.fillStyle = "#E74C3C"; ctx.font = "50px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", 400, 300);
+                ctx.fillStyle = "#F1C40F"; ctx.fillRect(300, 350, 200, 60);
+                ctx.fillStyle = "black"; ctx.font = "20px DungGeunMo"; ctx.fillText("처음으로", 400, 388);
+            } else if (gameState === "ENDING_ANIM" && animTimer > 800) {
+                ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(0,0,800,600);
+                ctx.fillStyle = "#F1C40F"; ctx.font = "50px DungGeunMo"; ctx.textAlign = "center";
+                ctx.fillText("하늘로 무사히 탈출했습니다!", 400, 250);
+                
+                ctx.save();
+                let glowIntensity = Math.abs(Math.sin(Date.now() / 300)) * 20 + 10;
+                ctx.shadowBlur = glowIntensity; ctx.shadowColor = "#F1C40F";
+                ctx.fillStyle = "#27ae60"; ctx.fillRect(300, 350, 200, 60);
+                ctx.restore();
+
+                ctx.fillStyle = "white"; ctx.font = "20px DungGeunMo"; ctx.fillText("처음으로", 400, 388);
+            }
+        }
+
+        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
+        initStage(); gameLoop();
+    </script>
+</body>
+</html>

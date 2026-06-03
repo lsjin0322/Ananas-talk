@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>은방울의 모험 2</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0a0620">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="은방울의 모험">
+</head>
+<body>
+  
+<div id="wrap">
+  <canvas id="gc" width="800" height="600"></canvas>
+  <div id="ui">
+    <div id="hud">
+      <div class="hb">HP<div id="heartsRow"></div></div>
+      <div class="hb">🛡️<span id="hShield">0</span></div>
+      <div class="hb">🌱<span id="hSeed">0</span></div>
+      <div class="hb">🔔<span id="hBell">0</span></div>
+      <div class="hb">🪙<span id="hCoin">0</span></div>
+      <div class="hb">⭐<span id="hStar">0</span></div>
+      <div class="hb">LV<span id="hLv">1</span></div>
+    </div>
+    
+    <div id="questPanel">
+      <div class="qt">📜 퀘스트</div>
+      <div id="questList"></div>
+    </div>
+    
+    <div id="invBar">
+      <div class="islot">🌱<span class="icnt" id="iSeed">0</span></div>
+      <div class="islot">🔔<span class="icnt" id="iBell">0</span></div>
+      <div class="islot">🪙<span class="icnt" id="iCoin">0</span></div>
+      <div class="islot">⭐<span class="icnt" id="iStar">0</span></div>
+    </div>
+    
+    <div id="notif"></div>
+    <div id="stgTitle"></div>
+    
+    <div id="dlgBox">
+      <div class="spk" id="dlgSpk"></div>
+      <div id="dlgTxt"></div>
+      <div class="arr">▼</div>
+    </div>
+    
+    <div id="ctrlHint">← → 이동 | ↑/↑↑ 점프/더블점프 | Z 공격 | X 씨앗심기 | C 지도 | Enter 대화</div>
+    
+    <div id="worldMap">
+      <div id="mapTitle">🗺 월드맵</div>
+      <div id="mapSub">스테이지를 선택하세요</div>
+      <canvas id="mapCanvas" width="800" height="400"></canvas>
+      <div class="map-legend">
+        <span class="legend-normal">①~④ 일반</span>
+        <span class="legend-boss">⑤ 보스</span>
+        <span class="legend-secret">⑥ 비밀</span>
+        <span class="legend-locked">🔒 미해금</span>
+      </div>
+      <button class="gbtn" id="closeMapBtn">✕ 닫기</button>
+    </div>
+    
+    <div id="puzzleScreen">
+      <div id="puzzleTitle">🌿 퍼즐 & 기믹</div>
+      <div id="puzzleDesc"></div>
+      <div id="puzzleLives">남은 기회: <span id="pLifeCnt">3</span></div>
+      <div id="puzzleGrid"></div>
+      <div id="puzzleResult"></div>
+      <button class="gbtn" id="skipPuzzleBtn">건너뛰기</button>
+    </div>
+    
+    <div id="stageClear">
+      <h2>✨ 스테이지 클리어! ✨</h2>
+      <div class="starsRow" id="clearStars"></div>
+      <p id="clearMsg"></p>
+      <div>
+        <button class="gbtn" id="clearMapBtn">🗺 월드맵</button>
+        <button class="gbtn" id="nextStageBtn">다음 ▶</button>
+      </div>
+    </div>
+    
+    <div id="gameOver">
+      <h2 id="goMsg">💀 게임 오버</h2>
+      <button class="gbtn" id="restartBtn">다시 시작</button>
+      <button class="gbtn" id="goMapBtn">🗺 월드맵</button>
+    </div>
+    
+    <div id="titleScreen">
+      <h1>은방울의 모험 2</h1>
+      <div class="ver">NEW VERSION 2.0</div>
+      <div class="sub">LILY OF THE VALLEY</div>
+      <div class="tag">작고 용감한 꽃의 위대한 여행<br>세상을 치유하는 마법의 여정</div>
+      <button class="startBtn" id="startBtn">▶ 게임 시작 ★</button>
+      <button class="sbtn" id="titleMapBtn">🗺 스테이지 선택</button>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

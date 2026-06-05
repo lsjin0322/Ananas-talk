@@ -23,4 +23,5 @@
 ---
 
 ### 📘 Deep Dive (Notion)
-- [Web 핵심 이론 아카이브 바로가기 ↗️](본인의_노션_링크)
+웹 이론정리 노션 바로가기 ↓
+(https://app.notion.com/p/Web-34bf07c99a898017979ffca55467ad4c?source=copy_link)

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ANANAS — 아나나스 메신저</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════ SPLASH SCREEN ══════════════ -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-bg-dots"></div>
+    <div class="splash-logo-wrap" id="splashLogo">
+      <span class="splash-letter letter-a1">A</span>
+      <span class="splash-letter letter-n1">N</span>
+      <span class="splash-letter letter-a2">A</span>
+      <span class="splash-letter letter-n2">N</span>
+      <span class="splash-letter letter-a3">A</span>
+      <span class="splash-letter letter-s">S</span>
+    </div>
+    <div class="splash-sub" id="splashSub">아나나스메신저</div>
+    <div class="splash-progress">
+      <div class="splash-progress-bar" id="splashProgressBar"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MAIN HOMEPAGE ══════════════ -->
+  <div class="site-wrapper" id="siteWrapper">
+
+    <header class="site-header" id="siteHeader">
+      <div class="header-inner">
+        <div class="header-logo" onclick="switchPage('home')">
+          <img src="./images/hero.png" class="logo-pixel-img" alt="logo">
+          <span class="logo-text">Ananas</span>
+        </div>
+        <nav class="site-nav">
+          <button class="nav-btn active" data-page="home" onclick="switchPage('home')">홈</button>
+          <button class="nav-btn" data-page="features" onclick="switchPage('features')">기능 소개</button>
+          <button class="nav-btn" data-page="rooms" onclick="switchPage('rooms')">아지트</button>
+          <button class="nav-btn" data-page="about" onclick="switchPage('about')">브랜드 스토리</button>
+        </nav>
+        <div class="header-actions">
+          <button class="power-btn" id="powerBtn" title="아나나스 톡 시작하기">
+            <span class="power-icon">⏻</span>
+            <span class="power-label">톡 시작</span>
+            <span class="power-pulse"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="site-main" id="siteMain">
+
+      <!-- ── PAGE: HOME ── -->
+      <section id="page-home" class="page active">
+
+        <div class="hero-section">
+          <div class="hero-content">
+            <div class="hero-eyebrow">
+              <span class="eyebrow-dot"></span>
+              NEW SEASON ARRIVED
+            </div>
+
+            <!-- 커튼 모션 타이틀 -->
+            <h1 class="hero-title">
+              <span class="curtain-line"><span class="curtain-text">우리만의</span></span>
+              <span class="curtain-line"><span class="curtain-text accent-outline">아지트에서</span></span>
+              <span class="curtain-line"><span class="curtain-text">만나요.</span></span>
+            </h1>
+
+            <p class="hero-desc">채팅은 기본, 나만의 공간에서 소통하고 공유하는<br>새로운 메신저 경험</p>
+            <div class="hero-cta">
+              <button class="cta-primary" onclick="document.getElementById('powerBtn').click()">
+                아지트 만들기
+              </button>
+              <button class="cta-secondary" onclick="switchPage('features')">
+                더 알아보기 →
+              </button>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-item">
+                <span class="stat-num">공지</span>
+                <span class="stat-label">고정</span>
+              </div>
+              <div class="stat-div"></div>
+              <div class="stat-item">
+                <span class="stat-num">사진</span>
+                <span class="stat-label">공유</span>
+              </div>
+              <div class="stat-div"></div>
+              <div class="stat-item">
+                <span class="stat-num">검색</span>
+                <span class="stat-label">기능</span>
+              </div>
+              <div class="stat-div"></div>
+              <div class="stat-item">
+                <span class="stat-num">링크</span>
+                <span class="stat-label">초대</span>
+              </div>
+            </div>
+
+            <!-- 최근 방문 채팅방 -->
+            <div class="recent-rooms-wrap" id="recentRoomsWrap" style="display:none">
+              <p class="recent-label">최근 방문한 아지트</p>
+              <div class="recent-rooms-list" id="recentRoomsList"></div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-img-frame">
+              <img src="./images/hero.png" alt="아나나스 톡방" class="hero-img">
+              <div class="hero-img-glow"></div>
+            </div>
+            <div class="floating-badge badge-1">새 메시지</div>
+            <div class="floating-badge badge-2">아지트 개설</div>
+          </div>
+        </div>
+
+        <!-- MARQUEE TICKER -->
+        <div class="ticker-wrap">
+          <div class="ticker-track">
+            <span>ANANAS TALK</span><span class="tick-dot">✦</span>
+            <span>실시간 채팅</span><span class="tick-dot">✦</span>
+            <span>나만의 아지트</span><span class="tick-dot">✦</span>
+            <span>공지 고정</span><span class="tick-dot">✦</span>
+            <span>사진 공유</span><span class="tick-dot">✦</span>
+            <span>메시지 검색</span><span class="tick-dot">✦</span>
+            <span>링크 초대</span><span class="tick-dot">✦</span>
+            <span>ANANAS TALK</span><span class="tick-dot">✦</span>
+            <span>실시간 채팅</span><span class="tick-dot">✦</span>
+            <span>나만의 아지트</span><span class="tick-dot">✦</span>
+            <span>공지 고정</span><span class="tick-dot">✦</span>
+            <span>사진 공유</span><span class="tick-dot">✦</span>
+            <span>메시지 검색</span><span class="tick-dot">✦</span>
+            <span>링크 초대</span><span class="tick-dot">✦</span>
+          </div>
+        </div>
+
+        <!-- HOME CARDS -->
+        <div class="home-cards">
+          <div class="hcard hcard-yellow" onclick="switchPage('features')">
+            <div class="hcard-img-wrap">
+              <img src="./images/elements.png" class="hcard-pixel" alt="">
+            </div>
+            <h3>실시간 채팅</h3>
+            <p>소켓 기반 즉시 전송</p>
+            <span class="hcard-arrow">→</span>
+          </div>
+          <div class="hcard hcard-dark" onclick="document.getElementById('powerBtn').click()">
+            <div class="hcard-img-wrap">
+              <img src="./images/elements.png" class="hcard-pixel" alt="">
+            </div>
+            <h3>아지트 개설</h3>
+            <p>방장이 되어 공간 만들기</p>
+            <span class="hcard-arrow">→</span>
+          </div>
+          <div class="hcard hcard-cream" onclick="switchPage('rooms')">
+            <div class="hcard-img-wrap">
+              <img src="./images/elements.png" class="hcard-pixel" alt="">
+            </div>
+            <h3>링크 초대</h3>
+            <p>코드 하나로 친구 초대</p>
+            <span class="hcard-arrow">→</span>
+          </div>
+          <div class="hcard hcard-green" onclick="switchPage('about')">
+            <div class="hcard-img-wrap">
+              <img src="./images/hero.png" class="hcard-pixel" alt="">
+            </div>
+            <h3>브랜드 스토리</h3>
+            <p>아나나스가 태어난 이유</p>
+            <span class="hcard-arrow">→</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── PAGE: FEATURES ── -->
+      <section id="page-features" class="page hidden">
+        <div class="page-header">
+          <span class="page-eyebrow">FEATURES</span>
+          <h2 class="page-title">아나나스가 특별한 이유</h2>
+          <p class="page-subtitle">카카오톡에서 영감을 받아, 더 자유롭게 설계했습니다</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card big">
+            <div class="feature-num">01</div>
+            <h3>초저지연 실시간 채팅</h3>
+            <p>WebSocket 기반으로 메시지가 전송되는 순간, 모든 참여자에게 동시에 도착합니다.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">02</div>
+            <h3>방 코드 초대</h3>
+            <p>6자리 고유 코드로 원하는 사람만 초대. 링크로도 쉽게 입장.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">03</div>
+            <h3>대화 내용 저장</h3>
+            <p>서버에 최대 500개 보관. 나중에 들어와도 이전 대화 확인 가능.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">04</div>
+            <h3>메시지 검색</h3>
+            <p>채팅방 내 키워드 실시간 검색. 결과 하이라이트 표시.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">05</div>
+            <h3>공지 고정</h3>
+            <p>방장이 중요 메시지를 상단에 고정. 모든 참여자에게 즉시 표시.</p>
+          </div>
+          <div class="feature-card big-right">
+            <div class="feature-num">06</div>
+            <h3>사진 공유 + 온라인 인원</h3>
+            <p>이미지를 채팅에서 바로 전송. 현재 접속 중인 인원도 실시간 확인.</p>
+          </div>
+        </div>
+        <div class="feature-elements-wrap">
+          <img src="./images/elements.png" alt="아나나스 요소들" class="elements-img">
+        </div>
+      </section>
+
+      <!-- ── PAGE: ROOMS ── -->
+      <section id="page-rooms" class="page hidden">
+        <div class="page-header">
+          <span class="page-eyebrow">OPEN CHANNELS</span>
+          <h2 class="page-title">지금 핫한 아지트</h2>
+          <p class="page-subtitle">공개 채널에 입장하거나, 나만의 아지트를 새로 열어보세요</p>
+        </div>
+        <div class="rooms-toolbar">
+          <button class="room-filter active" onclick="filterRooms('all', this)">전체</button>
+          <button class="room-filter" onclick="filterRooms('chat', this)">일상</button>
+          <button class="room-filter" onclick="filterRooms('study', this)">공부</button>
+          <button class="room-filter" onclick="filterRooms('fun', this)">게임</button>
+          <button class="room-filter" onclick="filterRooms('info', this)">정보</button>
+          <div class="rooms-create-btn-wrap">
+            <button class="rooms-create-btn" onclick="document.getElementById('powerBtn').click()">+ 새 아지트 만들기</button>
+          </div>
+        </div>
+        <div class="rooms-grid" id="roomsGrid">
+          <div class="room-card" data-tag="chat" onclick="quickJoinRoom('자유토크 방', 'chat', '아무 대화나 자유롭게')">
+            <div class="room-card-top">
+              <span class="room-tag tag-chat">일상</span>
+            </div>
+            <h3>자유토크 방</h3>
+            <p class="room-desc">아무 대화나 자유롭게 나누는 공간. 오늘 뭐 먹었어요?</p>
+            <div class="room-footer">
+              <span class="room-code-badge">FREETK</span>
+              <span class="room-join-link">입장 →</span>
+            </div>
+          </div>
+          <div class="room-card" data-tag="info" onclick="quickJoinRoom('여행 정보 공유', 'info', '국내외 여행 꿀팁')">
+            <div class="room-card-top">
+              <span class="room-tag tag-info">정보</span>
+            </div>
+            <h3>여행 정보 공유</h3>
+            <p class="room-desc">국내외 여행 꿀팁과 숙소 정보를 나눠요</p>
+            <div class="room-footer">
+              <span class="room-code-badge">TRAVEL</span>
+              <span class="room-join-link">입장 →</span>
+            </div>
+          </div>
+          <div class="room-card" data-tag="study" onclick="quickJoinRoom('개발자 아지트', 'study', '코딩 웹 기술 공유')">
+            <div class="room-card-top">
+              <span class="room-tag tag-study">공부</span>
+            </div>
+            <h3>개발자 아지트</h3>
+            <p class="room-desc">코딩, 웹 기술, 사이드 프로젝트 이야기</p>
+            <div class="room-footer">
+              <span class="room-code-badge">DEVHUB</span>
+              <span class="room-join-link">입장 →</span>
+            </div>
+          </div>
+          <div class="room-card" data-tag="fun" onclick="quickJoinRoom('게임 수다방', 'fun', '요즘 하는 게임 이야기')">
+            <div class="room-card-top">
+              <span class="room-tag tag-fun">게임</span>
+            </div>
+            <h3>게임 수다방</h3>
+            <p class="room-desc">요즘 하는 게임 이야기, 같이 할 사람 구하기</p>
+            <div class="room-footer">
+              <span class="room-code-badge">GAMERZ</span>
+              <span class="room-join-link">입장 →</span>
+            </div>
+          </div>
+          <div class="room-card" data-tag="chat" onclick="quickJoinRoom('음악 취향 공유', 'chat', '요즘 내 플레이리스트')">
+            <div class="room-card-top">
+              <span class="room-tag tag-chat">일상</span>
+            </div>
+            <h3>음악 취향 공유</h3>
+            <p class="room-desc">요즘 내 플레이리스트, 추천 좀 해줘요</p>
+            <div class="room-footer">
+              <span class="room-code-badge">MUSICL</span>
+              <span class="room-join-link">입장 →</span>
+            </div>
+          </div>
+          <div class="room-card card-new" onclick="document.getElementById('powerBtn').click()">
+            <div class="room-card-top"></div>
+            <h3>내 아지트 만들기</h3>
+            <p class="room-desc">나만의 채팅방을 직접 개설하고 친구를 초대하세요</p>
+            <div class="room-footer">
+              <span class="room-join-link" style="margin-left:auto">개설하기 →</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── PAGE: ABOUT ── -->
+      <section id="page-about" class="page hidden">
+        <div class="about-hero">
+          <div class="about-text">
+            <span class="page-eyebrow">BRAND STORY</span>
+            <h2 class="page-title">아나나스,<br>파인애플처럼.</h2>
+            <p class="about-desc">파인애플(Ananas)은 겉은 거칠어 보여도 안에는 달콤함이 가득합니다. 아나나스 메신저도 마찬가지예요 — 단순한 채팅 앱이 아니라, 우리만의 따뜻한 아지트.</p>
+            <div class="about-values">
+              <div class="value-item"><div><strong>자유로움</strong><p>형식 없이, 편하게 대화하는 공간</p></div></div>
+              <div class="value-item"><div><strong>따뜻함</strong><p>노란빛처럼 밝고 따뜻한 연결</p></div></div>
+              <div class="value-item"><div><strong>연결</strong><p>거리를 넘어 이어지는 관계</p></div></div>
+            </div>
+          </div>
+          <div class="about-visual">
+            <img src="./images/hero.png" alt="아나나스 세계" class="about-img">
+          </div>
+        </div>
+        <div class="about-timeline">
+          <h3 class="timeline-title">아나나스의 탄생</h3>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><span class="tl-year">CONCEPT</span><p>우리만의 공간에서 자유롭게 대화하고 싶다는 아이디어에서 시작</p></div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><span class="tl-year">DESIGN</span><p>픽셀아트 파인애플 캐릭터로 귀엽고 따뜻한 브랜드 아이덴티티 구축</p></div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><span class="tl-year">BUILD</span><p>Socket.IO 기반 실시간 채팅 엔진, 방 코드 초대 시스템 구현</p></div></div>
+            <div class="tl-item"><div class="tl-dot active"></div><div class="tl-content"><span class="tl-year">NOW</span><p>아나나스 메신저가 세상에 나왔습니다. 지금 바로 아지트를 만들어보세요!</p></div></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-logo">Ananas</div>
+        <p class="footer-copy">© 2025 Ananas Messenger. 우리만의 아지트.</p>
+        <div class="footer-links">
+          <a href="#" onclick="switchPage('features')">기능 소개</a>
+          <a href="#" onclick="switchPage('about')">브랜드 스토리</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ══════════════ ANANAS TALK MODAL ══════════════ -->
+  <div class="modal-overlay hidden" id="talkModal">
+    <div class="modal-card" id="talkModalCard">
+      <button class="modal-close" id="modalClose">✕</button>
+
+      <!-- STEP 1 -->
+      <div class="modal-step" id="step1">
+        <div class="modal-header">
+          <div class="modal-pixel-img"><img src="./images/hero.png" alt=""></div>
+          <h2>아지트 프로필 설정</h2>
+          <p>닉네임과 아바타를 선택하세요</p>
+        </div>
+        <div class="avatar-picker">
+          <p class="field-label">아바타 선택</p>
+          <div class="avatar-grid">
+            <button class="avatar-btn active" data-emoji="A" onclick="selectAvatar(this)"><img src="./images/hero.png" class="av-img" alt="A"></button>
+            <button class="avatar-btn" data-emoji="B" onclick="selectAvatar(this)"><img src="./images/hero.png" class="av-img av-flip" alt="B"></button>
+            <button class="avatar-btn" data-emoji="C" onclick="selectAvatar(this)"><img src="./images/elements.png" class="av-img" alt="C"></button>
+            <button class="avatar-btn" data-emoji="D" onclick="selectAvatar(this)"><img src="./images/elements.png" class="av-img av-flip" alt="D"></button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="nicknameInput">닉네임</label>
+          <input type="text" id="nicknameInput" class="modal-input" placeholder="사용할 닉네임을 입력하세요" maxlength="16" autocomplete="off">
+        </div>
+        <div class="step1-actions">
+          <button class="modal-btn btn-yellow" id="toStep2Btn">다음: 방 설정 →</button>
+          <p class="step-hint">이미 코드가 있나요? <a href="#" onclick="goToJoinStep()">방 참여하기</a></p>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="modal-step hidden" id="step2">
+        <button class="step-back" onclick="goBack(2)">← 뒤로</button>
+        <div class="step2-tabs">
+          <button class="tab-btn active" id="tabCreate" onclick="switchTab('create')">방 만들기</button>
+          <button class="tab-btn" id="tabJoin" onclick="switchTab('join')">코드로 참여</button>
+        </div>
+        <div id="createPanel">
+          <div class="field-group">
+            <label class="field-label" for="roomNameInput">채팅방 이름</label>
+            <input type="text" id="roomNameInput" class="modal-input" placeholder="우리 아지트 이름을 정해주세요" maxlength="30" autocomplete="off">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="roomDescInput">방 설명 (선택)</label>
+            <input type="text" id="roomDescInput" class="modal-input" placeholder="어떤 이야기를 나누는 공간인가요?" maxlength="60" autocomplete="off">
+          </div>
+          <div class="field-group">
+            <label class="field-label">카테고리</label>
+            <div class="category-grid">
+              <button class="cat-btn active" data-cat="chat" onclick="selectCat(this)">일상</button>
+              <button class="cat-btn" data-cat="study" onclick="selectCat(this)">공부</button>
+              <button class="cat-btn" data-cat="fun" onclick="selectCat(this)">게임</button>
+              <button class="cat-btn" data-cat="info" onclick="selectCat(this)">정보</button>
+              <button class="cat-btn" data-cat="music" onclick="selectCat(this)">음악</button>
+              <button class="cat-btn" data-cat="dev" onclick="selectCat(this)">개발</button>
+              <button class="cat-btn" data-cat="etc" onclick="selectCat(this)">기타</button>
+            </div>
+          </div>
+          <button class="modal-btn btn-yellow" id="createRoomBtn">아지트 개설하기</button>
+        </div>
+        <div id="joinPanel" class="hidden">
+          <div class="field-group">
+            <label class="field-label" for="roomCodeInput">방 코드 입력</label>
+            <input type="text" id="roomCodeInput" class="modal-input code-input" placeholder="XXXXXX" maxlength="6" autocomplete="off">
+          </div>
+          <p class="field-hint">방장에게 6자리 코드를 받아 입력하세요</p>
+          <button class="modal-btn btn-dark" id="joinRoomBtn">방 입장하기</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="modal-step hidden" id="step3">
+        <div class="modal-header">
+          <div class="modal-pixel-img success-anim"><img src="./images/hero.png" alt=""></div>
+          <h2>아지트가 열렸어요!</h2>
+          <p id="createdRoomNameDisplay">채팅방이 생성되었습니다</p>
+        </div>
+        <div class="invite-code-box">
+          <p class="field-label">초대 코드</p>
+          <div class="code-display">
+            <span id="inviteCodeDisplay" class="invite-code-text">------</span>
+            <button class="copy-code-btn" id="copyCodeBtn" onclick="copyCode()">복사</button>
+          </div>
+          <p class="code-desc">이 코드를 친구에게 공유하면 같은 방에 입장할 수 있어요</p>
+        </div>
+        <div class="invite-link-box">
+          <p class="field-label">초대 링크</p>
+          <div class="link-display">
+            <span id="inviteLinkDisplay" class="invite-link-text"></span>
+            <button class="copy-code-btn" onclick="copyLink()">복사</button>
+          </div>
+        </div>
+        <button class="modal-btn btn-yellow" id="enterRoomBtn">채팅방 입장하기 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CHAT APP ══════════════ -->
+  <div class="chat-app hidden" id="chatApp">
+    <aside class="chat-sidebar">
+      <div class="sidebar-logo">
+        <img src="./images/hero.png" class="sidebar-pixel" alt="">
+        <span>Ananas</span>
+      </div>
+      <div class="my-profile-card">
+        <div class="my-avatar-wrap">
+          <div class="my-avatar" id="myAvatarDisplay"><img src="./images/hero.png" class="profile-av-img" alt=""></div>
+        </div>
+        <div class="my-info">
+          <div class="my-name" id="myNicknameDisplay">—</div>
+          <div class="my-status">온라인</div>
+        </div>
+      </div>
+      <div class="current-room-section">
+        <p class="sidebar-section-label">현재 아지트</p>
+        <div class="current-room-card">
+          <div class="room-name-display" id="currentRoomDisplay">—</div>
+          <div class="room-code-small" id="currentCodeDisplay">코드: —</div>
+          <div class="online-count-wrap">
+            <span class="online-dot"></span>
+            <span id="onlineCount">1명 접속 중</span>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-actions">
+        <button class="sidebar-btn invite-share-btn" id="shareInviteBtn">초대 코드 공유</button>
+        <button class="sidebar-btn home-btn" id="toHomeBtn">홈으로</button>
+        <button class="sidebar-btn logout-btn" id="chatLogoutBtn">로그아웃</button>
+      </div>
+    </aside>
+
+    <main class="chat-main">
+      <!-- 공지 고정 영역 -->
+      <div class="notice-bar hidden" id="noticeBar">
+        <span class="notice-pin-icon">📌</span>
+        <span class="notice-text" id="noticeText"></span>
+        <button class="notice-close" id="noticeClose">✕</button>
+      </div>
+
+      <header class="chat-header">
+        <div class="ch-room-info">
+          <img src="./images/hero.png" class="ch-room-pixel" alt="">
+          <div>
+            <h2 id="chatRoomTitle">채팅방</h2>
+            <span class="ch-room-meta">
+              <span class="ch-room-code" id="chatRoomCode">코드: —</span>
+              <span class="ch-online" id="chatOnlineCount">1명</span>
+            </span>
+          </div>
+        </div>
+        <div class="ch-actions">
+          <!-- 검색 토글 -->
+          <button class="ch-btn ch-search-toggle" id="searchToggleBtn" title="메시지 검색">검색</button>
+          <button class="ch-btn" id="showCodeBtn">초대 코드</button>
+          <button class="ch-btn ch-home" id="chatHomeBtn">← 홈</button>
+        </div>
+      </header>
+
+      <!-- 검색 바 -->
+      <div class="search-bar hidden" id="searchBar">
+        <input type="text" id="searchInput" class="search-input" placeholder="메시지 검색...">
+        <button class="search-close-btn" id="searchCloseBtn">✕</button>
+      </div>
+
+      <div class="messages-area" id="messagesArea">
+        <div class="messages-empty-state" id="messagesEmpty">
+          <img src="./images/hero.png" class="empty-pixel-img" alt="">
+          <p>아직 대화가 없어요.<br>첫 메시지를 보내보세요!</p>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <!-- 온라인 멤버 패널 (헤더 클릭 시 표시) -->
+        <div class="input-row">
+          <div class="my-avatar-mini" id="myAvatarMini">
+            <img src="./images/hero.png" class="mini-av-img" alt="">
+          </div>
+          <!-- 이미지 첨부 버튼 -->
+          <label class="img-attach-btn" for="imageFileInput" title="사진 첨부">
+            <span>+</span>
+          </label>
+          <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+          <input type="text" id="msgInput" class="msg-input" placeholder="메시지를 입력하세요..." maxlength="500" autocomplete="off">
+          <button class="send-btn" id="sendBtn">전송</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 온라인 멤버 패널 -->
+  <div class="online-panel hidden" id="onlinePanel">
+    <div class="online-panel-header">
+      <span>접속 중인 멤버</span>
+      <button onclick="document.getElementById('onlinePanel').classList.add('hidden')">✕</button>
+    </div>
+    <div class="online-members-list" id="onlineMembersList"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

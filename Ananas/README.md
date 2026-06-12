@@ -10,7 +10,9 @@
 
 ## 🎬 Demo
 
-https://raw.githubusercontent.com/lsjin0322/web/master/Ananas/video/ananas.mp4
+<video width="100%" controls>
+  <source src="https://github.com/user-attachments/assets/d6d4a827-111c-46c2-a2a8-5bf5e93f9d7b" type="video/mp4">
+</video>
 
 ---
 

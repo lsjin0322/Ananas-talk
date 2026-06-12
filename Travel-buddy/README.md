@@ -72,6 +72,15 @@ Travel Buddy의 캐릭터는 **구름**을 모티브로 제작했습니다.
 <div align="left">
 <br/>
 
+---  
+# 3D 디자인 
+
+| 모델링 | 모션모델링  |
+|:----:|:----:|
+|<img width="1536" height="1024" alt="79a15d87-5a69-4aaa-8734-31163a1e4f8b" src="https://github.com/user-attachments/assets/2fe898b2-c269-46aa-9c78-8045daea8ecc" />|<img width="1254" height="1254" alt="result (1)" src="https://github.com/user-attachments/assets/e10037a4-69d9-4084-8490-a6e24c8a1108" />
+|
+
+---
 # 📱 Icon UI
 
 현재 서비스에 사용될 아이콘과 구성 요소들을 제작 및 정리 중입니다.

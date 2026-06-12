@@ -10,9 +10,10 @@
 
 ## 🎬 Demo
 
-<video width="100%" controls>
-  <source src="https://github.com/user-attachments/assets/d6d4a827-111c-46c2-a2a8-5bf5e93f9d7b" type="video/mp4">
-</video>
+
+https://github.com/user-attachments/assets/79b55e44-7d32-415f-b7d4-1ed24889a0f5
+
+
 
 ---
 

@@ -4,7 +4,8 @@
 
 ---
 ## 이미지
-<img width="1055" height="1786" alt="스크린샷 2026-06-10 210515" src="https://github.com/user-attachments/assets/db05cc54-ecca-48a1-a01b-58c5067402cf" />
+
+<img width="1078" height="1630" alt="image" src="https://github.com/user-attachments/assets/1ab132e8-02f8-4bac-8791-48e87faeddd9" />
 
 ---
 

@@ -3,58 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANANAS — 아나나스 메신저</title>
+  <title>ANANAS — 우리만의 아지트, 아나나스</title>
+  <meta name="description" content="채팅은 기본, 방명록과 파도타기까지. 그 시절 감성으로 만나는 우리만의 아지트 메신저.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6c-2 5-6 8-11 9 4 1 8 1 11-1 3 2 7 2 11 1-5-1-9-4-11-9z' fill='%234CAF2E'/%3E%3Crect x='12' y='18' width='40' height='34' rx='12' fill='%23FFC400'/%3E%3Cpath d='M40 50l8 9 1-11z' fill='%23FFC400'/%3E%3Ccircle cx='23' cy='35' r='3.4' fill='%23fff'/%3E%3Ccircle cx='32' cy='35' r='3.4' fill='%23fff'/%3E%3Ccircle cx='41' cy='35' r='3.4' fill='%23fff'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ════ 공용 SVG 로고 정의 (이미지3 기반 재창조) ════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="ananas-logo-shape">
+      <!-- 잎 3장 -->
+      <path d="M32 3 C29.5 9.5 25 13 19 14.5 C24 16 29 15.4 32 13.2 C35 15.4 40 16 45 14.5 C39 13 34.5 9.5 32 3 Z" fill="#4CAF2E"/>
+      <path d="M32 4.5 C30.5 9 29 12 27 13.6 C30 13.8 31.5 11 32 8 C32.5 11 34 13.8 37 13.6 C35 12 33.5 9 32 4.5 Z" fill="#3D8F22"/>
+      <!-- 말풍선 몸통 -->
+      <rect x="11" y="17" width="42" height="35" rx="13" fill="#FFC400"/>
+      <path d="M40 49 L49 60 L50 47 Z" fill="#FFC400"/>
+      <!-- 점 3개 -->
+      <circle cx="22.5" cy="34.5" r="3.6" fill="#FFFDF4"/>
+      <circle cx="32"   cy="34.5" r="3.6" fill="#FFFDF4"/>
+      <circle cx="41.5" cy="34.5" r="3.6" fill="#FFFDF4"/>
+    </g>
+  </defs>
+</svg>
+
 <!-- ════════════════════════════════════
-     INTRO ANIMATION SCREEN
+     INTRO — 3씬 할톤 시퀀스 (모션 연속성 개선판)
 ════════════════════════════════════ -->
 <div id="introScreen" class="intro-screen">
 
-  <!-- 씬1: 흰 배경 + 할톤 도트 아이콘들 -->
+  <!-- 씬1: 흰 배경, 도트가 모여 형태가 됨 -->
   <div class="intro-scene" id="scene1">
     <div class="sc1-dots-bg"></div>
-    <canvas class="ht-icon sc1-ht ht-pos1" data-shape="chat"      data-size="260" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos2" data-shape="pineapple" data-size="180" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos3" data-shape="pineapple" data-size="320" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos4" data-shape="heart"     data-size="120" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos5" data-shape="chat"      data-size="160" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos6" data-shape="pineapple" data-size="90"  data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos7" data-shape="heart"     data-size="200" data-color="#111"></canvas>
-    <canvas class="ht-icon sc1-ht ht-pos8" data-shape="chat"      data-size="80"  data-color="#111"></canvas>
+    <canvas class="ht-icon ht-pos1" data-shape="chat"      data-size="240" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos2" data-shape="pineapple" data-size="170" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos3" data-shape="logo"      data-size="320" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos4" data-shape="heart"     data-size="120" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos5" data-shape="chat"      data-size="150" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos6" data-shape="pineapple" data-size="90"  data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos7" data-shape="heart"     data-size="190" data-color="#1F1B13"></canvas>
+    <canvas class="ht-icon ht-pos8" data-shape="chat"      data-size="84"  data-color="#1F1B13"></canvas>
   </div>
 
-  <!-- 씬2: 검정 배경 + 카피 문구 + 오른쪽 그래픽 -->
+  <!-- 씬2: 잉크 배경 + 카피, 오른쪽 로고가 도트로 "조립"됨 -->
   <div class="intro-scene hidden" id="scene2">
     <div class="sc2-copy" id="sc2Copy">
       <span class="sc2-line" data-idx="0">채팅을 넘어</span>
       <span class="sc2-line" data-idx="1">나를 표현하는 아지트에</span>
-      <span class="sc2-line" data-idx="2">기억을 남기고</span>
-      <span class="sc2-line" data-idx="3">사람들과 연결되며</span>
-      <span class="sc2-line" data-idx="4">새로운 일상을 만들어가는 공간</span>
+      <span class="sc2-line" data-idx="2">방명록처럼 기억을 남기고</span>
+      <span class="sc2-line" data-idx="3">파도를 타듯 사람들과 만나는</span>
+      <span class="sc2-line" data-idx="4">그 시절 감성의 새로운 메신저</span>
     </div>
     <div class="sc2-right">
-      <canvas data-shape="pineapple" data-size="520" data-color="#FFDB00" id="sc2BigCanvas"></canvas>
+      <canvas id="sc2BigCanvas" data-shape="logo" data-size="500" data-color="#FFC400"></canvas>
     </div>
   </div>
 
   <!-- 씬3: 로고 마무리 -->
   <div class="intro-scene hidden" id="scene3">
     <div class="sc3-left">
-      <canvas data-shape="pineapple" data-size="360" data-color="#FFDB00" id="sc3Canvas"></canvas>
+      <canvas id="sc3Canvas" data-shape="logo" data-size="340" data-color="#FFC400"></canvas>
     </div>
     <div class="sc3-right">
       <div class="sc3-brand">ANANAS</div>
-      <div class="sc3-tagline">우리만의 아나나스에서 만나요</div>
-      <button class="sc3-enter" id="introEnterBtn">아나나스 톡 입장 →</button>
+      <div class="sc3-tagline">우리만의 아지트에서 만나요</div>
+      <button class="sc3-enter" id="introEnterBtn">아나나스 입장 →</button>
     </div>
-    <button class="intro-skip" id="introSkip">건너뛰기</button>
   </div>
 
+  <button class="intro-skip" id="introSkip">건너뛰기 ⏭</button>
 </div>
 
 <!-- ════════════════════════════════════
@@ -65,25 +86,156 @@
   <!-- HEADER -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
-      <div class="header-logo" onclick="switchPage('home')">
-        <div class="logo-pixel-wrap">
-          <img src="./images/hero.png" class="logo-pixel-img" alt="">
-        </div>
+      <a class="header-logo" href="#" onclick="switchPage('home');return false;">
+        <svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true"><use href="#ananas-logo-shape"/></svg>
         <span class="logo-text">Ananas</span>
-      </div>
+      </a>
       <nav class="site-nav">
-        <button class="nav-btn active" data-page="home"    onclick="switchPage('home')">홈</button>
-        <button class="nav-btn" data-page="features"       onclick="switchPage('features')">기능</button>
-        <button class="nav-btn" data-page="rooms"          onclick="switchPage('rooms')">아지트</button>
-        <button class="nav-btn" data-page="ai"             onclick="switchPage('ai')">AI 어시스턴트</button>
-        <button class="nav-btn" data-page="about"          onclick="switchPage('about')">스토리</button>
+        <!-- 홈 -->
+        <div class="nav-item" id="navItem-home">
+          <button class="nav-btn active" data-page="home" onclick="switchPage('home')">홈</button>
+        </div>
+
+        <!-- 기능 -->
+        <div class="nav-item" id="navItem-features">
+          <button class="nav-btn nav-has-drop" data-page="features" onclick="switchPage('features')">
+            기능 <span class="nav-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown" id="drop-features">
+            <div class="nd-inner retro-window">
+              <div class="rw-titlebar rw-mini"><span class="rw-title">✨ 기능 메뉴</span></div>
+              <div class="nd-body">
+                <button class="nd-item" onclick="switchPage('features');scrollToSection('feat-chat')">
+                  <span class="nd-icon">⚡</span>
+                  <span class="nd-label"><strong>실시간 채팅</strong><small>타이핑 표시 · 즉시 전송</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('features');scrollToSection('feat-react')">
+                  <span class="nd-icon">❤️</span>
+                  <span class="nd-label"><strong>공감 · 답장</strong><small>6가지 공감 리액션</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('features');scrollToSection('feat-guest')">
+                  <span class="nd-icon">📮</span>
+                  <span class="nd-label"><strong>방명록</strong><small>한 줄 추억 남기기</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('features');scrollToSection('feat-photo')">
+                  <span class="nd-icon">📷</span>
+                  <span class="nd-label"><strong>사진 공유</strong><small>JPG · PNG · WEBP</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('features');scrollToSection('feat-notice')">
+                  <span class="nd-icon">📌</span>
+                  <span class="nd-label"><strong>공지 고정 · 검색</strong><small>키워드 하이라이트</small></span>
+                </button>
+                <button class="nd-item nd-cta" onclick="document.getElementById('powerBtn').click()">
+                  <span class="nd-icon">🍍</span>
+                  <span class="nd-label"><strong>아지트 만들기 →</strong></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 아지트 -->
+        <div class="nav-item" id="navItem-rooms">
+          <button class="nav-btn nav-has-drop" data-page="rooms" onclick="switchPage('rooms')">
+            아지트 <span class="nav-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown" id="drop-rooms">
+            <div class="nd-inner retro-window">
+              <div class="rw-titlebar rw-mini"><span class="rw-title">🏠 아지트 메뉴</span></div>
+              <div class="nd-body">
+                <button class="nd-item" onclick="document.getElementById('powerBtn').click()">
+                  <span class="nd-icon">➕</span>
+                  <span class="nd-label"><strong>새 아지트 만들기</strong><small>6자리 코드로 개설</small></span>
+                </button>
+                <button class="nd-item" onclick="openJoinDirect()">
+                  <span class="nd-icon">🔑</span>
+                  <span class="nd-label"><strong>코드로 입장</strong><small>초대 코드 입력</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('rooms')">
+                  <span class="nd-icon">🌊</span>
+                  <span class="nd-label"><strong>공개 아지트 둘러보기</strong><small>지금 열린 아지트 목록</small></span>
+                </button>
+                <button class="nd-item" onclick="doWaveSurf()">
+                  <span class="nd-icon">🎲</span>
+                  <span class="nd-label"><strong>파도타기</strong><small>무작위 아지트로 풍덩!</small></span>
+                </button>
+                <div class="nd-recent" id="dropRecentRooms">
+                  <!-- JS로 최근 방문 아지트 채워짐 -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI -->
+        <div class="nav-item" id="navItem-ai">
+          <button class="nav-btn nav-has-drop" data-page="ai" onclick="switchPage('ai')">
+            AI <span class="nav-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown" id="drop-ai">
+            <div class="nd-inner retro-window">
+              <div class="rw-titlebar rw-mini"><span class="rw-title">🤖 AI 어시스턴트</span></div>
+              <div class="nd-body">
+                <button class="nd-item" onclick="switchPage('ai');setTimeout(()=>sendAiSuggestion({textContent:'아나나스 사용 방법 알려줘'}),200)">
+                  <span class="nd-icon">💬</span>
+                  <span class="nd-label"><strong>사용법 물어보기</strong><small>아나나스 가이드</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('ai');setTimeout(()=>sendAiSuggestion({textContent:'방명록에 남길 한 줄 추천해줘'}),200)">
+                  <span class="nd-icon">📝</span>
+                  <span class="nd-label"><strong>방명록 문구 추천</strong><small>AI가 대신 써줘요</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('ai');setTimeout(()=>sendAiSuggestion({textContent:'영어로 자기소개 번역해줘'}),200)">
+                  <span class="nd-icon">🌐</span>
+                  <span class="nd-label"><strong>번역 요청</strong><small>한 ↔ 영 · 일 번역</small></span>
+                </button>
+                <button class="nd-item" onclick="openAiQuickChat()">
+                  <span class="nd-icon">⚡</span>
+                  <span class="nd-label"><strong>빠른 질문</strong><small>AI와 바로 대화 시작</small></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 스토리 -->
+        <div class="nav-item" id="navItem-about">
+          <button class="nav-btn nav-has-drop" data-page="about" onclick="switchPage('about')">
+            스토리 <span class="nav-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown" id="drop-about">
+            <div class="nd-inner retro-window">
+              <div class="rw-titlebar rw-mini"><span class="rw-title">🍍 아나나스 이야기</span></div>
+              <div class="nd-body">
+                <button class="nd-item" onclick="switchPage('about');scrollToSection('about-hero')">
+                  <span class="nd-icon">✨</span>
+                  <span class="nd-label"><strong>브랜드 스토리</strong><small>아나나스의 탄생</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('about');scrollToSection('about-timeline')">
+                  <span class="nd-icon">📅</span>
+                  <span class="nd-label"><strong>개발 타임라인</strong><small>기획부터 지금까지</small></span>
+                </button>
+                <button class="nd-item" onclick="switchPage('about');scrollToSection('about-devnote')">
+                  <span class="nd-icon">💻</span>
+                  <span class="nd-label"><strong>개발자 한마디</strong><small>기술 스택 소개</small></span>
+                </button>
+                <a class="nd-item nd-link" href="https://github.com/lsjin0322" target="_blank" rel="noopener">
+                  <span class="nd-icon">🐙</span>
+                  <span class="nd-label"><strong>GitHub</strong><small>소스코드 보러가기 →</small></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </nav>
       <div class="header-actions">
-        <button class="hdr-ai-btn" onclick="switchPage('ai')">AI</button>
+        <div class="visit-counter" id="visitCounter" title="오늘 방문 / 누적 방문">
+          <span class="vc-cell">TODAY <b id="vcToday">-</b></span>
+          <span class="vc-div"></span>
+          <span class="vc-cell">TOTAL <b id="vcTotal">-</b></span>
+        </div>
         <button class="power-btn" id="powerBtn">
           <span class="power-icon">⏻</span>
           <span class="power-label">톡 시작</span>
-          <span class="power-pulse"></span>
         </button>
       </div>
     </div>
@@ -91,49 +243,54 @@
 
   <main class="site-main">
 
-    <!-- ── HOME ── -->
+    <!-- ━━━━━━━━ HOME ━━━━━━━━ -->
     <section id="page-home" class="page active">
 
-      <!-- HERO -->
       <div class="hero-section">
         <div class="hero-content">
-          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD — NEW SEASON</div>
+          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD · SINCE 2025</div>
           <h1 class="hero-title">
             <span class="curtain-line"><span class="ct">우리만의</span></span>
             <span class="curtain-line"><span class="ct accent-stroke">아지트에서</span></span>
-            <span class="curtain-line"><span class="ct">만나요.</span></span>
+            <span class="curtain-line"><span class="ct">만나요<span class="title-dot">.</span></span></span>
           </h1>
-          <p class="hero-desc">채팅은 기본, 나만의 공간에서 소통하고 공유하는<br>새로운 메신저 경험 — 파인애플처럼 달콤하게.</p>
+          <p class="hero-desc">채팅은 기본 — 방명록에 기억을 남기고, 파도타기로 새 아지트를 만나요.<br>미니홈피 시절의 설렘을 지금의 메신저로.</p>
           <div class="hero-cta">
             <button class="cta-primary" onclick="document.getElementById('powerBtn').click()">아지트 만들기</button>
-            <button class="cta-ghost"   onclick="switchPage('features')">기능 살펴보기 →</button>
+            <button class="cta-wave" id="heroWaveBtn">🌊 파도타기</button>
           </div>
           <div class="hero-feature-chips">
-            <span class="fc">공지 고정</span>
-            <span class="fc">사진 공유</span>
-            <span class="fc">메시지 검색</span>
+            <span class="fc fc-click" onclick="switchPage('features');scrollToSection('feat-guest')">방명록</span>
+            <span class="fc fc-click" onclick="switchPage('features');scrollToSection('feat-react')">공감 · 답장</span>
+            <span class="fc fc-click" onclick="switchPage('features');scrollToSection('feat-photo')">사진 공유</span>
+            <span class="fc fc-click" onclick="switchPage('features');scrollToSection('feat-notice')">공지 고정</span>
             <span class="fc fc-ai" onclick="switchPage('ai')">AI 어시스턴트 →</span>
           </div>
-          <!-- 최근 방문 -->
           <div class="recent-wrap" id="recentRoomsWrap" style="display:none">
             <p class="recent-label">최근 방문한 아지트</p>
             <div id="recentRoomsList" class="recent-list"></div>
           </div>
         </div>
+
+        <!-- 시그니처: 레트로 메신저 창 라이브 데모 -->
         <div class="hero-visual">
-          <div class="hv-main-frame">
-            <img src="./images/hero.png" class="hv-main-img" alt="아나나스 세계">
-            <div class="hv-glow"></div>
+          <div class="retro-window hero-demo" id="heroDemo">
+            <div class="rw-titlebar">
+              <span class="rw-title"><svg class="rw-logo" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>파인애플 아지트</span>
+              <span class="rw-btns"><i></i><i></i><i class="rw-x"></i></span>
+            </div>
+            <div class="rw-statusbar">
+              <span class="rw-online"><span class="online-dot"></span>친구 3명 접속 중</span>
+              <span class="rw-bgm">♪ 추억은 방울방울</span>
+            </div>
+            <div class="rw-body" id="heroDemoBody"><!-- JS 데모 메시지 --></div>
+            <div class="rw-inputbar">
+              <span class="rw-fake-input">메시지를 입력하세요…</span>
+              <span class="rw-fake-send">전송</span>
+            </div>
           </div>
-          <!-- 픽셀 오버레이 뱃지들 -->
-          <div class="hv-badge hv-b1">
-            <img src="./images/elements.png" class="hv-badge-img" alt="">
-            <span>새 메시지</span>
-          </div>
-          <div class="hv-badge hv-b2">
-            <img src="./images/hero.png" class="hv-badge-img hv-badge-sm" alt="">
-            <span>아지트 개설</span>
-          </div>
+          <div class="hv-badge hv-b1"><canvas class="px" data-sprite="heart" data-scale="3"></canvas><span>공감 +1</span></div>
+          <div class="hv-badge hv-b2"><canvas class="px" data-sprite="mail" data-scale="3"></canvas><span>방명록 도착</span></div>
         </div>
       </div>
 
@@ -141,8 +298,8 @@
       <div class="ticker-wrap">
         <div class="ticker-inner">
           <div class="ticker-track">
-            <span>ANANAS TALK</span><b>✦</b><span>실시간 채팅</span><b>✦</b><span>나만의 아지트</span><b>✦</b><span>공지 고정</span><b>✦</b><span>사진 공유</span><b>✦</b><span>메시지 검색</span><b>✦</b><span>AI 어시스턴트</span><b>✦</b><span>링크 초대</span><b>✦</b>
-            <span>ANANAS TALK</span><b>✦</b><span>실시간 채팅</span><b>✦</b><span>나만의 아지트</span><b>✦</b><span>공지 고정</span><b>✦</b><span>사진 공유</span><b>✦</b><span>메시지 검색</span><b>✦</b><span>AI 어시스턴트</span><b>✦</b><span>링크 초대</span><b>✦</b>
+            <span>ANANAS TALK</span><b>✦</b><span>실시간 채팅</span><b>✦</b><span>방명록</span><b>✦</b><span>파도타기</span><b>✦</b><span>공감 · 답장</span><b>✦</b><span>사진 공유</span><b>✦</b><span>공지 고정</span><b>✦</b><span>메시지 검색</span><b>✦</b><span>AI 어시스턴트</span><b>✦</b>
+            <span>ANANAS TALK</span><b>✦</b><span>실시간 채팅</span><b>✦</b><span>방명록</span><b>✦</b><span>파도타기</span><b>✦</b><span>공감 · 답장</span><b>✦</b><span>사진 공유</span><b>✦</b><span>공지 고정</span><b>✦</b><span>메시지 검색</span><b>✦</b><span>AI 어시스턴트</span><b>✦</b>
           </div>
         </div>
       </div>
@@ -150,280 +307,383 @@
       <!-- FEATURE CARDS -->
       <div class="home-grid">
         <div class="hg-card hg-yellow" onclick="document.getElementById('powerBtn').click()">
-          <div class="hgc-pixel"><img src="./images/hero.png" alt=""></div>
-          <div class="hgc-body">
-            <h3>아지트 개설</h3>
-            <p>6자리 코드로 나만의 채팅방 개설</p>
-          </div>
+          <div class="hgc-pixel"><canvas class="px" data-sprite="pine" data-scale="5"></canvas></div>
+          <div class="hgc-body"><h3>아지트 개설</h3><p>6자리 코드로 우리만의 비밀 채팅방</p></div>
           <span class="hgc-arrow">→</span>
         </div>
-        <div class="hg-card hg-dark" onclick="switchPage('features')">
-          <div class="hgc-pixel"><img src="./images/elements.png" alt=""></div>
-          <div class="hgc-body">
-            <h3>실시간 채팅</h3>
-            <p>WebSocket 기반 즉시 전송</p>
-          </div>
+        <div class="hg-card hg-dark" onclick="doWaveSurf()">
+          <div class="hgc-pixel"><canvas class="px" data-sprite="wave" data-scale="5"></canvas></div>
+          <div class="hgc-body"><h3>파도타기</h3><p>무작위 공개 아지트로 풍덩</p></div>
           <span class="hgc-arrow">→</span>
         </div>
-        <div class="hg-card hg-cream" onclick="switchPage('rooms')">
-          <div class="hgc-pixel"><img src="./images/hero.png" alt=""></div>
-          <div class="hgc-body">
-            <h3>공개 아지트</h3>
-            <p>지금 뜨는 채팅방에 참여</p>
-          </div>
+        <div class="hg-card hg-cream" onclick="switchPage('features')">
+          <div class="hgc-pixel"><canvas class="px" data-sprite="mail" data-scale="5"></canvas></div>
+          <div class="hgc-body"><h3>방명록</h3><p>아지트마다 한 줄 추억 남기기</p></div>
           <span class="hgc-arrow">→</span>
         </div>
-        <div class="hg-card hg-ai" onclick="switchPage('ai')">
-          <div class="hgc-pixel"><img src="./images/elements.png" alt=""></div>
-          <div class="hgc-body">
-            <h3>AI 어시스턴트</h3>
-            <p>Claude와 대화하기</p>
-          </div>
+        <div class="hg-card hg-green" onclick="switchPage('ai')">
+          <div class="hgc-pixel"><canvas class="px" data-sprite="star" data-scale="5"></canvas></div>
+          <div class="hgc-body"><h3>AI 어시스턴트</h3><p>질문 · 번역 · 아이디어를 한 번에</p></div>
           <span class="hgc-arrow">→</span>
         </div>
       </div>
 
-      <!-- HOW TO CONNECT (채팅 연결 가이드) -->
+      <!-- HOW TO -->
       <div class="connect-guide">
         <div class="cg-header">
           <span class="page-eyebrow">HOW TO USE</span>
-          <h2 class="cg-title">다른 사람과 함께 채팅하는 방법</h2>
+          <h2 class="cg-title">친구와 함께 톡하는 방법</h2>
         </div>
         <div class="cg-steps">
           <div class="cg-step">
             <div class="cgs-num">01</div>
-            <div class="cgs-img"><img src="./images/hero.png" alt=""></div>
-            <h4>서버 실행</h4>
-            <p><code>npm start</code>로 서버를 켜고<br><code>http://서버IP:4000</code>으로 접속</p>
+            <div class="cgs-img"><canvas class="px" data-sprite="power" data-scale="4"></canvas></div>
+            <h4>주소 접속</h4>
+            <p>브라우저에서<br>아나나스 주소만 열면 끝!</p>
           </div>
           <div class="cg-arrow-divider">→</div>
           <div class="cg-step">
             <div class="cgs-num">02</div>
-            <div class="cgs-img"><img src="./images/elements.png" alt=""></div>
+            <div class="cgs-img"><canvas class="px" data-sprite="pine" data-scale="4"></canvas></div>
             <h4>아지트 개설</h4>
-            <p>방장이 [톡 시작] → 아지트 만들기로<br>6자리 초대 코드 발급</p>
+            <p>[톡 시작] → 아지트 만들기로<br>6자리 초대 코드 발급</p>
           </div>
           <div class="cg-arrow-divider">→</div>
           <div class="cg-step">
             <div class="cgs-num">03</div>
-            <div class="cgs-img"><img src="./images/hero.png" alt=""></div>
+            <div class="cgs-img"><canvas class="px" data-sprite="key" data-scale="4"></canvas></div>
             <h4>친구 초대</h4>
-            <p>초대 링크 또는 코드를<br>친구에게 공유</p>
+            <p>초대 링크나 코드를<br>친구에게 공유</p>
           </div>
           <div class="cg-arrow-divider">→</div>
           <div class="cg-step">
             <div class="cgs-num">04</div>
-            <div class="cgs-img"><img src="./images/elements.png" alt=""></div>
-            <h4>함께 대화</h4>
-            <p>같은 방 코드로 입장하면<br>실시간 대화 시작</p>
+            <div class="cgs-img"><canvas class="px" data-sprite="chat" data-scale="4"></canvas></div>
+            <h4>함께 톡!</h4>
+            <p>같은 코드로 입장하면<br>실시간 대화 시작</p>
           </div>
         </div>
         <div class="cg-dao-note">
-          <strong>원격/팀 사용 (DAO 등):</strong> 서버를 외부 접근 가능한 IP에서 실행하고, <code>http://[서버IP]:4000</code> 주소를 팀원에게 공유하세요. 또는 ngrok을 사용해 로컬 서버를 외부에 노출할 수 있습니다: <code>ngrok http 4000</code>
+          <strong>누구나 접속:</strong> 클라우드에 배포된 아나나스 주소를 친구에게 공유하면, 설치 없이 브라우저만으로 같은 아지트에서 대화할 수 있어요. 대화는 암호화된 서버에 안전하게 보관됩니다.
         </div>
       </div>
-
     </section>
 
-    <!-- ── FEATURES ── -->
+    <!-- ━━━━━━━━ FEATURES ━━━━━━━━ -->
     <section id="page-features" class="page hidden">
       <div class="page-header">
         <span class="page-eyebrow">FEATURES</span>
         <h2 class="page-title">아나나스가 특별한 이유</h2>
-        <p class="page-sub">카카오톡에서 영감을 받아, 더 자유롭게 설계했습니다</p>
+        <p class="page-sub">카카오톡의 기본기에, 그 시절 미니홈피 낭만을 더했습니다</p>
       </div>
+
+      <!-- 기능 그리드 -->
       <div class="feat-grid">
-        <div class="feat-card fc-wide fc-dark">
-          <div class="feat-pixel"><img src="./images/hero.png" alt=""></div>
-          <div class="feat-body">
-            <span class="fn">01</span>
-            <h3>초저지연 실시간 채팅</h3>
-            <p>WebSocket 기반으로 메시지가 전송되는 순간, 모든 참여자에게 동시에 도착합니다.</p>
+        <div class="feat-card fc-wide fc-dark" id="feat-chat">
+          <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="5"></canvas></div>
+          <div class="feat-body"><span class="fn">01</span><h3>초저지연 실시간 채팅</h3>
+          <p>WebSocket으로 보내는 순간 상대방에게 도착. 타이핑 중인 상태도 실시간으로 표시됩니다.</p></div>
+        </div>
+        <div class="feat-card" id="feat-react">
+          <div class="feat-pixel"><canvas class="px" data-sprite="heart" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">02</span><h3>공감 · 답장</h3>
+          <p>❤️ 👍 😂 😮 😢 🍍 여섯 가지 공감, 특정 말풍선에 바로 인용 답장.</p></div>
+        </div>
+        <div class="feat-card" id="feat-guest">
+          <div class="feat-pixel"><canvas class="px" data-sprite="mail" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">03</span><h3>방명록</h3>
+          <p>아지트마다 한 줄 방명록. 누가 다녀갔는지 흔적이 쌓입니다.</p></div>
+        </div>
+        <div class="feat-card fc-yellow" id="feat-wave">
+          <div class="feat-pixel"><canvas class="px" data-sprite="wave" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">04</span><h3>파도타기</h3>
+          <p>버튼 하나로 무작위 공개 아지트에 입장. 새로운 사람들과 우연한 만남.</p></div>
+        </div>
+        <div class="feat-card" id="feat-invite">
+          <div class="feat-pixel"><canvas class="px" data-sprite="key" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">05</span><h3>코드 · 링크 초대</h3>
+          <p>6자리 코드 또는 URL 링크로 원하는 사람만 초대. 카카오톡에 붙여넣기 OK.</p></div>
+        </div>
+        <div class="feat-card" id="feat-notice">
+          <div class="feat-pixel"><canvas class="px" data-sprite="pin" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">06</span><h3>공지 고정 · 검색</h3>
+          <p>방장 공지 상단 고정, 키워드 메시지 검색 + 하이라이트.</p></div>
+        </div>
+        <div class="feat-card" id="feat-photo">
+          <div class="feat-pixel"><canvas class="px" data-sprite="camera" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">07</span><h3>사진 공유</h3>
+          <p>JPG · PNG · WEBP 원본 비율 그대로 채팅 안에서 전송.</p></div>
+        </div>
+        <div class="feat-card fc-wide fc-yellow" id="feat-ai">
+          <div class="feat-pixel"><canvas class="px" data-sprite="star" data-scale="5"></canvas></div>
+          <div class="feat-body"><span class="fn">08</span><h3>AI 어시스턴트 내장</h3>
+          <p>질문 · 번역 · 글쓰기 · 아이디어까지. 아지트 안의 똑똑한 친구가 되어줍니다.</p></div>
+        </div>
+      </div>
+
+      <!-- 공유 방법 가이드 -->
+      <div class="share-guide">
+        <div class="share-guide-header">
+          <canvas class="px" data-sprite="key" data-scale="3"></canvas>
+          <div>
+            <h3>아지트를 친구와 함께하려면?</h3>
+            <p>아지트를 만들면 초대 코드와 링크가 생깁니다. 아래 방법 중 하나로 공유하세요!</p>
           </div>
         </div>
-        <div class="feat-card">
-          <div class="feat-pixel"><img src="./images/elements.png" alt=""></div>
-          <div class="feat-body"><span class="fn">02</span><h3>방 코드 초대</h3><p>6자리 고유 코드 + 링크로 원하는 사람만 초대.</p></div>
+        <div class="share-steps">
+          <div class="share-step">
+            <div class="ss-num">1</div>
+            <div class="ss-body">
+              <strong>아지트 만들기</strong>
+              <p>우측 상단 <b>「톡 시작」</b> 버튼 → 닉네임·기분 설정 → 방 이름 입력 → 만들기</p>
+            </div>
+          </div>
+          <div class="share-step">
+            <div class="ss-num">2</div>
+            <div class="ss-body">
+              <strong>초대 코드 복사</strong>
+              <p>생성 완료 화면에 나오는 <b>6자리 코드</b>를 복사해 친구에게 카카오톡·문자로 전송</p>
+              <div class="share-code-demo">
+                <span class="scd-code">A1B2C3</span>
+                <span class="scd-arrow">→</span>
+                <span class="scd-label">친구에게 전송</span>
+              </div>
+            </div>
+          </div>
+          <div class="share-step">
+            <div class="ss-num">3</div>
+            <div class="ss-body">
+              <strong>링크로 바로 초대 (더 간편!)</strong>
+              <p>채팅방 상단 <b>「초대」</b> 버튼 클릭 → URL 자동 복사 → 친구에게 붙여넣기</p>
+              <div class="share-url-demo">
+                <span class="sud-url">https://ananas.app/?room=A1B2C3</span>
+              </div>
+              <p class="share-tip">👆 링크를 받은 친구는 클릭만 하면 자동으로 그 아지트로 입장!</p>
+            </div>
+          </div>
+          <div class="share-step">
+            <div class="ss-num">4</div>
+            <div class="ss-body">
+              <strong>친구가 참여하는 법</strong>
+              <p>「톡 시작」 → 닉네임 설정 → <b>「코드로 참여」</b> 탭 → 코드 입력 → 입장</p>
+            </div>
+          </div>
         </div>
-        <div class="feat-card">
-          <div class="feat-pixel"><img src="./images/hero.png" alt=""></div>
-          <div class="feat-body"><span class="fn">03</span><h3>메시지 검색</h3><p>채팅방 내 키워드 실시간 검색, 하이라이트 표시.</p></div>
-        </div>
-        <div class="feat-card fc-yellow">
-          <div class="feat-pixel"><img src="./images/elements.png" alt=""></div>
-          <div class="feat-body"><span class="fn">04</span><h3>공지 고정</h3><p>방장이 중요 메시지를 상단 고정. 전원에게 표시.</p></div>
-        </div>
-        <div class="feat-card">
-          <div class="feat-pixel"><img src="./images/hero.png" alt=""></div>
-          <div class="feat-body"><span class="fn">05</span><h3>사진 공유</h3><p>JPG·PNG·WEBP 이미지를 채팅에서 바로 전송.</p></div>
-        </div>
-        <div class="feat-card">
-          <div class="feat-pixel"><img src="./images/elements.png" alt=""></div>
-          <div class="feat-body"><span class="fn">06</span><h3>온라인 인원</h3><p>지금 접속 중인 멤버 수 실시간 표시.</p></div>
-        </div>
-        <div class="feat-card fc-wide fc-yellow">
-          <div class="feat-pixel feat-pixel-wide"><img src="./images/elements.png" alt=""></div>
-          <div class="feat-body"><span class="fn">07</span><h3>AI 어시스턴트 내장</h3><p>Claude AI와 직접 대화. 질문, 번역, 아이디어 제안 등 다양하게 활용.</p></div>
+        <div class="share-cta">
+          <button class="cta-primary" onclick="document.getElementById('powerBtn').click()">
+            지금 아지트 만들기 →
+          </button>
+          <button class="cta-secondary" onclick="switchPage('rooms')">
+            공개 아지트 둘러보기
+          </button>
         </div>
       </div>
+
       <div class="feat-elements-banner">
-        <img src="./images/elements.png" alt="아나나스 요소들" class="feb-img">
+        <img src="./images/elements.png" alt="아나나스 세계관 일러스트" class="feb-img">
       </div>
     </section>
 
-    <!-- ── ROOMS ── -->
     <section id="page-rooms" class="page hidden">
       <div class="page-header">
-        <span class="page-eyebrow">OPEN CHANNELS</span>
-        <h2 class="page-title">지금 핫한 아지트</h2>
-        <p class="page-sub">공개 채널에 입장하거나 나만의 아지트를 열어보세요</p>
+        <span class="page-eyebrow">OPEN AZIT</span>
+        <h2 class="page-title">지금 열려 있는 아지트</h2>
+        <p class="page-sub">공개 아지트에 입장하거나, 파도를 타고 우연한 만남을 즐기세요</p>
       </div>
+
+      <!-- 검색·필터 바 -->
       <div class="rooms-bar">
         <div class="rooms-filters">
           <button class="rf active" onclick="filterRooms('all',this)">전체</button>
-          <button class="rf" onclick="filterRooms('chat',this)">일상</button>
+          <button class="rf" onclick="filterRooms('daily',this)">일상</button>
           <button class="rf" onclick="filterRooms('study',this)">공부</button>
-          <button class="rf" onclick="filterRooms('fun',this)">게임</button>
+          <button class="rf" onclick="filterRooms('music',this)">음악</button>
+          <button class="rf" onclick="filterRooms('hobby',this)">취미</button>
           <button class="rf" onclick="filterRooms('info',this)">정보</button>
+          <button class="rf" onclick="filterRooms('club',this)">친목</button>
         </div>
-        <button class="rooms-new-btn" onclick="document.getElementById('powerBtn').click()">+ 새 아지트</button>
+        <div class="rooms-bar-acts">
+          <button class="rooms-wave-btn" id="roomsWaveBtn">🌊 파도타기</button>
+          <button class="rooms-new-btn" onclick="document.getElementById('powerBtn').click()">+ 새 아지트</button>
+        </div>
       </div>
+
+      <!-- 서버 연결 상태 배너 -->
+      <div class="rooms-status" id="roomsStatus">
+        <span class="rs-dot"></span>
+        <span id="roomsStatusText">서버에 연결 중…</span>
+      </div>
+
+      <!-- 아지트 카드 그리드 -->
       <div class="rooms-grid" id="roomsGrid">
-        <div class="room-card" data-tag="chat" onclick="quickJoinRoom('자유토크 방','chat','아무 대화나 자유롭게')">
-          <div class="rc-img"><img src="./images/hero.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"><span class="rc-tag t-chat">일상</span></div>
-            <h3>자유토크 방</h3>
-            <p>아무 대화나 자유롭게 나누는 공간</p>
-            <div class="rc-foot"><span class="rc-code">FREETK</span><span class="rc-join">입장 →</span></div>
-          </div>
+        <div class="rooms-empty" id="roomsEmpty">
+          <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
+          <p>아직 열린 공개 아지트가 없어요.<br>첫 번째 아지트의 주인이 되어 보세요!</p>
+          <button class="cta-primary" onclick="document.getElementById('powerBtn').click()">아지트 만들기</button>
         </div>
-        <div class="room-card" data-tag="info" onclick="quickJoinRoom('여행 정보 공유','info','국내외 여행 꿀팁')">
-          <div class="rc-img"><img src="./images/elements.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"><span class="rc-tag t-info">정보</span></div>
-            <h3>여행 정보 공유</h3>
-            <p>국내외 여행 꿀팁과 숙소 정보</p>
-            <div class="rc-foot"><span class="rc-code">TRAVEL</span><span class="rc-join">입장 →</span></div>
+      </div>
+
+      <!-- 초대 코드로 직접 입장 -->
+      <div class="rooms-direct">
+        <div class="rd-inner">
+          <canvas class="px" data-sprite="key" data-scale="3"></canvas>
+          <div>
+            <h4>코드로 바로 입장</h4>
+            <p>초대 코드가 있다면 여기에 입력하세요</p>
           </div>
-        </div>
-        <div class="room-card" data-tag="study" onclick="quickJoinRoom('개발자 아지트','study','코딩 웹 기술 공유')">
-          <div class="rc-img"><img src="./images/hero.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"><span class="rc-tag t-study">공부</span></div>
-            <h3>개발자 아지트</h3>
-            <p>코딩, 웹 기술, 사이드 프로젝트</p>
-            <div class="rc-foot"><span class="rc-code">DEVHUB</span><span class="rc-join">입장 →</span></div>
-          </div>
-        </div>
-        <div class="room-card" data-tag="fun" onclick="quickJoinRoom('게임 수다방','fun','요즘 하는 게임 이야기')">
-          <div class="rc-img"><img src="./images/elements.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"><span class="rc-tag t-fun">게임</span></div>
-            <h3>게임 수다방</h3>
-            <p>요즘 하는 게임 이야기</p>
-            <div class="rc-foot"><span class="rc-code">GAMERZ</span><span class="rc-join">입장 →</span></div>
-          </div>
-        </div>
-        <div class="room-card" data-tag="chat" onclick="quickJoinRoom('음악 취향 공유','chat','요즘 내 플레이리스트')">
-          <div class="rc-img"><img src="./images/hero.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"><span class="rc-tag t-chat">일상</span></div>
-            <h3>음악 취향 공유</h3>
-            <p>요즘 내 플레이리스트 추천</p>
-            <div class="rc-foot"><span class="rc-code">MUSICL</span><span class="rc-join">입장 →</span></div>
-          </div>
-        </div>
-        <div class="room-card rc-new" onclick="document.getElementById('powerBtn').click()">
-          <div class="rc-img rc-new-img"><img src="./images/elements.png" alt=""></div>
-          <div class="rc-body">
-            <div class="rc-top"></div>
-            <h3>내 아지트 만들기</h3>
-            <p>나만의 채팅방을 직접 개설하세요</p>
-            <div class="rc-foot"><span class="rc-join" style="margin-left:auto">개설하기 →</span></div>
+          <div class="rd-input-row">
+            <input type="text" id="directCodeInput" class="rd-input" maxlength="6"
+              placeholder="A1B2C3" oninput="this.value=this.value.toUpperCase()">
+            <button class="rd-btn" onclick="directJoin()">입장</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── AI ASSISTANT ── -->
     <section id="page-ai" class="page hidden">
       <div class="page-header">
         <span class="page-eyebrow">AI ASSISTANT</span>
         <h2 class="page-title">아나나스 AI 어시스턴트</h2>
-        <p class="page-sub">Claude AI와 대화하며 질문, 번역, 아이디어를 얻어보세요</p>
+        <p class="page-sub">질문 · 번역 · 아이디어 — 아지트 안의 똑똑한 친구</p>
       </div>
+
       <div class="ai-layout">
-        <div class="ai-chat-area">
+        <!-- 채팅 영역 -->
+        <div class="ai-chat-area retro-window">
+          <div class="rw-titlebar">
+            <span class="rw-title">
+              <svg class="rw-logo" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>
+              AI 어시스턴트
+            </span>
+            <span class="rw-statusbar">claude-sonnet · 서버 프록시</span>
+            <span class="rw-btns"><i></i><i></i><i class="rw-x"></i></span>
+          </div>
           <div class="ai-messages" id="aiMessages">
             <div class="ai-welcome">
-              <div class="ai-wel-pixel"><img src="./images/hero.png" alt=""></div>
-              <h3>안녕하세요! 아나나스 AI입니다</h3>
-              <p>무엇이든 물어보세요. 질문, 번역, 글쓰기, 아이디어 모두 도와드립니다.</p>
+              <div class="ai-wel-pixel"><canvas class="px" data-sprite="pine" data-scale="6"></canvas></div>
+              <h3>안녕하세요! 아나나스 AI예요 🍍</h3>
+              <p>무엇이든 물어보세요.<br>질문 · 번역 · 글쓰기 · 아이디어를 도와드려요.</p>
               <div class="ai-suggestions">
-                <button class="ai-sug" onclick="sendAiSuggestion(this)">아나나스 채팅방 사용 방법 알려줘</button>
-                <button class="ai-sug" onclick="sendAiSuggestion(this)">다른 사람과 채팅하려면 어떻게 해?</button>
+                <button class="ai-sug" onclick="sendAiSuggestion(this)">아나나스 사용 방법 알려줘</button>
+                <button class="ai-sug" onclick="sendAiSuggestion(this)">방명록에 남길 한 줄 추천해줘</button>
+                <button class="ai-sug" onclick="sendAiSuggestion(this)">영어로 자기소개 번역해줘</button>
                 <button class="ai-sug" onclick="sendAiSuggestion(this)">파인애플에 대해 알려줘</button>
-                <button class="ai-sug" onclick="sendAiSuggestion(this)">DAO가 뭐야?</button>
               </div>
             </div>
           </div>
           <div class="ai-input-area">
             <div class="ai-input-row">
-              <textarea id="aiInput" class="ai-textarea" placeholder="AI에게 무엇이든 물어보세요..." rows="1"></textarea>
+              <textarea id="aiInput" class="ai-textarea" placeholder="AI에게 무엇이든 물어보세요…" rows="1"></textarea>
               <button class="ai-send-btn" id="aiSendBtn">전송</button>
             </div>
-            <p class="ai-disclaimer">Claude AI (Anthropic)를 사용합니다. 중요한 사항은 전문가에게 확인하세요.</p>
+            <p class="ai-disclaimer">Claude AI(Anthropic)를 사용합니다. 중요한 정보는 꼭 다시 확인하세요.</p>
           </div>
         </div>
+
+        <!-- 사이드바 -->
         <div class="ai-sidebar">
-          <div class="ai-sb-pixel">
-            <img src="./images/elements.png" alt="">
-          </div>
-          <div class="ai-tips">
-            <h4>활용 팁</h4>
-            <ul>
-              <li>채팅방 사용법 질문</li>
-              <li>외국어 번역</li>
-              <li>코드 작성 도움</li>
-              <li>글쓰기·아이디어</li>
-              <li>일반 지식 검색</li>
+          <div class="ai-tips retro-window">
+            <div class="rw-titlebar rw-mini">
+              <span class="rw-title">💡 활용 팁</span>
+              <span class="rw-btns"><i></i><i class="rw-x"></i></span>
+            </div>
+            <ul class="ai-tips-list">
+              <li>아지트 사용법 · 기능 질문</li>
+              <li>한국어 ↔ 영어 · 일어 번역</li>
+              <li>방명록 · 상태메시지 문구 작성</li>
+              <li>아이디어 브레인스토밍</li>
+              <li>일반 지식 · 검색 대화</li>
             </ul>
           </div>
-          <div class="ai-sb-pixel2">
-            <img src="./images/hero.png" alt="">
+          <div class="ai-key-notice retro-window">
+            <div class="rw-titlebar rw-mini">
+              <span class="rw-title">🔑 서버 설정</span>
+              <span class="rw-btns"><i></i><i class="rw-x"></i></span>
+            </div>
+            <p class="ai-key-text">AI 기능을 사용하려면 서버의 <code>.env</code> 파일에 Anthropic API 키를 설정하세요.</p>
+            <code class="ai-key-code">ANTHROPIC_API_KEY=sk-ant-...</code>
+            <a class="ai-key-link" href="https://console.anthropic.com" target="_blank" rel="noopener">키 발급받기 →</a>
+          </div>
+          <div class="ai-sb-pixel">
+            <canvas class="px" data-sprite="pineHappy" data-scale="7"></canvas>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── ABOUT ── -->
     <section id="page-about" class="page hidden">
-      <div class="about-hero">
+      <div class="about-hero" id="about-hero">
         <div class="about-text">
           <span class="page-eyebrow">BRAND STORY</span>
-          <h2 class="page-title">아나나스,<br>파인애플처럼.</h2>
-          <p class="about-desc">파인애플(Ananas)은 겉은 거칠어 보여도 안에는 달콤함이 가득합니다. 아나나스 메신저도 마찬가지예요 — 단순한 채팅 앱이 아니라, 우리만의 따뜻한 아지트.</p>
+          <h2 class="page-title">아나나스,<br>그 시절 우리들의 아지트.</h2>
+          <p class="about-desc">미니홈피 방명록에 한 줄을 남기던 마음, 친구 접속 알림에 설레던 그 감각. 파인애플(Ananas)은 겉은 거칠어도 속은 달콤하죠 — 아나나스는 그 시절의 따뜻함을 지금의 메신저로 다시 빚었습니다.</p>
           <div class="about-vals">
-            <div class="av-item"><div><strong>자유로움</strong><p>형식 없이, 편하게 대화하는 공간</p></div></div>
-            <div class="av-item"><div><strong>따뜻함</strong><p>노란빛처럼 밝고 따뜻한 연결</p></div></div>
-            <div class="av-item"><div><strong>연결</strong><p>거리를 넘어 이어지는 관계</p></div></div>
+            <div class="av-item"><canvas class="px" data-sprite="heart" data-scale="3"></canvas>
+              <div><strong>흔적</strong><p>방명록처럼, 다녀간 마음이 남는 공간</p></div></div>
+            <div class="av-item"><canvas class="px" data-sprite="wave"  data-scale="3"></canvas>
+              <div><strong>우연</strong><p>파도타기처럼, 뜻밖의 만남이 있는 공간</p></div></div>
+            <div class="av-item"><canvas class="px" data-sprite="pine"  data-scale="3"></canvas>
+              <div><strong>온기</strong><p>파인애플빛처럼, 밝고 따뜻한 연결</p></div></div>
+          </div>
+          <div class="about-btns">
+            <button class="cta-primary" onclick="document.getElementById('powerBtn').click()">아지트 만들기</button>
+            <button class="cta-secondary" onclick="switchPage('features')">기능 살펴보기</button>
           </div>
         </div>
         <div class="about-vis">
-          <img src="./images/hero.png" alt="" class="about-main-img">
-          <div class="about-float-pixel">
-            <img src="./images/elements.png" alt="">
+          <img src="./images/hero.png" alt="아나나스 톡방 일러스트" class="about-main-img">
+          <div class="about-float-pixel"><canvas class="px" data-sprite="pineHappy" data-scale="5"></canvas></div>
+        </div>
+      </div>
+
+      <!-- 타임라인 -->
+      <div class="tl-section" id="about-timeline">
+        <h3 class="tl-title">아나나스의 탄생</h3>
+        <div class="tl">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-body"><span class="tl-year">CONCEPT</span>
+            <p>"우리만의 공간에서 자유롭게" — 미니홈피와 버디버디 감성에서 출발</p></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-body"><span class="tl-year">DESIGN</span>
+            <p>픽셀아트 파인애플 캐릭터와 레트로 메신저 창으로 브랜드 세계관 구축</p></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-body"><span class="tl-year">BUILD</span>
+            <p>Socket.IO 위에 방명록 · 파도타기 · 공감 · 답장 · AI 어시스턴트 구현</p></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-active"></div>
+            <div class="tl-body"><span class="tl-year">NOW</span>
+            <p>1,000명 규모 보안 설계 완료. 지금 바로 아지트를 열어보세요!</p></div>
           </div>
         </div>
       </div>
-      <div class="tl-section">
-        <h3 class="tl-title">아나나스의 탄생</h3>
-        <div class="tl">
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><span class="tl-year">CONCEPT</span><p>우리만의 공간에서 자유롭게 대화하고 싶다는 아이디어에서 시작</p></div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><span class="tl-year">DESIGN</span><p>픽셀아트 파인애플 캐릭터로 귀엽고 따뜻한 브랜드 아이덴티티 구축</p></div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-body"><span class="tl-year">BUILD</span><p>Socket.IO 실시간 채팅 엔진, 방 코드 초대 시스템 구현</p></div></div>
-          <div class="tl-item"><div class="tl-dot tl-active"></div><div class="tl-body"><span class="tl-year">NOW</span><p>AI 어시스턴트 내장. 지금 바로 아지트를 만들어보세요!</p></div></div>
+
+      <!-- 개발자 한마디 (포트폴리오용) -->
+      <div class="about-dev-note retro-window" id="about-devnote">
+        <div class="rw-titlebar">
+          <span class="rw-title">
+            <canvas class="px" data-sprite="pineWink" data-scale="2" style="vertical-align:middle;margin-right:6px"></canvas>
+            개발자 한마디
+          </span>
+          <span class="rw-btns"><i></i><i></i><i class="rw-x"></i></span>
+        </div>
+        <div class="adn-body">
+          <p>아나나스는 <strong>Socket.IO 실시간 통신</strong>과 <strong>픽셀아트 캔버스 엔진</strong>을 처음부터 직접 구현한 개인 프로젝트입니다. 레트로 감성을 살리면서도 현대적인 보안(helmet · rate-limit · XSS escape)을 갖춘 채팅 플랫폼을 목표로 했어요.</p>
+          <div class="adn-tags">
+            <span>Node.js</span><span>Socket.IO</span><span>Express</span>
+            <span>Canvas API</span><span>Anthropic Claude</span><span>픽셀 아트</span>
+          </div>
+          <div class="adn-links">
+            <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="adn-link">
+              GitHub →
+            </a>
+            <button class="adn-link" onclick="switchPage('features')">기능 보기 →</button>
+          </div>
         </div>
       </div>
     </section>
@@ -433,14 +693,14 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <img src="./images/hero.png" class="footer-pixel" alt="">
+        <svg class="logo-mark" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>
         <span class="footer-logo">Ananas</span>
       </div>
-      <p class="footer-copy">© 2025 Ananas Messenger. 우리만의 아지트.</p>
+      <p class="footer-copy">© 2026 Ananas Messenger · 우리만의 아지트</p>
       <div class="footer-links">
-        <a href="#" onclick="switchPage('features')">기능</a>
-        <a href="#" onclick="switchPage('ai')">AI</a>
-        <a href="#" onclick="switchPage('about')">스토리</a>
+        <a href="#" onclick="switchPage('features');return false;">기능</a>
+        <a href="#" onclick="switchPage('ai');return false;">AI</a>
+        <a href="#" onclick="switchPage('about');return false;">스토리</a>
       </div>
     </div>
   </footer>
@@ -448,87 +708,108 @@
 
 <!-- ════════════════ MODAL ════════════════ -->
 <div class="modal-overlay hidden" id="talkModal">
-  <div class="modal-card" id="talkModalCard">
-    <button class="modal-close" id="modalClose">✕</button>
-
-    <!-- STEP 1 -->
-    <div class="modal-step" id="step1">
-      <div class="mh">
-        <div class="mh-pixel"><img src="./images/hero.png" alt=""></div>
-        <h2>아지트 프로필</h2>
-        <p>닉네임과 아바타를 선택하세요</p>
-      </div>
-      <div class="av-picker">
-        <label class="fl">아바타 선택</label>
-        <div class="av-grid">
-          <button class="av-btn active" data-emoji="A" onclick="selectAvatar(this)"><img src="./images/hero.png" class="av-img" alt="A"></button>
-          <button class="av-btn" data-emoji="B" onclick="selectAvatar(this)"><img src="./images/hero.png" class="av-img" style="transform:scaleX(-1)" alt="B"></button>
-          <button class="av-btn" data-emoji="C" onclick="selectAvatar(this)"><img src="./images/elements.png" class="av-img" alt="C"></button>
-          <button class="av-btn" data-emoji="D" onclick="selectAvatar(this)"><img src="./images/elements.png" class="av-img" style="transform:scaleX(-1)" alt="D"></button>
-        </div>
-      </div>
-      <div class="fg">
-        <label class="fl" for="nicknameInput">닉네임</label>
-        <input type="text" id="nicknameInput" class="fi" placeholder="사용할 닉네임" maxlength="16" autocomplete="off">
-      </div>
-      <button class="mb mb-y" id="toStep2Btn">다음 →</button>
-      <p class="sh">코드 있나요? <a href="#" onclick="goToJoinStep()">방 참여하기</a></p>
+  <div class="modal-card retro-window" id="talkModalCard">
+    <div class="rw-titlebar">
+      <span class="rw-title"><svg class="rw-logo" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>ANANAS LOGIN</span>
+      <span class="rw-btns"><i></i><i></i><button class="rw-x rw-x-btn" id="modalClose" aria-label="닫기"></button></span>
     </div>
+    <div class="modal-inner">
 
-    <!-- STEP 2 -->
-    <div class="modal-step hidden" id="step2">
-      <button class="sbk" onclick="goBack(2)">← 뒤로</button>
-      <div class="s2tabs">
-        <button class="s2t active" id="tabCreate" onclick="switchTab('create')">방 만들기</button>
-        <button class="s2t" id="tabJoin"   onclick="switchTab('join')">코드 참여</button>
-      </div>
-      <div id="createPanel">
-        <div class="fg"><label class="fl" for="roomNameInput">채팅방 이름</label><input type="text" id="roomNameInput" class="fi" placeholder="우리 아지트 이름" maxlength="30" autocomplete="off"></div>
-        <div class="fg"><label class="fl" for="roomDescInput">방 설명 (선택)</label><input type="text" id="roomDescInput" class="fi" placeholder="어떤 이야기를 나누나요?" maxlength="60" autocomplete="off"></div>
-        <div class="fg">
-          <label class="fl">카테고리</label>
-          <div class="cat-grid">
-            <button class="cat active" data-cat="chat"  onclick="selectCat(this)">일상</button>
-            <button class="cat" data-cat="study" onclick="selectCat(this)">공부</button>
-            <button class="cat" data-cat="fun"   onclick="selectCat(this)">게임</button>
-            <button class="cat" data-cat="info"  onclick="selectCat(this)">정보</button>
-            <button class="cat" data-cat="music" onclick="selectCat(this)">음악</button>
-            <button class="cat" data-cat="dev"   onclick="selectCat(this)">개발</button>
-            <button class="cat" data-cat="etc"   onclick="selectCat(this)">기타</button>
+      <!-- STEP 1: 프로필 -->
+      <div class="modal-step" id="step1">
+        <div class="mh">
+          <h2>아지트 프로필</h2>
+          <p>아바타와 오늘의 기분을 골라주세요</p>
+        </div>
+        <div class="av-picker">
+          <label class="fl">아바타</label>
+          <div class="av-grid">
+            <button class="av-btn active" data-emoji="A" onclick="selectAvatar(this)"><canvas class="px" data-sprite="pine"      data-scale="3"></canvas></button>
+            <button class="av-btn" data-emoji="B" onclick="selectAvatar(this)"><canvas class="px" data-sprite="pineWink"  data-scale="3"></canvas></button>
+            <button class="av-btn" data-emoji="C" onclick="selectAvatar(this)"><canvas class="px" data-sprite="pineCool"  data-scale="3"></canvas></button>
+            <button class="av-btn" data-emoji="D" onclick="selectAvatar(this)"><canvas class="px" data-sprite="pineHappy" data-scale="3"></canvas></button>
           </div>
         </div>
-        <button class="mb mb-y" id="createRoomBtn">아지트 개설하기</button>
+        <div class="fg">
+          <label class="fl">오늘의 기분</label>
+          <div class="mood-grid">
+            <button class="mood active" data-mood="happy"   onclick="selectMood(this)">😊 행복</button>
+            <button class="mood" data-mood="excited" onclick="selectMood(this)">🤩 신남</button>
+            <button class="mood" data-mood="soso"    onclick="selectMood(this)">😶 그냥</button>
+            <button class="mood" data-mood="sleepy"  onclick="selectMood(this)">😪 졸림</button>
+            <button class="mood" data-mood="blue"    onclick="selectMood(this)">🌧 우울</button>
+            <button class="mood" data-mood="love"    onclick="selectMood(this)">💛 설렘</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="nicknameInput">닉네임</label>
+          <input type="text" id="nicknameInput" class="fi" placeholder="사용할 닉네임" maxlength="16" autocomplete="off">
+        </div>
+        <button class="mb mb-y" id="toStep2Btn">다음 →</button>
+        <p class="sh">코드 있나요? <a href="#" onclick="goToJoinStep();return false;">바로 참여하기</a></p>
       </div>
-      <div id="joinPanel" class="hidden">
-        <div class="fg"><label class="fl" for="roomCodeInput">방 코드</label><input type="text" id="roomCodeInput" class="fi fi-code" placeholder="XXXXXX" maxlength="6" autocomplete="off"></div>
-        <p class="fh">방장에게 6자리 코드를 받아 입력하세요</p>
-        <button class="mb mb-d" id="joinRoomBtn">입장하기</button>
-      </div>
-    </div>
 
-    <!-- STEP 3 -->
-    <div class="modal-step hidden" id="step3">
-      <div class="mh">
-        <div class="mh-pixel mh-bounce"><img src="./images/hero.png" alt=""></div>
-        <h2>아지트가 열렸어요!</h2>
-        <p id="createdRoomNameDisplay"></p>
-      </div>
-      <div class="ic-box">
-        <label class="fl">초대 코드</label>
-        <div class="ic-row">
-          <span id="inviteCodeDisplay" class="ic-code">------</span>
-          <button class="ic-copy" id="copyCodeBtn" onclick="copyCode()">복사</button>
+      <!-- STEP 2: 만들기/참여 -->
+      <div class="modal-step hidden" id="step2">
+        <button class="sbk" onclick="goBack(2)">← 뒤로</button>
+        <div class="s2tabs">
+          <button class="s2t active" id="tabCreate" onclick="switchTab('create')">방 만들기</button>
+          <button class="s2t" id="tabJoin" onclick="switchTab('join')">코드 참여</button>
         </div>
-        <p class="ic-desc">이 코드를 친구에게 공유하면 같은 방에 입장할 수 있어요</p>
-      </div>
-      <div class="ic-box">
-        <label class="fl">초대 링크</label>
-        <div class="ic-row">
-          <span id="inviteLinkDisplay" class="ic-link"></span>
-          <button class="ic-copy" onclick="copyLink()">복사</button>
+        <div id="createPanel">
+          <div class="fg"><label class="fl" for="roomNameInput">아지트 이름</label><input type="text" id="roomNameInput" class="fi" placeholder="우리 아지트 이름" maxlength="30" autocomplete="off"></div>
+          <div class="fg"><label class="fl" for="roomDescInput">설명 (선택)</label><input type="text" id="roomDescInput" class="fi" placeholder="어떤 이야기를 나누나요?" maxlength="60" autocomplete="off"></div>
+          <div class="fg">
+            <label class="fl">카테고리</label>
+            <div class="cat-grid">
+              <button class="cat active" data-cat="daily" onclick="selectCat(this)">일상</button>
+              <button class="cat" data-cat="study" onclick="selectCat(this)">공부</button>
+              <button class="cat" data-cat="music" onclick="selectCat(this)">음악</button>
+              <button class="cat" data-cat="hobby" onclick="selectCat(this)">취미</button>
+              <button class="cat" data-cat="info"  onclick="selectCat(this)">정보</button>
+              <button class="cat" data-cat="club"  onclick="selectCat(this)">친목</button>
+              <button class="cat" data-cat="etc"   onclick="selectCat(this)">기타</button>
+            </div>
+          </div>
+          <label class="public-toggle">
+            <input type="checkbox" id="publicToggle">
+            <span class="pt-box"></span>
+            <span class="pt-label">공개 아지트로 등록 <small>· 파도타기와 아지트 목록에 노출됩니다</small></span>
+          </label>
+          <button class="mb mb-y" id="createRoomBtn">아지트 개설하기</button>
+        </div>
+        <div id="joinPanel" class="hidden">
+          <div class="fg"><label class="fl" for="roomCodeInput">초대 코드</label><input type="text" id="roomCodeInput" class="fi fi-code" placeholder="XXXXXX" maxlength="6" autocomplete="off"></div>
+          <p class="fh">방장에게 받은 6자리 코드를 입력하세요</p>
+          <button class="mb mb-d" id="joinRoomBtn">입장하기</button>
         </div>
       </div>
-      <button class="mb mb-y" id="enterRoomBtn">채팅방 입장하기 →</button>
+
+      <!-- STEP 3: 개설 완료 -->
+      <div class="modal-step hidden" id="step3">
+        <div class="mh">
+          <div class="mh-pixel mh-bounce"><canvas class="px" data-sprite="pineHappy" data-scale="4"></canvas></div>
+          <h2>아지트가 열렸어요!</h2>
+          <p id="createdRoomNameDisplay"></p>
+        </div>
+        <div class="ic-box">
+          <label class="fl">초대 코드</label>
+          <div class="ic-row">
+            <span id="inviteCodeDisplay" class="ic-code">------</span>
+            <button class="ic-copy" id="copyCodeBtn" onclick="copyCode()">복사</button>
+          </div>
+          <p class="ic-desc">이 코드를 친구에게 공유하면 같은 아지트에 들어올 수 있어요</p>
+        </div>
+        <div class="ic-box">
+          <label class="fl">초대 링크</label>
+          <div class="ic-row">
+            <span id="inviteLinkDisplay" class="ic-link"></span>
+            <button class="ic-copy" onclick="copyLink()">복사</button>
+          </div>
+        </div>
+        <button class="mb mb-y" id="enterRoomBtn">아지트 입장하기 →</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -537,16 +818,23 @@
 <div class="chat-app hidden" id="chatApp">
   <aside class="chat-sb">
     <div class="csb-logo">
-      <img src="./images/hero.png" class="csb-pixel" alt="">
+      <svg class="logo-mark" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>
       <span>Ananas</span>
     </div>
-    <div class="csb-profile">
-      <div class="csb-av" id="myAvatarDisplay"><img src="./images/hero.png" class="csb-av-img" alt=""></div>
-      <div>
-        <div class="csb-name" id="myNicknameDisplay">—</div>
-        <div class="csb-status">온라인</div>
+
+    <!-- 미니홈피 프로필 카드 -->
+    <div class="csb-profile retro-window">
+      <div class="rw-titlebar rw-mini"><span class="rw-title">MY 미니프로필</span><span class="rw-btns"><i></i><i class="rw-x"></i></span></div>
+      <div class="csb-profile-body">
+        <div class="csb-av" id="myAvatarDisplay"><canvas class="px" data-sprite="pine" data-scale="3"></canvas></div>
+        <div class="csb-pinfo">
+          <div class="csb-name" id="myNicknameDisplay">—</div>
+          <button class="csb-mood" id="myMoodBtn" title="기분 바꾸기">😊 행복</button>
+        </div>
       </div>
+      <div class="csb-mood-pop hidden" id="moodPop"></div>
     </div>
+
     <div class="csb-section">
       <p class="csb-label">현재 아지트</p>
       <div class="csb-room-card">
@@ -555,68 +843,152 @@
         <div class="csb-online"><span class="csb-dot"></span><span id="onlineCount">1명 접속</span></div>
       </div>
     </div>
+
+    <div class="csb-tabs">
+      <button class="csb-tab active" id="tabMembers" onclick="switchSbTab('members')">친구 <span id="memberCnt"></span></button>
+      <button class="csb-tab" id="tabGuestbook" onclick="switchSbTab('guestbook')">방명록</button>
+    </div>
+    <div class="csb-panel" id="membersPanel"></div>
+    <div class="csb-panel hidden" id="guestbookPanel">
+      <div class="gb-list" id="gbList">
+        <p class="gb-empty">아직 방명록이 비어 있어요.<br>첫 흔적을 남겨보세요!</p>
+      </div>
+      <div class="gb-input-row">
+        <input type="text" id="gbInput" class="gb-input" placeholder="한 줄 남기기…" maxlength="120">
+        <button class="gb-send" id="gbSendBtn">남기기</button>
+      </div>
+    </div>
+
     <div class="csb-actions">
       <button class="csb-btn csb-share" id="shareInviteBtn">초대 링크 복사</button>
-      <button class="csb-btn csb-home"  id="toHomeBtn">홈으로</button>
-      <button class="csb-btn csb-out"   id="chatLogoutBtn">로그아웃</button>
-    </div>
-    <div class="csb-bot-pixel">
-      <img src="./images/elements.png" alt="">
+      <button class="csb-btn csb-home" id="toHomeBtn">홈으로</button>
+      <button class="csb-btn csb-out" id="chatLogoutBtn">아지트 나가기</button>
     </div>
   </aside>
 
-  <main class="chat-main">
-    <!-- 공지 -->
+  <main class="chat-main retro-window">
+    <div class="rw-titlebar">
+      <span class="rw-title"><svg class="rw-logo" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg><span id="chatRoomTitle">아지트</span></span>
+      <span class="rw-btns"><i></i><i></i><button class="rw-x rw-x-btn" id="chatHomeBtn" aria-label="홈으로"></button></span>
+    </div>
+
+    <header class="chat-hdr">
+      <div class="ch-info">
+        <div class="ch-meta">
+          <span class="ch-code" id="chatRoomCode">—</span>
+          <span class="ch-online-badge" id="chatOnlineCount">1명</span>
+          <span class="ch-conn hidden" id="chatConnState">● 재연결 중…</span>
+        </div>
+      </div>
+      <div class="ch-acts">
+        <button class="ch-btn" id="searchToggleBtn">🔍 검색</button>
+        <button class="ch-btn" id="showCodeBtn">🔑 초대 코드</button>
+      </div>
+    </header>
+
     <div class="notice-bar hidden" id="noticeBar">
       <span class="notice-pin">📌</span>
       <span class="notice-txt" id="noticeText"></span>
       <button class="notice-x" id="noticeClose">✕</button>
     </div>
-    <!-- 헤더 -->
-    <header class="chat-hdr">
-      <div class="ch-info">
-        <img src="./images/hero.png" class="ch-room-pixel" alt="">
-        <div>
-          <h2 id="chatRoomTitle">채팅방</h2>
-          <div class="ch-meta">
-            <span class="ch-code" id="chatRoomCode">—</span>
-            <span class="ch-online-badge" id="chatOnlineCount">1명</span>
-          </div>
-        </div>
-      </div>
-      <div class="ch-acts">
-        <button class="ch-btn" id="searchToggleBtn">검색</button>
-        <button class="ch-btn" id="showCodeBtn">초대 코드</button>
-        <button class="ch-btn ch-back" id="chatHomeBtn">← 홈</button>
-      </div>
-    </header>
-    <!-- 검색 바 -->
+
     <div class="search-bar hidden" id="searchBar">
-      <input type="text" id="searchInput" class="search-inp" placeholder="메시지 검색...">
+      <input type="text" id="searchInput" class="search-inp" placeholder="메시지 검색…">
       <button id="searchCloseBtn" class="search-x">✕</button>
     </div>
-    <!-- 메시지 영역 -->
+
     <div class="messages-area" id="messagesArea">
       <div class="msg-empty" id="messagesEmpty">
-        <img src="./images/hero.png" class="me-pixel" alt="">
+        <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
         <p>아직 대화가 없어요.<br>첫 메시지를 보내보세요!</p>
       </div>
     </div>
-    <!-- 입력 -->
+
+    <button class="new-msg-jump hidden" id="newMsgJump">새 메시지 ↓</button>
+
+    <div class="typing-bar" id="typingBar"></div>
+
+    <!-- 답장 미리보기 -->
+    <div class="reply-preview hidden" id="replyPreview">
+      <div class="rp-body">
+        <span class="rp-label">답장</span>
+        <span class="rp-user" id="rpUser"></span>
+        <span class="rp-text" id="rpText"></span>
+      </div>
+      <button class="rp-x" id="replyCancel">✕</button>
+    </div>
+
+    <!-- 이모지 피커 -->
+    <div class="emoji-pop hidden" id="emojiPop"></div>
+
     <div class="chat-input-zone">
       <div class="ci-row">
-        <div class="ci-av" id="myAvatarMini"><img src="./images/hero.png" class="ci-av-img" alt=""></div>
-        <label class="ci-img-btn" for="imageFileInput" title="사진 첨부">+</label>
+        <label class="ci-img-btn" for="imageFileInput" title="사진 첨부">📷</label>
         <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-        <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요..." maxlength="500" autocomplete="off">
+        <button class="ci-emoji-btn" id="emojiBtn" title="이모티콘">😊</button>
+        <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요…" maxlength="500" autocomplete="off">
         <button class="ci-send" id="sendBtn">전송</button>
       </div>
     </div>
   </main>
 </div>
 
+<!-- 메시지 컨텍스트 메뉴 -->
+<div class="msg-menu hidden" id="msgMenu">
+  <div class="mm-reactions" id="mmReactions"></div>
+  <button class="mm-item" id="mmReply">↩ 답장</button>
+  <button class="mm-item" id="mmNotice">📌 공지로 고정</button>
+  <button class="mm-item mm-danger" id="mmDelete">🗑 삭제</button>
+</div>
+
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════ AI 빠른 질문 모달 ════════ -->
+<div class="modal-overlay hidden" id="aiQuickModal">
+  <div class="modal-card retro-window" style="max-width:480px;width:94%">
+    <div class="rw-titlebar">
+      <span class="rw-title">
+        <svg class="rw-logo" viewBox="0 0 64 64"><use href="#ananas-logo-shape"/></svg>
+        AI 빠른 질문
+      </span>
+      <span class="rw-btns"><i></i><i></i><button class="rw-x rw-x-btn" id="aiQuickClose" aria-label="닫기"></button></span>
+    </div>
+    <div class="modal-inner" style="padding:20px">
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:12px">AI에게 바로 물어보세요!</p>
+      <textarea id="aiQuickInput" class="ai-textarea" placeholder="질문을 입력하세요…" rows="3"
+        style="width:100%;resize:none;padding:12px;border:2px solid var(--ink);border-radius:var(--rs);font-family:inherit;font-size:0.95rem;background:#FFFEF8"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="mb mb-y" id="aiQuickSendBtn" style="flex:1">전송 →</button>
+        <button class="mb" id="aiQuickFullBtn" style="background:var(--c2);border:2px solid var(--ink);border-radius:var(--rs);padding:10px 16px;font-family:var(--pxfont)" onclick="closeAiQuickChat();switchPage('ai')">AI 페이지로</button>
+      </div>
+      <div id="aiQuickResult" style="margin-top:14px;display:none">
+        <div style="font-size:0.8rem;color:var(--gray);margin-bottom:6px;font-family:var(--pxfont)">AI 답변</div>
+        <div id="aiQuickResultText" style="background:var(--c2);border:2px solid var(--ink);border-radius:var(--rs);padding:12px;font-size:0.9rem;line-height:1.6;max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 코드 직접 입장 모달 ════════ -->
+<div class="modal-overlay hidden" id="joinDirectModal">
+  <div class="modal-card retro-window" style="max-width:400px;width:94%">
+    <div class="rw-titlebar">
+      <span class="rw-title">🔑 코드로 입장</span>
+      <span class="rw-btns"><i></i><i></i><button class="rw-x rw-x-btn" id="joinDirectClose" aria-label="닫기"></button></span>
+    </div>
+    <div class="modal-inner" style="padding:20px">
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:16px">초대받은 6자리 코드를 입력하세요</p>
+      <div class="fg">
+        <label class="fl" for="joinDirectInput">초대 코드</label>
+        <input type="text" id="joinDirectInput" class="fi fi-code" placeholder="A1B2C3"
+          maxlength="6" autocomplete="off" oninput="this.value=this.value.toUpperCase()"
+          style="text-align:center;letter-spacing:0.3em;font-size:1.4rem;font-family:var(--pxfont)">
+      </div>
+      <button class="mb mb-y" id="joinDirectSubmitBtn" style="width:100%;margin-top:12px">입장하기 →</button>
+    </div>
+  </div>
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>

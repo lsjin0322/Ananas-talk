@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="이수진 — 문제를 발견하고 AI와 협업하여 실제 서비스를 만드는 개발자">
+<title>이수진 — AI Collaboration Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  --bg:           #080810;
+  --bg-lift:      rgba(255,255,255,0.018);
+  --border:       rgba(255,255,255,0.06);
+  --border-h:     rgba(124,111,247,0.35);
+  --t1:           #f0f0f8;
+  --t2:           #9898b8;
+  --t3:           #50507a;
+  --accent:       #7c6ff7;
+  --accent-dim:   rgba(124,111,247,0.12);
+  --accent-b:     #60a5fa;
+  --accent-g:     #34d399;
+  --accent-o:     #fb923c;
+  --r:            16px;
+  --max:          1080px;
+  --py:           120px;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+
+/* ── Scroll Progress ───────────────────────────────────── */
+#sp {
+  position: fixed; top: 0; left: 0;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-b));
+  z-index: 1000;
+  transition: width .08s linear;
+}
+
+/* ── Ambient Orbs ──────────────────────────────────────── */
+.ambient {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(100px);
+}
+.orb-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, var(--accent), transparent 70%);
+  top: -250px; left: -150px; opacity: .1;
+  animation: fl1 22s ease-in-out infinite;
+}
+.orb-2 {
+  width: 550px; height: 550px;
+  background: radial-gradient(circle, var(--accent-b), transparent 70%);
+  bottom: 5%; right: -180px; opacity: .08;
+  animation: fl2 28s ease-in-out infinite;
+}
+.orb-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--accent-g), transparent 70%);
+  top: 60%; left: 40%; opacity: .05;
+  animation: fl3 35s ease-in-out infinite;
+}
+@keyframes fl1 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  40%      { transform: translate(80px,100px) scale(1.15); }
+  70%      { transform: translate(-50px,50px) scale(.9); }
+}
+@keyframes fl2 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  35%     { transform: translate(-90px,-70px) scale(1.1); }
+  70%     { transform: translate(60px,-40px) scale(.92); }
+}
+@keyframes fl3 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(-60px,60px) scale(1.3); }
+}
+
+/* ── Navigation ────────────────────────────────────────── */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 0 40px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid transparent;
+  transition: background .3s, border-color .3s, backdrop-filter .3s;
+}
+#nav.scrolled {
+  background: rgba(8,8,16,.85);
+  backdrop-filter: blur(24px);
+  border-color: var(--border);
+}
+.nav-logo {
+  font-size: 16px; font-weight: 700; letter-spacing: -.02em;
+}
+.nav-logo em { font-style: normal; color: var(--accent); }
+.nav-links { display: flex; gap: 30px; align-items: center; }
+.nav-links a {
+  font-size: 14px; color: var(--t2);
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--t1); }
+.nav-cta {
+  font-size: 13px; font-weight: 600;
+  padding: 8px 18px; border-radius: 8px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(124,111,247,.25);
+  color: var(--accent);
+  transition: all .2s;
+}
+.nav-cta:hover {
+  background: rgba(124,111,247,.22);
+  border-color: var(--accent);
+}
+
+/* ── Container ─────────────────────────────────────────── */
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative; z-index: 1;
+}
+
+/* ── Section Label ─────────────────────────────────────── */
+.label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.label::before {
+  content: ''; display: block;
+  width: 22px; height: 1px; background: var(--accent);
+}
+
+/* ── Section Title ─────────────────────────────────────── */
+.stitle {
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 800; letter-spacing: -.035em;
+  color: var(--t1); line-height: 1.18;
+}
+.stitle em { font-style: normal; color: var(--accent); }
+.sdesc {
+  font-size: 16px; color: var(--t2); font-weight: 300;
+  line-height: 1.8; margin-top: 14px; max-width: 480px;
+}
+
+/* ── HERO ──────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh; position: relative;
+  display: flex; flex-direction: column;
+  justify-content: center; padding-top: 64px; overflow: hidden;
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero-h1 {
+  font-size: clamp(48px, 8.5vw, 104px);
+  font-weight: 800; letter-spacing: -.045em;
+  line-height: 1.04;
+}
+.hl {
+  display: block;
+  opacity: 0; transform: translateY(70px);
+  animation: hup .9s cubic-bezier(.16,1,.3,1) forwards;
+}
+.hl:nth-child(1) { animation-delay: .05s; }
+.hl:nth-child(2) {
+  animation-delay: .25s;
+  background: linear-gradient(130deg, var(--accent) 0%, var(--accent-b) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+@keyframes hup {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-meta {
+  margin-top: 60px;
+  opacity: 0; transform: translateY(20px);
+  animation: fup .8s cubic-bezier(.16,1,.3,1) .55s forwards;
+}
+.hero-name { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+.badge {
+  font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  padding: 4px 14px; border-radius: 100px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(124,111,247,.2);
+  color: var(--accent);
+}
+.hero-desc {
+  font-size: 17px; color: var(--t2); font-weight: 300;
+  line-height: 1.9; max-width: 400px; margin-bottom: 44px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-p {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 12px;
+  background: var(--accent); color: #fff;
+  font-size: 15px; font-weight: 700;
+  transition: all .22s; letter-spacing: -.01em;
+}
+.btn-p:hover {
+  background: #8f83f8; transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124,111,247,.4);
+}
+.btn-s {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  color: var(--t2); font-size: 15px; font-weight: 500;
+  transition: all .22s;
+}
+.btn-s:hover {
+  border-color: rgba(255,255,255,.14); color: var(--t1);
+  transform: translateY(-2px);
+}
+
+.scroll-hint {
+  position: absolute; bottom: 44px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: 0; animation: fadein 1s 1.6s forwards;
+}
+.scroll-hint span { font-size: 10px; letter-spacing: .2em; color: var(--t3); text-transform: uppercase; }
+.scroll-mouse {
+  width: 20px; height: 32px;
+  border: 1.5px solid var(--t3); border-radius: 12px; position: relative;
+}
+.scroll-mouse::after {
+  content: ''; position: absolute;
+  left: 50%; top: 6px; transform: translateX(-50%);
+  width: 3px; height: 7px; border-radius: 3px;
+  background: var(--t3);
+  animation: sbob 2s ease-in-out infinite;
+}
+@keyframes sbob {
+  0%,100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  80%      { transform: translateX(-50%) translateY(10px); opacity: 0; }
+}
+
+/* ── Section base ──────────────────────────────────────── */
+section { padding: var(--py) 0; position: relative; z-index: 1; }
+
+/* ── WHY I BUILD ───────────────────────────────────────── */
+.why-head { margin-bottom: 56px; }
+.why-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.wcard {
+  background: var(--bg-lift);
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 36px 30px; position: relative; overflow: hidden;
+  transition: border-color .3s, transform .4s cubic-bezier(.16,1,.3,1);
+}
+.wcard::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 0%, rgba(124,111,247,.09), transparent 60%);
+  opacity: 0; transition: opacity .3s;
+}
+.wcard:hover { border-color: var(--border-h); transform: translateY(-6px); }
+.wcard:hover::after { opacity: 1; }
+.wcard-icon {
+  font-size: 26px; margin-bottom: 22px;
+  width: 52px; height: 52px; border-radius: 14px;
+  background: var(--accent-dim); border: 1px solid rgba(124,111,247,.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.wcard-n {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 10px;
+}
+.wcard-t {
+  font-size: 20px; font-weight: 800; letter-spacing: -.025em;
+  color: var(--t1); margin-bottom: 12px;
+}
+.wcard-d { font-size: 14px; color: var(--t2); line-height: 1.75; font-weight: 300; }
+
+/* ── JOURNEY ───────────────────────────────────────────── */
+#journey { padding: var(--py) 0; }
+.journey-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+.journey-left { position: sticky; top: 100px; }
+.tl { position: relative; padding-left: 28px; }
+.tl::before {
+  content: ''; position: absolute;
+  left: 5px; top: 10px; bottom: 10px; width: 1px;
+  background: linear-gradient(to bottom, var(--accent) 0%, rgba(124,111,247,.1) 100%);
+}
+.ti {
+  position: relative; margin-bottom: 32px;
+  opacity: 0; transform: translateX(16px);
+  transition: opacity .5s, transform .5s;
+}
+.ti.vis { opacity: 1; transform: translateX(0); }
+.ti:last-child { margin-bottom: 0; }
+.ti::before {
+  content: ''; position: absolute;
+  left: -24px; top: 7px;
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1.5px solid var(--accent); background: var(--bg);
+  transition: background .3s, box-shadow .3s;
+}
+.ti.now::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(124,111,247,.2);
+}
+.ti-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 3px;
+}
+.ti-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--t1); letter-spacing: -.01em; margin-bottom: 3px;
+}
+.ti-desc { font-size: 13px; color: var(--t3); }
+
+/* ── PROJECTS ──────────────────────────────────────────── */
+#projects { padding: var(--py) 0; }
+.proj-head { margin-bottom: 72px; }
+.pitem {
+  position: relative; overflow: hidden;
+  background: var(--bg-lift);
+  border: 1px solid var(--border); border-radius: 24px;
+  padding: 64px 56px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 56px;
+  align-items: center; margin-bottom: 24px;
+  transition: border-color .3s;
+}
+.pitem:last-child { margin-bottom: 0; }
+.pitem::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0% 60%, rgba(124,111,247,.04), transparent 50%);
+}
+.pitem:hover { border-color: rgba(124,111,247,.22); }
+.pnum {
+  position: absolute; top: 16px; right: 36px;
+  font-size: 100px; font-weight: 900;
+  letter-spacing: -.06em; color: rgba(255,255,255,.025);
+  line-height: 1; pointer-events: none; font-family: 'Inter', sans-serif;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.04);
+}
+.pleft, .pright { position: relative; z-index: 1; }
+.p-micro {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 10px;
+}
+.p-name {
+  font-size: clamp(36px, 4vw, 54px);
+  font-weight: 900; letter-spacing: -.05em;
+  color: var(--t1); line-height: .95; margin-bottom: 32px;
+}
+.prob {
+  padding: 18px 22px;
+  background: rgba(239,68,68,.05);
+  border: 1px solid rgba(239,68,68,.13);
+  border-radius: 12px; margin-bottom: 10px;
+}
+.sol {
+  padding: 18px 22px;
+  background: rgba(52,211,153,.04);
+  border: 1px solid rgba(52,211,153,.12);
+  border-radius: 12px;
+}
+.blk-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; margin-bottom: 7px;
+}
+.prob .blk-label { color: #f87171; }
+.sol  .blk-label { color: var(--accent-g); }
+.blk-text { font-size: 13px; color: var(--t2); line-height: 1.75; }
+.arrow-sep {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; color: var(--t3);
+}
+.arrow-sep span { font-size: 16px; }
+.arrow-line { flex: 1; height: 1px; background: var(--border); }
+.p-feat-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--t3); margin-bottom: 12px;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+.tag {
+  font-size: 12px; padding: 5px 14px; border-radius: 100px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border); color: var(--t2);
+}
+.ltag {
+  font-size: 12px; padding: 5px 14px; border-radius: 100px;
+  background: rgba(124,111,247,.08); border: 1px solid rgba(124,111,247,.18);
+  color: var(--accent);
+}
+.btn-gh {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); color: var(--t2);
+  font-size: 13px; font-weight: 500;
+  transition: all .2s; margin-top: 6px;
+}
+.btn-gh:hover { border-color: rgba(255,255,255,.18); color: var(--t1); }
+.btn-gh svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* ── HOW I WORK ────────────────────────────────────────── */
+#how { padding: var(--py) 0; }
+.how-head { margin-bottom: 56px; }
+.process {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  position: relative; margin-top: 8px;
+}
+.process::before {
+  content: ''; position: absolute;
+  top: 50%; left: calc(100% / 12); right: calc(100% / 12);
+  height: 1px; background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  transform: translateY(-50%); pointer-events: none;
+}
+.ps {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 32px 16px; position: relative;
+  transition: background .25s;
+  cursor: default;
+}
+.ps:hover .ps-orb { background: var(--accent); box-shadow: 0 0 22px rgba(124,111,247,.5); }
+.ps-n {
+  font-size: 10px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+}
+.ps-orb {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(124,111,247,.12); border: 1.5px solid rgba(124,111,247,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+  transition: all .3s; position: relative; z-index: 1;
+}
+.ps-name {
+  font-size: 13px; font-weight: 700; color: var(--t1);
+  line-height: 1.4; letter-spacing: -.01em;
+}
+
+/* ── TECH STACK ────────────────────────────────────────── */
+#tech { padding: var(--py) 0; }
+.tech-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-top: 56px;
+}
+.tcat {
+  background: var(--bg-lift); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px 22px;
+  transition: border-color .3s;
+}
+.tcat:hover { border-color: rgba(124,111,247,.2); }
+.tcat-label {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .2em; text-transform: uppercase; margin-bottom: 20px;
+}
+.c-accent  .tcat-label { color: var(--accent); }
+.c-blue    .tcat-label { color: var(--accent-b); }
+.c-green   .tcat-label { color: var(--accent-g); }
+.c-orange  .tcat-label { color: var(--accent-o); }
+.tcat ul { display: flex; flex-direction: column; gap: 10px; }
+.tcat li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: var(--t2);
+}
+.dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.c-accent .dot  { background: var(--accent); }
+.c-blue   .dot  { background: var(--accent-b); }
+.c-green  .dot  { background: var(--accent-g); }
+.c-orange .dot  { background: var(--accent-o); }
+
+/* ── CURRENT WORK ──────────────────────────────────────── */
+#current { padding: var(--py) 0; }
+.cur-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-top: 56px;
+}
+.ccard {
+  background: var(--bg-lift); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px 26px;
+  position: relative; overflow: hidden;
+  transition: border-color .3s, transform .35s cubic-bezier(.16,1,.3,1);
+}
+.ccard::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-b));
+}
+.ccard:hover { border-color: rgba(124,111,247,.28); transform: translateY(-5px); }
+.live {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 10px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent-g); margin-bottom: 18px;
+}
+.pdot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent-g); position: relative;
+}
+.pdot::after {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%; background: var(--accent-g); opacity: .4;
+  animation: pring 1.6s ease-in-out infinite;
+}
+@keyframes pring {
+  0%,100% { transform: scale(1); opacity: .4; }
+  60%      { transform: scale(1.9); opacity: 0; }
+}
+.ccard-t {
+  font-size: 20px; font-weight: 800; letter-spacing: -.025em;
+  color: var(--t1); margin-bottom: 10px;
+}
+.ccard-d { font-size: 14px; color: var(--t2); line-height: 1.7; }
+
+/* ── CONTACT ───────────────────────────────────────────── */
+#contact {
+  padding: var(--py) 0; text-align: center;
+}
+.ct-label { justify-content: center; }
+.ct-label::before { display: none; }
+.ct-headline {
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 900; letter-spacing: -.045em;
+  color: var(--t1); line-height: 1.12; margin-bottom: 20px;
+}
+.ct-headline span {
+  background: linear-gradient(130deg, var(--accent), var(--accent-b));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.ct-sub {
+  font-size: 16px; color: var(--t2); font-weight: 300;
+  margin-bottom: 52px;
+}
+.ct-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.clink {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 14px 26px; border-radius: 12px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  color: var(--t2); font-size: 14px; font-weight: 500;
+  transition: all .22s; cursor: pointer;
+}
+.clink:hover { border-color: rgba(255,255,255,.16); color: var(--t1); transform: translateY(-2px); }
+.clink svg { flex-shrink: 0; }
+
+/* ── Toast ─────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(16,16,30,.95); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 24px;
+  font-size: 14px; color: var(--t1);
+  backdrop-filter: blur(12px);
+  opacity: 0; transition: all .3s; z-index: 9999; pointer-events: none;
+}
+#toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Footer ────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: var(--max); margin: 0 auto;
+  position: relative; z-index: 1;
+}
+.ft { font-size: 13px; color: var(--t3); }
+
+/* ── Reveal Animations ─────────────────────────────────── */
+.r {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .72s cubic-bezier(.16,1,.3,1),
+              transform .72s cubic-bezier(.16,1,.3,1);
+}
+.r.vis { opacity: 1; transform: translateY(0); }
+.r.d1 { transition-delay: .1s; }
+.r.d2 { transition-delay: .2s; }
+.r.d3 { transition-delay: .3s; }
+.r.d4 { transition-delay: .4s; }
+
+@keyframes fup   { to { opacity: 1; transform: translateY(0); } }
+@keyframes fadein { to { opacity: 1; } }
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 960px) {
+  :root { --py: 80px; }
+  #nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .wrap { padding: 0 24px; }
+  .hero-inner { padding: 0 24px; }
+  .why-cards { grid-template-columns: 1fr; }
+  .journey-grid { grid-template-columns: 1fr; gap: 48px; }
+  .journey-left { position: static; }
+  .pitem { grid-template-columns: 1fr; gap: 32px; padding: 36px 28px; }
+  .pnum { font-size: 60px; }
+  .process { grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .process::before { display: none; }
+  .ps { border: 1px solid var(--border); margin: 4px; border-radius: 12px; }
+  .tech-grid { grid-template-columns: 1fr 1fr; }
+  .cur-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 8px; text-align: center; padding: 28px 24px; }
+}
+@media (max-width: 600px) {
+  .hero-h1 { font-size: clamp(40px, 11vw, 56px); }
+  .ct-links { flex-direction: column; align-items: center; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .process { grid-template-columns: repeat(2, 1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div id="sp"></div>
+
+<!-- Ambient -->
+<div class="ambient">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">이수진<em>.</em></a>
+  <div class="nav-links">
+    <a href="#why">Why I Build</a>
+    <a href="#journey">Journey</a>
+    <a href="#projects">Projects</a>
+    <a href="#tech">Stack</a>
+    <a href="#contact" class="nav-cta">연락하기</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="hero">
+  <div class="hero-inner wrap">
+    <h1 class="hero-h1">
+      <span class="hl">아이디어는 기록되고</span>
+      <span class="hl">서비스가 된다</span>
+    </h1>
+    <div class="hero-meta">
+      <p class="hero-name">이수진</p>
+      <div class="badges">
+        <span class="badge">AI Collaboration Developer</span>
+        <span class="badge">Frontend Developer</span>
+      </div>
+      <p class="hero-desc">
+        문제를 발견하고<br>
+        AI와 협업하여<br>
+        실제 사용 가능한 서비스를 만드는 개발자
+      </p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn-p">
+          프로젝트 보기
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="btn-s">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-mouse"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════════ WHY I BUILD ═══════════════ -->
+<section id="why">
+  <div class="wrap">
+    <div class="why-head r">
+      <div class="label">Why I Build</div>
+      <h2 class="stitle">기술이 아닌<br><em>이유</em>에서 시작합니다</h2>
+      <p class="sdesc">코드를 작성하기 전에, 먼저 왜 만들어야 하는지를 묻습니다.</p>
+    </div>
+    <div class="why-cards">
+      <div class="wcard r d1">
+        <div class="wcard-icon">🔍</div>
+        <div class="wcard-n">01 — Discover</div>
+        <h3 class="wcard-t">불편함 발견</h3>
+        <p class="wcard-d">일상 속에서 반복되는 문제를 찾습니다. 당연하게 여겼던 불편함이 서비스의 씨앗이 됩니다.</p>
+      </div>
+      <div class="wcard r d2">
+        <div class="wcard-icon">⚡</div>
+        <div class="wcard-n">02 — Validate</div>
+        <h3 class="wcard-t">빠른 검증</h3>
+        <p class="wcard-d">AI와 협업하여 아이디어를 빠르게 실험합니다. 완벽한 계획보다 빠른 실행을 선택합니다.</p>
+      </div>
+      <div class="wcard r d3">
+        <div class="wcard-icon">🚀</div>
+        <div class="wcard-n">03 — Ship</div>
+        <h3 class="wcard-t">서비스 제작</h3>
+        <p class="wcard-d">실제 사용 가능한 형태로 구현합니다. 상상에 머물지 않고 사람들이 쓸 수 있는 것을 만듭니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ JOURNEY ═══════════════ -->
+<section id="journey">
+  <div class="wrap">
+    <div class="journey-grid">
+      <div class="journey-left r">
+        <div class="label">My Journey</div>
+        <h2 class="stitle">학습에서<br><em>빌딩</em>으로</h2>
+        <p class="sdesc">코드 한 줄을 처음 쓴 순간부터 지금까지. 한 명의 개발자가 성장하는 이야기입니다.</p>
+      </div>
+      <div class="tl">
+        <div class="ti">
+          <div class="ti-label">Start</div>
+          <div class="ti-title">프로그래밍 학습 시작</div>
+          <div class="ti-desc">처음으로 코드를 만나다</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Phase 1</div>
+          <div class="ti-title">Python 학습</div>
+          <div class="ti-desc">로직의 언어를 익히다</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Phase 2</div>
+          <div class="ti-title">웹 개발 학습</div>
+          <div class="ti-desc">HTML · CSS · JavaScript 기초를 쌓다</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Phase 3</div>
+          <div class="ti-title">AI 협업 개발 연구</div>
+          <div class="ti-desc">AI를 도구로 활용하는 방식을 탐구하다</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Build 01</div>
+          <div class="ti-title">ANANAS 개발</div>
+          <div class="ti-desc">첫 번째 서비스를 세상에 내놓다</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Build 02</div>
+          <div class="ti-title">Travel Buddy 개발</div>
+          <div class="ti-desc">사용자 문제를 해결하는 AI 서비스</div>
+        </div>
+        <div class="ti">
+          <div class="ti-label">Build 03</div>
+          <div class="ti-title">은방울 개발</div>
+          <div class="ti-desc">감정을 담은 픽셀 세계를 만들다</div>
+        </div>
+        <div class="ti now">
+          <div class="ti-label">Now</div>
+          <div class="ti-title">Frontend Developer 취업 준비</div>
+          <div class="ti-desc">더 많은 문제를 더 잘 풀기 위해 성장 중</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROJECTS ═══════════════ -->
+<section id="projects">
+  <div class="wrap">
+    <div class="proj-head r">
+      <div class="label">Project Story</div>
+      <h2 class="stitle">왜 만들었는지가<br><em>가장 중요</em>합니다</h2>
+      <p class="sdesc">기능을 나열하기 전에, 문제가 무엇이었는지를 먼저 이야기합니다.</p>
+    </div>
+
+    <!-- PROJECT 01 -->
+    <div class="pitem r">
+      <div class="pnum">01</div>
+      <div class="pleft">
+        <div class="p-micro">Project 01</div>
+        <h3 class="p-name">ANANAS</h3>
+        <div class="prob">
+          <div class="blk-label">문제</div>
+          <p class="blk-text">기존 메신저는 대화는 가능하지만 나만의 공간을 만들기 어렵다. 소통과 개인 공간이 분리되어 있었다.</p>
+        </div>
+        <div class="arrow-sep">
+          <div class="arrow-line"></div>
+          <span>↓</span>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="sol">
+          <div class="blk-label">해결</div>
+          <p class="blk-text">채팅과 개인 공간(아지트)을 결합한 플랫폼. 대화하면서도 나만의 공간을 꾸밀 수 있는 서비스.</p>
+        </div>
+      </div>
+      <div class="pright">
+        <div class="p-feat-label">주요 기능</div>
+        <div class="tags">
+          <span class="tag">실시간 채팅</span>
+          <span class="tag">아지트 생성</span>
+          <span class="tag">커뮤니티</span>
+          <span class="tag">AI 활용</span>
+        </div>
+        <div class="p-feat-label">배운 점</div>
+        <div class="tags" style="margin-bottom:24px;">
+          <span class="ltag">서비스 구조 설계</span>
+          <span class="ltag">사용자 경험 설계</span>
+          <span class="ltag">AI 협업 개발</span>
+        </div>
+        <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="btn-gh">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub에서 보기
+        </a>
+      </div>
+    </div>
+
+    <!-- PROJECT 02 -->
+    <div class="pitem r">
+      <div class="pnum">02</div>
+      <div class="pleft">
+        <div class="p-micro">Project 02</div>
+        <h3 class="p-name">TRAVEL<br>BUDDY</h3>
+        <div class="prob">
+          <div class="blk-label">문제</div>
+          <p class="blk-text">해외여행 중 언어 장벽과 정보 탐색의 어려움. 낯선 곳에서 필요한 정보를 빠르게 찾기 힘들었다.</p>
+        </div>
+        <div class="arrow-sep">
+          <div class="arrow-line"></div>
+          <span>↓</span>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="sol">
+          <div class="blk-label">해결</div>
+          <p class="blk-text">AI 여행 도우미 플랫폼. 번역부터 여행지 추천, 일정 관리까지 하나의 서비스에서 해결.</p>
+        </div>
+      </div>
+      <div class="pright">
+        <div class="p-feat-label">주요 기능</div>
+        <div class="tags">
+          <span class="tag">번역</span>
+          <span class="tag">여행지 추천</span>
+          <span class="tag">AI 비서</span>
+          <span class="tag">일정 관리</span>
+        </div>
+        <div class="p-feat-label">배운 점</div>
+        <div class="tags" style="margin-bottom:24px;">
+          <span class="ltag">사용자 중심 기능 설계</span>
+          <span class="ltag">AI 서비스 기획</span>
+        </div>
+        <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="btn-gh">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub에서 보기
+        </a>
+      </div>
+    </div>
+
+    <!-- PROJECT 03 -->
+    <div class="pitem r">
+      <div class="pnum">03</div>
+      <div class="pleft">
+        <div class="p-micro">Project 03</div>
+        <h3 class="p-name">은방울</h3>
+        <div class="prob">
+          <div class="blk-label">문제</div>
+          <p class="blk-text">경쟁 중심 게임보다 편안하게 즐길 수 있는 콘텐츠가 부족하다. 쉬고 싶을 때 쉴 수 있는 게임이 없었다.</p>
+        </div>
+        <div class="arrow-sep">
+          <div class="arrow-line"></div>
+          <span>↓</span>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="sol">
+          <div class="blk-label">해결</div>
+          <p class="blk-text">픽셀 기반 힐링 어드벤처 게임. 경쟁 없이 이야기를 탐험하고 세계관을 즐기는 게임.</p>
+        </div>
+      </div>
+      <div class="pright">
+        <div class="p-feat-label">주요 기능</div>
+        <div class="tags">
+          <span class="tag">스토리</span>
+          <span class="tag">세계관</span>
+          <span class="tag">픽셀 그래픽</span>
+        </div>
+        <div class="p-feat-label">배운 점</div>
+        <div class="tags" style="margin-bottom:24px;">
+          <span class="ltag">게임 UX</span>
+          <span class="ltag">스토리텔링</span>
+          <span class="ltag">연출 설계</span>
+        </div>
+        <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="btn-gh">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub에서 보기
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ HOW I WORK ═══════════════ -->
+<section id="how">
+  <div class="wrap">
+    <div class="how-head r">
+      <div class="label">How I Work</div>
+      <h2 class="stitle">아이디어에서<br><em>서비스</em>까지</h2>
+      <p class="sdesc">기술 목록이 아닌 작업 방식을 보여드립니다.</p>
+    </div>
+    <div class="process r">
+      <div class="ps">
+        <div class="ps-n">01</div>
+        <div class="ps-orb">💡</div>
+        <div class="ps-name">아이디어<br>발견</div>
+      </div>
+      <div class="ps">
+        <div class="ps-n">02</div>
+        <div class="ps-orb">🔍</div>
+        <div class="ps-name">문제<br>정의</div>
+      </div>
+      <div class="ps">
+        <div class="ps-n">03</div>
+        <div class="ps-orb">🤝</div>
+        <div class="ps-name">AI<br>협업</div>
+      </div>
+      <div class="ps">
+        <div class="ps-n">04</div>
+        <div class="ps-orb">⚡</div>
+        <div class="ps-name">프로토타입<br>제작</div>
+      </div>
+      <div class="ps">
+        <div class="ps-n">05</div>
+        <div class="ps-orb">👤</div>
+        <div class="ps-name">사용자 관점<br>테스트</div>
+      </div>
+      <div class="ps">
+        <div class="ps-n">06</div>
+        <div class="ps-orb">🚀</div>
+        <div class="ps-name">개선 및<br>배포</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TECH STACK ═══════════════ -->
+<section id="tech">
+  <div class="wrap">
+    <div class="r">
+      <div class="label">Tech Stack</div>
+      <h2 class="stitle">지금 이 순간의<br><em>도구들</em></h2>
+    </div>
+    <div class="tech-grid">
+      <div class="tcat c-accent r d1">
+        <div class="tcat-label">현재 사용</div>
+        <ul>
+          <li><span class="dot"></span>HTML</li>
+          <li><span class="dot"></span>CSS</li>
+          <li><span class="dot"></span>JavaScript</li>
+          <li><span class="dot"></span>Python</li>
+        </ul>
+      </div>
+      <div class="tcat c-blue r d2">
+        <div class="tcat-label">활용 도구</div>
+        <ul>
+          <li><span class="dot"></span>ChatGPT</li>
+          <li><span class="dot"></span>Claude</li>
+          <li><span class="dot"></span>Gemini</li>
+          <li><span class="dot"></span>Mechy AI</li>
+          <li><span class="dot"></span>Adobe Firefly</li>
+          <li><span class="dot"></span>Gamma</li>
+        </ul>
+      </div>
+      <div class="tcat c-green r d3">
+        <div class="tcat-label">개발 환경</div>
+        <ul>
+          <li><span class="dot"></span>Git</li>
+          <li><span class="dot"></span>GitHub</li>
+          <li><span class="dot"></span>VS Code</li>
+        </ul>
+      </div>
+      <div class="tcat c-orange r d4">
+        <div class="tcat-label">배우는 중</div>
+        <ul>
+          <li><span class="dot"></span>React</li>
+          <li><span class="dot"></span>WebSocket</li>
+          <li><span class="dot"></span>Node.js</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CURRENT WORK ═══════════════ -->
+<section id="current">
+  <div class="wrap">
+    <div class="r">
+      <div class="label">In Progress</div>
+      <h2 class="stitle">지금 이 순간도<br><em>만들고 있습니다</em></h2>
+    </div>
+    <div class="cur-grid">
+      <div class="ccard r d1">
+        <div class="live"><div class="pdot"></div>진행 중</div>
+        <h3 class="ccard-t">ANANAS 고도화</h3>
+        <p class="ccard-d">더 나은 사용자 경험을 위한 기능 개선과 안정화 작업 진행 중</p>
+      </div>
+      <div class="ccard r d2">
+        <div class="live"><div class="pdot"></div>진행 중</div>
+        <h3 class="ccard-t">Travel Buddy 개선</h3>
+        <p class="ccard-d">사용자 피드백을 반영한 AI 기능 개선 및 UI 리뉴얼 작업 중</p>
+      </div>
+      <div class="ccard r d3">
+        <div class="live"><div class="pdot"></div>진행 중</div>
+        <h3 class="ccard-t">은방울 스토리 확장</h3>
+        <p class="ccard-d">새로운 챕터와 세계관 확장, 픽셀 그래픽 추가 작업 진행 중</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section id="contact">
+  <div class="wrap">
+    <div class="label ct-label r">Let's Build Something</div>
+    <h2 class="ct-headline r">
+      좋은 서비스는<br>
+      <span>좋은 아이디어</span>에서<br>
+      시작됩니다
+    </h2>
+    <p class="ct-sub r">함께 만들어보고 싶은 것이 있다면, 언제든 연락주세요.</p>
+    <div class="ct-links r">
+      <button class="clink" onclick="copyMail()" title="클릭하여 이메일 복사">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m2 7 10 7 10-7"/>
+        </svg>
+        lsujin0322@naver.com
+      </button>
+      <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="clink">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        GitHub
+      </a>
+      <a href="https://app.notion.com/p/34bf07c99a898066bfe7db89b14a78de" target="_blank" rel="noopener" class="clink">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/>
+        </svg>
+        Notion
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <span class="ft">이수진 — AI Collaboration Developer</span>
+  <span class="ft">© 2025 Lee Sujin. Built with intention.</span>
+</footer>
+
+<!-- Toast -->
+<div id="toast">이메일이 복사되었습니다 ✓</div>
+
+<script>
+// Scroll Progress + Nav
+const sp  = document.getElementById('sp');
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  const s = window.scrollY;
+  const h = document.body.scrollHeight - window.innerHeight;
+  sp.style.width = (s / h * 100) + '%';
+  nav.classList.toggle('scrolled', s > 30);
+}, { passive: true });
+
+// Intersection Observer — reveal
+const ro = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('vis'); ro.unobserve(e.target); }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -36px 0px' });
+document.querySelectorAll('.r').forEach(el => ro.observe(el));
+
+// Timeline Observer
+const to = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.55 });
+document.querySelectorAll('.ti').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.07) + 's';
+  to.observe(el);
+});
+
+// 3D Tilt
+document.querySelectorAll('.wcard, .pitem, .ccard').forEach(el => {
+  el.addEventListener('mousemove', e => {
+    const r  = el.getBoundingClientRect();
+    const dx = ((e.clientX - r.left) / r.width  - .5) * 6;
+    const dy = ((e.clientY - r.top)  / r.height - .5) * 6;
+    el.style.transform = `perspective(700px) rotateY(${dx}deg) rotateX(${-dy}deg) translateY(-4px)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transition = 'transform .55s cubic-bezier(.16,1,.3,1), border-color .3s';
+    el.style.transform  = '';
+    setTimeout(() => { el.style.transition = ''; }, 560);
+  });
+});
+
+// Copy Email
+function copyMail() {
+  navigator.clipboard.writeText('lsujin0322@naver.com').then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('on');
+    setTimeout(() => t.classList.remove('on'), 2600);
+  }).catch(() => {
+    // fallback for non-HTTPS
+    const ta = document.createElement('textarea');
+    ta.value = 'lsujin0322@naver.com';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const t = document.getElementById('toast');
+    t.classList.add('on');
+    setTimeout(() => t.classList.remove('on'), 2600);
+  });
+}
+
+// Smooth scroll (supplement for older browsers)
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const tgt = document.querySelector(a.getAttribute('href'));
+    if (!tgt) return;
+    e.preventDefault();
+    tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>

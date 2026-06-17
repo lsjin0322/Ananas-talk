@@ -1,0 +1,25 @@
+# Render 배포 블루프린트
+# 주의: 영구 디스크(disk)는 Render 유료 인스턴스에서만 동작합니다.
+#       무료 플랜은 디스크가 휘발성이라 재배포 시 DB(대화)가 초기화됩니다.
+#       대화를 반드시 보존하려면 Railway(볼륨) 사용을 권장합니다. DEPLOY.md 참고.
+services:
+  - type: web
+    name: ananas-messenger
+    runtime: node
+    plan: starter           # 영구 디스크가 필요하면 free 가 아닌 starter 이상
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /var/data/ananas.db
+      - key: DB_ENCRYPTION_KEY
+        generateValue: true   # Render가 안전한 랜덤 키 자동 생성
+      - key: CORS_ORIGIN
+        sync: false           # 배포 후 발급된 도메인으로 직접 입력
+    disk:
+      name: ananas-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -1,16 +1,20 @@
 /**
- * ANANAS Messenger Server v3
- * 100~1000명 대응 / 보안 강화 버전
- * ─────────────────────────────────
- * 보안: helmet, rate-limit, 입력 검증, XSS 방지
- * 성능: compression, 연결 풀, 메모리 관리
- * 안정: graceful shutdown, 에러 핸들링
+ * ANANAS Messenger Server v4 — "우리만의 아지트"
+ * 1,000명 동시접속 대응 / 보안 강화
+ * ─────────────────────────────────────────────
+ * 보안   : helmet CSP, HTTP/소켓 rate-limit, 전 입력 sanitize, XSS 방지
+ * 성능   : compression, 메시지 순환 버퍼, 빈 방 자동 정리
+ * 안정   : graceful shutdown, 호스트 승계, 에러 핸들링
+ * 기능   : 타이핑 표시, 공감(리액션), 답장, 메시지 삭제(본인),
+ *          방명록, 공개 아지트 목록, 파도타기, TODAY/TOTAL 방문 카운터,
+ *          AI 어시스턴트 서버 프록시(키 노출 방지)
  */
 
 require('dotenv').config();
 
 const express     = require('express');
 const http        = require('http');
+const crypto      = require('crypto');
 const { Server }  = require('socket.io');
 const helmet      = require('helmet');
 const rateLimit   = require('express-rate-limit');
@@ -18,291 +22,460 @@ const compression = require('compression');
 const cors        = require('cors');
 const validator   = require('validator');
 const path        = require('path');
+const db          = require('./db');
 
-// ─── 환경변수 ────────────────────────────────
-const PORT             = process.env.PORT            || 4000;
-const NODE_ENV         = process.env.NODE_ENV        || 'development';
-const CORS_ORIGIN      = process.env.CORS_ORIGIN     || `http://localhost:${PORT}`;
-const ROOM_MAX_USERS   = parseInt(process.env.ROOM_MAX_USERS)   || 100;
-const MAX_MESSAGES     = parseInt(process.env.MAX_MESSAGES_PER_ROOM) || 500;
-const SOCKET_RATE_LIM  = parseInt(process.env.SOCKET_RATE_LIMIT)    || 60;
+/* ─── 환경변수 ─────────────────────────────── */
+const PORT            = process.env.PORT || 4000;
+const NODE_ENV        = process.env.NODE_ENV || 'development';
+const CORS_ORIGIN     = process.env.CORS_ORIGIN || `http://localhost:${PORT}`;
+const ROOM_MAX_USERS  = parseInt(process.env.ROOM_MAX_USERS)        || 200;   // 방 1개 최대
+const SERVER_MAX_CONN = parseInt(process.env.SERVER_MAX_CONNECTIONS)|| 1000;  // 서버 전체 최대
+const MAX_MESSAGES    = parseInt(process.env.MAX_MESSAGES_PER_ROOM) || 500;
+const SOCKET_RATE_LIM = parseInt(process.env.SOCKET_RATE_LIMIT)     || 60;    // 분당 이벤트
+const ANTHROPIC_KEY   = process.env.ANTHROPIC_API_KEY || '';
 
 const app    = express();
 const server = http.createServer(app);
 
-// ─── 미들웨어: 보안 헤더 ──────────────────────
+app.set('trust proxy', 1); // nginx 등 리버스 프록시 뒤에서 IP 식별
+
+/* ─── 보안 헤더 ────────────────────────────── */
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
-      fontSrc:    ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc:  ["'self'", "'unsafe-inline'"],
+      styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      fontSrc:    ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
       imgSrc:     ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'", "ws:", "wss:", "https://api.anthropic.com"],
+      connectSrc: ["'self'", "ws:", "wss:"],
     },
   },
   crossOriginEmbedderPolicy: false,
 }));
 
-// ─── 미들웨어: 압축 (트래픽 절감) ────────────
 app.use(compression({ level: 6 }));
-
-// ─── 미들웨어: CORS ───────────────────────────
 app.use(cors({
   origin: NODE_ENV === 'production' ? CORS_ORIGIN : '*',
   methods: ['GET', 'POST'],
 }));
+app.use(express.json({ limit: '64kb' }));
 
-// ─── 미들웨어: HTTP Rate Limit ────────────────
-// 분당 200 요청으로 제한 (일반 브라우저 충분)
+/* ─── HTTP Rate Limit ─────────────────────── */
 const httpLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 60 * 1000, max: 240,
+  standardHeaders: true, legacyHeaders: false,
   message: { error: '요청이 너무 많습니다. 잠시 후 다시 시도하세요.' },
-  skip: (req) => req.path.startsWith('/socket.io'), // 소켓은 별도 처리
+  skip: (req) => req.path.startsWith('/socket.io'),
 });
 app.use(httpLimiter);
 
-// ─── 미들웨어: 정적 파일 ─────────────────────
+/* AI 프록시는 더 엄격하게: 분당 10회 */
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000, max: 10,
+  standardHeaders: true, legacyHeaders: false,
+  message: { error: 'AI 요청이 너무 많습니다. 1분 후 다시 시도하세요.' },
+});
+
+/* ─── 정적 파일 ────────────────────────────── */
 app.use(express.static(path.join(__dirname), {
   maxAge: NODE_ENV === 'production' ? '1d' : 0,
   etag: true,
 }));
 
-// ─── Socket.IO 설정 ───────────────────────────
+/* ─── Socket.IO ────────────────────────────── */
 const io = new Server(server, {
   cors: {
     origin: NODE_ENV === 'production' ? CORS_ORIGIN : '*',
     methods: ['GET', 'POST'],
   },
-  // 연결 안정성 설정
-  pingTimeout:  60000,
+  pingTimeout: 60000,
   pingInterval: 25000,
-  // 페이로드 크기 제한 (이미지 포함 5MB)
-  maxHttpBufferSize: 5 * 1024 * 1024,
-  // transports 우선순위: websocket 먼저 (polling 폴백)
+  maxHttpBufferSize: 5 * 1024 * 1024,   // 이미지 포함 5MB
   transports: ['websocket', 'polling'],
 });
 
-// ─── 데이터 저장소 ────────────────────────────
-const rooms = new Map();
+/* ─── 데이터 저장소 (암호화 SQLite에서 복원) ── */
+const rooms = db.loadAll();
+log(`💾 DB 복원: 방 ${rooms.size}개`);
 /*
   rooms.get(code) = {
-    name, desc, category, host (socketId),
-    createdAt, messages: [],
-    users: Set<socketId>
+    name, desc, category, isPublic, host(socketId), createdAt,
+    notice: '' ,
+    messages: [{ id,user,avatar,mood,text,time,isImage,replyTo,reactions:{emoji:[nick]} }],
+    guestbook: [{ id,user,avatar,text,time }],
+    users: Set<socketId>,
   }
 */
 
-// ─── 입력 검증 헬퍼 ──────────────────────────
+/* 방문 카운터 — 싸이월드 TODAY / TOTAL (DB 영속) */
+function dayKey() { return new Date().toISOString().slice(0, 10); }
+const _savedStats = db.loadStats() || {};
+const visitStats = {
+  total: _savedStats.total || 0,
+  today: _savedStats.date === dayKey() ? (_savedStats.today || 0) : 0,
+  date: dayKey(),
+};
+function bumpVisit() {
+  if (visitStats.date !== dayKey()) { visitStats.date = dayKey(); visitStats.today = 0; }
+  visitStats.today++; visitStats.total++;
+}
+/* 통계는 30초마다 묶어서 디스크에 기록 */
+setInterval(() => db.saveStats(visitStats), 30000);
+
+/* ─── 입력 검증 헬퍼 ───────────────────────── */
 function sanitize(str, maxLen = 100) {
   if (typeof str !== 'string') return '';
   return validator.escape(str.trim().slice(0, maxLen));
 }
-
 function isValidCode(code) {
   return typeof code === 'string' && /^[A-Z0-9]{6}$/.test(code);
 }
-
 function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 혼동 문자 제외
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 6; i++) code += chars[crypto.randomInt(chars.length)];
   return code;
 }
+const ALLOWED_MOODS     = ['happy', 'soso', 'sleepy', 'excited', 'blue', 'love'];
+const ALLOWED_REACTIONS = ['❤️', '👍', '😂', '😮', '😢', '🍍'];
 
-// ─── 소켓별 Rate Limiter ──────────────────────
-// Map<socketId, { count, resetAt }>
+/* ─── 소켓별 Rate Limiter ──────────────────── */
 const socketRateMap = new Map();
-
-function checkSocketRate(socketId) {
+function checkSocketRate(socketId, weight = 1) {
   const now = Date.now();
   let entry = socketRateMap.get(socketId);
   if (!entry || now > entry.resetAt) {
     entry = { count: 0, resetAt: now + 60000 };
     socketRateMap.set(socketId, entry);
   }
-  entry.count++;
+  entry.count += weight;
   return entry.count <= SOCKET_RATE_LIM;
 }
 
-// ─── 소켓 이벤트 ──────────────────────────────
-io.on('connection', (socket) => {
-  const clientIp = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+/* ─── 공개 아지트 목록 직렬화 ──────────────── */
+function publicRoomList() {
+  const list = [];
+  for (const [code, r] of rooms) {
+    if (!r.isPublic) continue;
+    list.push({
+      code, name: r.name, desc: r.desc, category: r.category,
+      users: r.users.size, createdAt: r.createdAt,
+    });
+    if (list.length >= 60) break;
+  }
+  // 인원 많은 순
+  return list.sort((a, b) => b.users - a.users);
+}
+let roomListDirty = false;
+function markRoomListDirty() { roomListDirty = true; }
+setInterval(() => {            // 3초마다 묶어서 브로드캐스트 (1000명 트래픽 절감)
+  if (!roomListDirty) return;
+  roomListDirty = false;
+  io.emit('roomList', publicRoomList());
+}, 3000);
 
-  // ── 방 만들기 ──────────────────────────────
+/* ─── 소켓 이벤트 ──────────────────────────── */
+io.on('connection', (socket) => {
+
+  /* 서버 전체 동시접속 제한 */
+  if (io.sockets.sockets.size > SERVER_MAX_CONN) {
+    socket.emit('serverFull', `현재 접속 인원이 가득 찼습니다. (최대 ${SERVER_MAX_CONN}명)`);
+    return socket.disconnect(true);
+  }
+
+  bumpVisit();
+  socket.emit('visitStats', { today: visitStats.today, total: visitStats.total });
+  socket.emit('roomList', publicRoomList());
+
+  /* ── 방 만들기 ── */
   socket.on('createRoom', (data) => {
-    if (!checkSocketRate(socket.id)) {
-      return socket.emit('error', '요청이 너무 많습니다.');
-    }
+    if (!checkSocketRate(socket.id, 3)) return socket.emit('errorMsg', '요청이 너무 많습니다.');
 
     const nickname = sanitize(data?.nickname, 20);
     const roomName = sanitize(data?.roomName, 40);
     const roomDesc = sanitize(data?.roomDesc, 80);
     const category = sanitize(data?.category, 20);
-    const avatar   = sanitize(data?.avatar,   4);
+    const avatar   = sanitize(data?.avatar, 4);
+    const mood     = ALLOWED_MOODS.includes(data?.mood) ? data.mood : 'happy';
+    const isPublic = data?.isPublic === true;
 
     if (!nickname || !roomName) return;
 
-    // 고유 코드 생성
-    let code;
-    let attempts = 0;
+    let code, attempts = 0;
     do { code = genCode(); attempts++; } while (rooms.has(code) && attempts < 20);
+    if (rooms.has(code)) return socket.emit('errorMsg', '방 생성에 실패했습니다. 다시 시도하세요.');
 
+    const createdAt = Date.now();
     rooms.set(code, {
-      name:      roomName,
-      desc:      roomDesc,
-      category:  category || 'chat',
-      host:      socket.id,
-      createdAt: Date.now(),
-      messages:  [],
-      users:     new Set(),
+      name: roomName, desc: roomDesc, category: category || 'daily',
+      isPublic, host: socket.id, createdAt,
+      notice: '', messages: [], guestbook: [], users: new Set(),
     });
+    db.saveRoom({ code, name: roomName, desc: roomDesc, category: category || 'daily', isPublic, notice: '', createdAt });
 
     socket.nickname = nickname;
     socket.room     = code;
     socket.avatar   = avatar || 'A';
+    socket.mood     = mood;
 
     socket.join(code);
     rooms.get(code).users.add(socket.id);
 
-    socket.emit('roomCreated', { code, roomName });
-
-    pushMessage(code, { user: 'system', text: `${nickname}님이 아지트를 열었습니다.`, time: Date.now() });
+    socket.emit('roomCreated', { code, roomName, isHost: true });
+    pushSystem(code, `${nickname}님이 아지트를 열었습니다.`);
     broadcastOnline(code);
-    log(`방 생성: ${code} (${roomName}) — ${nickname}`);
+    if (isPublic) markRoomListDirty();
+    log(`방 생성: ${code} (${roomName})${isPublic ? ' [공개]' : ''} — ${nickname}`);
   });
 
-  // ── 방 참여 ───────────────────────────────
+  /* ── 방 참여 ── */
   socket.on('joinRoom', (data) => {
-    if (!checkSocketRate(socket.id)) return socket.emit('error', '요청이 너무 많습니다.');
+    if (!checkSocketRate(socket.id, 2)) return socket.emit('errorMsg', '요청이 너무 많습니다.');
 
     const nickname = sanitize(data?.nickname, 20);
     const code     = (data?.code || '').toUpperCase().trim();
     const avatar   = sanitize(data?.avatar, 4);
+    const mood     = ALLOWED_MOODS.includes(data?.mood) ? data.mood : 'happy';
 
-    if (!nickname || !isValidCode(code)) return;
+    if (!nickname || !isValidCode(code)) return socket.emit('joinError', '코드 형식이 올바르지 않습니다.');
 
     const room = rooms.get(code);
-    if (!room) return socket.emit('joinError', '존재하지 않는 방 코드입니다.');
-    if (room.users.size >= ROOM_MAX_USERS) return socket.emit('joinError', `방이 가득 찼습니다. (최대 ${ROOM_MAX_USERS}명)`);
+    if (!room) return socket.emit('joinError', '존재하지 않는 아지트 코드입니다.');
+    if (room.users.size >= ROOM_MAX_USERS) return socket.emit('joinError', `아지트가 가득 찼습니다. (최대 ${ROOM_MAX_USERS}명)`);
+
+    // 다른 방에 있던 경우 먼저 퇴장
+    if (socket.room && socket.room !== code) doLeave(socket, true);
 
     socket.nickname = nickname;
     socket.room     = code;
     socket.avatar   = avatar || 'A';
+    socket.mood     = mood;
 
     socket.join(code);
     room.users.add(socket.id);
 
-    socket.emit('roomJoined', { code, roomName: room.name });
-    // 이전 메시지 전송 (최근 100개만)
+    /* 재시작 등으로 방장이 비어 있으면 첫 입장자에게 위임 */
+    if (!room.host) room.host = socket.id;
+
+    socket.emit('roomJoined', { code, roomName: room.name, isHost: room.host === socket.id });
     const history = room.messages.slice(-100);
     if (history.length) socket.emit('messageHistory', history);
+    if (room.notice)    socket.emit('notice', room.notice);
+    socket.emit('guestbook', room.guestbook.slice(-50));
 
-    pushMessage(code, { user: 'system', text: `${nickname}님이 합류했습니다.`, time: Date.now() });
+    pushSystem(code, `${nickname}님이 합류했습니다.`);
     broadcastOnline(code);
+    if (room.isPublic) markRoomListDirty();
     log(`방 참여: ${code} — ${nickname}`);
   });
 
-  // ── 메시지 전송 ───────────────────────────
-  socket.on('chatMessage', (msg) => {
+  /* ── 메시지 전송 ── */
+  socket.on('chatMessage', (payload) => {
     if (!checkSocketRate(socket.id)) return;
     if (!socket.room || !socket.nickname) return;
-
-    // 이미지(dataURL) 또는 텍스트 판별
-    const isImage = typeof msg === 'string' && msg.startsWith('data:image');
-    let text;
-
-    if (isImage) {
-      // 이미지: 크기 체크 (5MB)
-      if (msg.length > 5 * 1024 * 1024 * 1.37) return; // base64 오버헤드
-      text = msg;
-    } else {
-      text = sanitize(msg, 500);
-      if (!text) return;
-    }
-
-    const msgData = {
-      user:    socket.nickname,
-      avatar:  socket.avatar,
-      text,
-      time:    Date.now(),
-      isImage,
-    };
-
     const room = rooms.get(socket.room);
     if (!room) return;
 
+    const raw     = (typeof payload === 'string') ? payload : payload?.text;
+    const isImage = typeof raw === 'string' && raw.startsWith('data:image/');
+    let text;
+
+    if (isImage) {
+      if (raw.length > 5 * 1024 * 1024 * 1.37) return;     // base64 오버헤드 포함 5MB
+      if (!/^data:image\/(png|jpeg|webp|gif);base64,/.test(raw)) return;
+      text = raw;
+    } else {
+      text = sanitize(raw, 500);
+      if (!text) return;
+    }
+
+    /* 답장 검증: 실제 존재하는 메시지만 */
+    let replyTo = null;
+    const rid = payload?.replyTo;
+    if (rid && typeof rid === 'string') {
+      const orig = room.messages.find(m => m.id === rid);
+      if (orig) {
+        replyTo = {
+          id: orig.id, user: orig.user,
+          text: orig.isImage ? '(사진)' : String(orig.text).slice(0, 60),
+        };
+      }
+    }
+
+    const msgData = {
+      id: crypto.randomUUID(),
+      user: socket.nickname, avatar: socket.avatar, mood: socket.mood,
+      text, time: Date.now(), isImage, replyTo, reactions: {},
+    };
+
     room.messages.push(msgData);
     if (room.messages.length > MAX_MESSAGES) room.messages.shift();
+    db.saveMessage(socket.room, msgData);
 
-    // 송신자 제외 전송
-    socket.to(socket.room).emit('message', msgData);
+    io.to(socket.room).emit('message', msgData);   // 전원 동일 데이터(id 일치) 수신
   });
 
-  // ── 공지 설정 (방장만) ────────────────────
+  /* ── 타이핑 표시 ── */
+  socket.on('typing', () => {
+    if (!socket.room || !socket.nickname) return;
+    socket.to(socket.room).volatile.emit('typing', { user: socket.nickname });
+  });
+  socket.on('stopTyping', () => {
+    if (!socket.room || !socket.nickname) return;
+    socket.to(socket.room).volatile.emit('stopTyping', { user: socket.nickname });
+  });
+
+  /* ── 공감(리액션) 토글 ── */
+  socket.on('reactMessage', ({ msgId, emoji } = {}) => {
+    if (!checkSocketRate(socket.id)) return;
+    if (!socket.room || !socket.nickname) return;
+    if (!ALLOWED_REACTIONS.includes(emoji)) return;
+
+    const room = rooms.get(socket.room);
+    const msg  = room?.messages.find(m => m.id === msgId);
+    if (!msg) return;
+
+    if (!msg.reactions[emoji]) msg.reactions[emoji] = [];
+    const arr = msg.reactions[emoji];
+    const idx = arr.indexOf(socket.nickname);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(socket.nickname);
+    if (!arr.length) delete msg.reactions[emoji];
+    db.saveReactions(msgId, msg.reactions);
+
+    io.to(socket.room).emit('reactionUpdate', { msgId, reactions: msg.reactions });
+  });
+
+  /* ── 메시지 삭제(본인 것만) ── */
+  socket.on('deleteMessage', ({ msgId } = {}) => {
+    if (!checkSocketRate(socket.id)) return;
+    if (!socket.room || !socket.nickname) return;
+    const room = rooms.get(socket.room);
+    const msg  = room?.messages.find(m => m.id === msgId);
+    if (!msg || msg.user !== socket.nickname) return;
+
+    msg.deleted = true;
+    msg.text    = '삭제된 메시지입니다';
+    msg.isImage = false;
+    db.softDeleteMessage(msgId);
+    io.to(socket.room).emit('messageDeleted', { msgId });
+  });
+
+  /* ── 공지 설정 (방장만) ── */
   socket.on('setNotice', (text) => {
     if (!checkSocketRate(socket.id)) return;
     if (!socket.room) return;
-
     const room = rooms.get(socket.room);
-    if (!room || room.host !== socket.id) return; // 방장 확인
-
+    if (!room || room.host !== socket.id) return;
     const clean = sanitize(text, 200);
     if (!clean) return;
-
     room.notice = clean;
+    db.saveNotice(socket.room, clean);
     io.to(socket.room).emit('notice', clean);
   });
 
-  // ── 퇴장 ─────────────────────────────────
+  /* ── 방명록 ── */
+  socket.on('addGuestbook', (text) => {
+    if (!checkSocketRate(socket.id, 2)) return;
+    if (!socket.room || !socket.nickname) return;
+    const room = rooms.get(socket.room);
+    if (!room) return;
+    const clean = sanitize(text, 120);
+    if (!clean) return;
+
+    const entry = {
+      id: crypto.randomUUID(),
+      user: socket.nickname, avatar: socket.avatar,
+      text: clean, time: Date.now(),
+    };
+    room.guestbook.push(entry);
+    if (room.guestbook.length > 50) room.guestbook.shift();
+    db.saveGuestbook(socket.room, entry);
+    io.to(socket.room).emit('guestbookEntry', entry);
+  });
+
+  /* ── 기분(무드) 변경 ── */
+  socket.on('setMood', (mood) => {
+    if (!checkSocketRate(socket.id)) return;
+    if (!ALLOWED_MOODS.includes(mood)) return;
+    socket.mood = mood;
+    if (socket.room) broadcastOnline(socket.room);
+  });
+
+  /* ── 파도타기: 무작위 공개 아지트 ── */
+  socket.on('wave', () => {
+    if (!checkSocketRate(socket.id, 2)) return;
+    const candidates = [];
+    for (const [code, r] of rooms) {
+      if (r.isPublic && r.users.size < ROOM_MAX_USERS && code !== socket.room) {
+        candidates.push(code);
+      }
+    }
+    if (!candidates.length) return socket.emit('waveResult', { found: false });
+    const code = candidates[crypto.randomInt(candidates.length)];
+    const room = rooms.get(code);
+    socket.emit('waveResult', { found: true, code, name: room.name });
+  });
+
+  /* ── 퇴장 ── */
   socket.on('leaveRoom', () => doLeave(socket));
+
+  /* 아지트 목록 수동 요청 (페이지 진입 시) */
+  socket.on('requestRoomList', () => {
+    socket.emit('roomList', publicRoomList());
+  });
   socket.on('disconnect', () => {
     doLeave(socket);
     socketRateMap.delete(socket.id);
   });
 });
 
-// ─── 헬퍼 함수들 ──────────────────────────────
-function pushMessage(code, msgData) {
+/* ─── 헬퍼 ─────────────────────────────────── */
+function pushSystem(code, text) {
   const room = rooms.get(code);
   if (!room) return;
+  const msgData = {
+    id: crypto.randomUUID(),
+    user: 'system', text, time: Date.now(), reactions: {},
+  };
   room.messages.push(msgData);
   if (room.messages.length > MAX_MESSAGES) room.messages.shift();
+  db.saveMessage(code, msgData);
   io.to(code).emit('message', msgData);
 }
 
-function doLeave(socket) {
+function doLeave(socket, silent = false) {
   if (!socket.room) return;
-  const room = rooms.get(socket.room);
+  const code = socket.room;
+  const room = rooms.get(code);
+
   if (room) {
     room.users.delete(socket.id);
-    if (socket.nickname) {
-      pushMessage(socket.room, {
-        user: 'system',
-        text: `${socket.nickname}님이 아지트를 떠났습니다.`,
-        time: Date.now(),
-      });
-    }
-    broadcastOnline(socket.room);
+    socket.leave(code);
 
-    // 빈 방은 1시간 후 자동 삭제 (메모리 관리)
-    if (room.users.size === 0) {
-      const code = socket.room;
-      setTimeout(() => {
-        const r = rooms.get(code);
-        if (r && r.users.size === 0) {
-          rooms.delete(code);
-          log(`빈 방 정리: ${code}`);
-        }
-      }, 60 * 60 * 1000);
+    if (!silent && socket.nickname) {
+      pushSystem(code, `${socket.nickname}님이 아지트를 떠났습니다.`);
     }
+
+    /* 방장 승계: 방장이 나가면 남은 사람 중 첫 번째에게 위임 */
+    if (room.host === socket.id && room.users.size > 0) {
+      const nextId = room.users.values().next().value;
+      room.host = nextId;
+      const next = io.sockets.sockets.get(nextId);
+      if (next) {
+        next.emit('hostGranted');
+        if (next.nickname) pushSystem(code, `${next.nickname}님이 새 방장이 되었습니다.`);
+      }
+    }
+
+    /* 빈 방이 되면 방장 자리를 비워 둠 (재입장 시 첫 입장자 승계) */
+    if (room.users.size === 0) room.host = null;
+
+    broadcastOnline(code);
+    if (room.isPublic) markRoomListDirty();
+    /* 대화 영속화를 위해 빈 방도 삭제하지 않음 — DB에 보존되어 언제든 다시 볼 수 있음 */
   }
-  socket.room     = null;
-  socket.nickname = null;
+  socket.room = null;
 }
 
 function broadcastOnline(code) {
@@ -310,7 +483,7 @@ function broadcastOnline(code) {
   if (!room) return;
   const users = [...room.users].map(id => {
     const s = io.sockets.sockets.get(id);
-    return s ? { nickname: s.nickname, avatar: s.avatar } : null;
+    return s ? { nickname: s.nickname, avatar: s.avatar, mood: s.mood, isHost: room.host === id } : null;
   }).filter(Boolean);
   io.to(code).emit('onlineUsers', users);
 }
@@ -321,59 +494,88 @@ function log(msg) {
   }
 }
 
-// ─── 헬스체크 엔드포인트 ─────────────────────
+/* ─── AI 어시스턴트 프록시 (키는 서버에만) ─── */
+app.post('/api/ai', aiLimiter, async (req, res) => {
+  try {
+    if (!ANTHROPIC_KEY) {
+      return res.json({ reply: '아직 AI 키가 설정되지 않았어요. 서버 .env 파일에 ANTHROPIC_API_KEY를 등록하면 사용할 수 있습니다.' });
+    }
+    const messages = Array.isArray(req.body?.messages) ? req.body.messages.slice(-10) : [];
+    const clean = messages
+      .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+      .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }));
+    if (!clean.length) return res.status(400).json({ error: '메시지가 비어 있습니다.' });
+
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1000,
+        system: '당신은 아나나스(Ananas) 메신저의 AI 어시스턴트입니다. 파인애플 아지트 세계관의 따뜻한 도우미예요. 한국어로 친절하고 간결하게 답하세요.',
+        messages: clean,
+      }),
+    });
+    const data = await r.json();
+    const reply = data?.content?.[0]?.text || '답변을 가져올 수 없습니다.';
+    res.json({ reply });
+  } catch (err) {
+    console.error('[AI Proxy]', err.message);
+    res.status(502).json({ error: 'AI 연결이 원활하지 않습니다.' });
+  }
+});
+
+/* ─── 통계/헬스체크 ────────────────────────── */
+app.get('/api/stats', (req, res) => {
+  res.json({ today: visitStats.today, total: visitStats.total, rooms: rooms.size, users: io.sockets.sockets.size });
+});
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    rooms:  rooms.size,
-    users:  io.sockets.sockets.size,
+    rooms: rooms.size,
+    users: io.sockets.sockets.size,
     uptime: Math.floor(process.uptime()),
     memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
   });
 });
 
-// ─── 404 처리 ─────────────────────────────────
+/* ─── SPA 폴백 ─────────────────────────────── */
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ─── 에러 핸들러 ──────────────────────────────
+/* ─── 에러 핸들러 ──────────────────────────── */
 app.use((err, req, res, next) => {
   console.error('[Error]', err.message);
   res.status(500).json({ error: '서버 오류가 발생했습니다.' });
 });
 
-// ─── 서버 시작 ───────────────────────────────
+/* ─── 서버 시작 ────────────────────────────── */
 server.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
-  console.log('🍍  ANANAS Messenger v3');
+  console.log('🍍  ANANAS Messenger v4');
   console.log(`🔗  http://localhost:${PORT}`);
   console.log(`🌍  환경: ${NODE_ENV}`);
-  console.log(`👥  최대 인원/방: ${ROOM_MAX_USERS}명`);
+  console.log(`👥  방당 최대: ${ROOM_MAX_USERS}명 / 서버 전체: ${SERVER_MAX_CONN}명`);
+  console.log(`🤖  AI 프록시: ${ANTHROPIC_KEY ? '활성' : '키 미설정'}`);
   console.log('═══════════════════════════════════════');
 });
 
-// ─── Graceful Shutdown ────────────────────────
+/* ─── Graceful Shutdown ────────────────────── */
 function gracefulShutdown(signal) {
   console.log(`\n[${signal}] 서버 종료 중...`);
-  // 모든 클라이언트에게 종료 알림
-  io.emit('message', { user: 'system', text: '서버가 잠시 점검에 들어갑니다.', time: Date.now() });
-  server.close(() => {
-    console.log('✅ 서버 정상 종료');
-    process.exit(0);
-  });
-  // 10초 후 강제 종료
+  io.emit('message', { id: 'sys-shutdown', user: 'system', text: '서버가 잠시 점검에 들어갑니다.', time: Date.now(), reactions: {} });
+  try { db.saveStats(visitStats); db.close(); } catch (_) {}
+  server.close(() => { console.log('✅ 서버 정상 종료'); process.exit(0); });
   setTimeout(() => process.exit(1), 10000);
 }
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT',  () => gracefulShutdown('SIGINT'));
-
-// 처리되지 않은 에러 로깅 (크래시 방지)
-process.on('uncaughtException', (err) => {
-  console.error('[UncaughtException]', err);
-});
-process.on('unhandledRejection', (reason) => {
-  console.error('[UnhandledRejection]', reason);
-});
+process.on('uncaughtException', (err) => console.error('[UncaughtException]', err));
+process.on('unhandledRejection', (reason) => console.error('[UnhandledRejection]', reason));
 
 module.exports = { app, server, io };

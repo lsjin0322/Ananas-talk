@@ -51,13 +51,14 @@ try {
 /* ─── 스키마 ───────────────────────────────── */
 db.exec(`
   CREATE TABLE IF NOT EXISTS rooms (
-    code       TEXT PRIMARY KEY,
-    name       TEXT NOT NULL,
-    descr      TEXT DEFAULT '',
-    category   TEXT DEFAULT 'daily',
-    is_public  INTEGER DEFAULT 0,
-    notice     TEXT DEFAULT '',
-    created_at INTEGER NOT NULL
+    code        TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    descr       TEXT DEFAULT '',
+    category    TEXT DEFAULT 'daily',
+    is_public   INTEGER DEFAULT 0,
+    notice      TEXT DEFAULT '',
+    created_at  INTEGER NOT NULL,
+    creator_cid TEXT DEFAULT ''
   );
 
   CREATE TABLE IF NOT EXISTS messages (
@@ -96,11 +97,17 @@ db.exec(`
   INSERT OR IGNORE INTO visit_stats (id, total, today, date) VALUES (1, 0, 0, '');
 `);
 
+/* 기존 DB 마이그레이션: creator_cid 컬럼 없으면 추가 */
+try {
+  const cols = db.prepare(`PRAGMA table_info(rooms)`).all().map(c => c.name);
+  if (!cols.includes('creator_cid')) db.exec(`ALTER TABLE rooms ADD COLUMN creator_cid TEXT DEFAULT ''`);
+} catch (_) {}
+
 /* ─── Prepared statements (인젝션 차단) ─────── */
 const stmt = {
   upsertRoom: db.prepare(`
-    INSERT INTO rooms (code, name, descr, category, is_public, notice, created_at)
-    VALUES (@code, @name, @descr, @category, @is_public, @notice, @created_at)
+    INSERT INTO rooms (code, name, descr, category, is_public, notice, created_at, creator_cid)
+    VALUES (@code, @name, @descr, @category, @is_public, @notice, @created_at, @creator_cid)
     ON CONFLICT(code) DO UPDATE SET
       name=@name, descr=@descr, category=@category,
       is_public=@is_public, notice=@notice
@@ -147,6 +154,7 @@ module.exports = {
       code: r.code, name: r.name, descr: r.desc || '',
       category: r.category || 'daily', is_public: r.isPublic ? 1 : 0,
       notice: r.notice || '', created_at: r.createdAt,
+      creator_cid: r.creatorCid || '',
     });
   },
   saveNotice(code, notice) { stmt.setNotice.run(notice, code); },
@@ -199,7 +207,7 @@ module.exports = {
       result.set(row.code, {
         name: row.name, desc: row.descr, category: row.category,
         isPublic: !!row.is_public, notice: row.notice || '',
-        createdAt: row.created_at,
+        createdAt: row.created_at, creatorCid: row.creator_cid || '',
         messages: msgs, guestbook: gb,
         host: null, users: new Set(),
       });

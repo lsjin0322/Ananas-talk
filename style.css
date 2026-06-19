@@ -1249,11 +1249,11 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   color:var(--ink);transition:background .13s,color .13s;white-space:nowrap}
 .ai-mode-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .ai-mode-tab:hover:not(.active){background:var(--c3,#e8e2d4)}
-.ai-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.ai-panel{display:flex;flex-direction:column;overflow:hidden}
 .ai-panel.hidden{display:none}
 
 /* ── 번역기 ──────────────────────────────── */
-.tr-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto}
+.tr-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px}
 .tr-target-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .tr-target-label{font-size:.82rem;font-weight:800;color:var(--gray);text-transform:uppercase;
   letter-spacing:.05em;white-space:nowrap}
@@ -1273,25 +1273,28 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   border:1.5px solid var(--border);background:var(--c2);cursor:pointer;transition:background .13s,color .13s}
 .tr-lang-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .tr-lang-btn:hover:not(.active){background:var(--c3,#e8e2d4)}
-.tr-panels{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start}
-.tr-panel{display:flex;flex-direction:column;gap:6px}
+.tr-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.tr-panel{display:flex;flex-direction:column;gap:6px;min-width:0}
 .tr-label{font-size:.78rem;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
-.tr-textarea{width:100%;min-height:110px;padding:10px 12px;border:1.5px solid var(--border);
+.tr-textarea{width:100%;min-height:130px;padding:10px 12px;border:1.5px solid var(--border);
   border-radius:var(--rs);font-family:var(--font);font-size:.9rem;resize:vertical;
-  background:var(--c2);color:var(--ink);line-height:1.55}
+  background:var(--c2);color:var(--ink);line-height:1.55;box-sizing:border-box}
 .tr-textarea:focus{outline:none;border-color:var(--ink)}
 .tr-char-count{font-size:.75rem;color:var(--gray);text-align:right}
 .tr-divider{display:flex;align-items:center;justify-content:center;padding-top:28px}
 .tr-swap-btn{background:var(--c2);border:1.5px solid var(--border);border-radius:50%;
   width:36px;height:36px;cursor:pointer;font-size:1.1rem;transition:background .13s}
 .tr-swap-btn:hover{background:var(--ink);color:#fff}
-.tr-output{min-height:110px;padding:10px 12px;border:1.5px solid var(--border);
-  border-radius:var(--rs);font-size:.9rem;background:var(--paper);color:var(--ink);
-  line-height:1.55;white-space:pre-wrap;word-break:break-word}
+/* 번역 결과 칸 — 입력 칸과 동일한 디자인 */
+.tr-output{min-height:130px;padding:10px 12px;border:1.5px solid var(--border);
+  border-radius:var(--rs);font-size:.9rem;background:var(--c2);color:var(--ink);
+  line-height:1.55;white-space:pre-wrap;word-break:break-word;position:relative;
+  font-family:var(--font)}
 .tr-placeholder{color:var(--gray);font-size:.85rem}
 .tr-loading{color:var(--gray);font-style:italic}
 .tr-copy-btn{align-self:flex-end;font-size:.8rem;font-weight:700;padding:4px 12px;
-  border:1.5px solid var(--border);border-radius:var(--rs);background:var(--c2);cursor:pointer}
+  border:1.5px solid var(--border);border-radius:var(--rs);background:var(--paper);
+  cursor:pointer;margin-top:2px}
 .tr-copy-btn:hover{background:var(--ink);color:#fff}
 .tr-translate-btn{width:100%;padding:12px;font-size:.95rem;font-weight:800;
   background:var(--ink);color:#fff;border:none;border-radius:var(--rs);cursor:pointer;

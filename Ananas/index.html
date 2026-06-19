@@ -446,7 +446,7 @@
               <img class="rw-logo" src="/images/logo.png" alt="">
               AI 어시스턴트
             </span>
-            <span class="rw-statusbar admin-only">claude-sonnet · 서버 프록시</span>
+            <span class="rw-statusbar admin-only">Gemini · 서버 프록시</span>
             <span class="rw-btns"><i class="rw-x"></i></span>
           </div>
           <div class="ai-messages" id="aiMessages">
@@ -467,7 +467,7 @@
               <textarea id="aiInput" class="ai-textarea" placeholder="AI에게 무엇이든 물어보세요…" rows="1"></textarea>
               <button class="ai-send-btn" id="aiSendBtn">전송</button>
             </div>
-            <p class="ai-disclaimer">Claude AI(Anthropic)를 사용합니다. 중요한 정보는 꼭 다시 확인하세요.</p>
+            <p class="ai-disclaimer">Google Gemini를 사용합니다. 중요한 정보는 꼭 다시 확인하세요.</p>
           </div>
         </div>
 
@@ -491,12 +491,12 @@
               <span class="rw-title">🔑 관리자 · AI 키 설정</span>
               <span class="rw-btns"><i class="rw-x"></i></span>
             </div>
-            <p class="ai-key-text">관리자만 보이는 영역입니다. Anthropic API 키를 입력하면 즉시 AI가 활성화돼요. <span id="aiKeyState" class="ai-key-badge">상태 확인 중…</span></p>
+            <p class="ai-key-text">관리자만 보이는 영역입니다. Google Gemini API 키(무료)를 입력하면 즉시 AI가 활성화돼요. <span id="aiKeyState" class="ai-key-badge">상태 확인 중…</span></p>
             <div class="ai-key-row">
-              <input type="password" id="adminAiKeyInput" class="ai-key-input" placeholder="sk-ant-..." autocomplete="off">
+              <input type="password" id="adminAiKeyInput" class="ai-key-input" placeholder="AIza..." autocomplete="off">
               <button class="ai-key-save" id="adminAiKeySave">적용</button>
             </div>
-            <a class="ai-key-link" href="https://console.anthropic.com" target="_blank" rel="noopener">키 발급받기 →</a>
+            <a class="ai-key-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 발급받기 (Google AI Studio) →</a>
           </div>
           <div class="ai-sb-pixel">
             <canvas class="px" data-sprite="pineHappy" data-scale="7"></canvas>
@@ -570,7 +570,7 @@
           <p>아나나스는 <strong>Socket.IO 실시간 통신</strong>과 <strong>픽셀아트 캔버스 엔진</strong>을 처음부터 직접 구현한 개인 프로젝트입니다. 레트로 감성을 살리면서도 현대적인 보안(helmet · rate-limit · XSS escape)을 갖춘 채팅 플랫폼을 목표로 했어요.</p>
           <div class="adn-tags">
             <span>Node.js</span><span>Socket.IO</span><span>Express</span>
-            <span>Canvas API</span><span>Anthropic Claude</span><span>픽셀 아트</span>
+            <span>Canvas API</span><span>Google Gemini</span><span>픽셀 아트</span>
           </div>
           <div class="adn-links">
             <a href="https://github.com/lsjin0322" target="_blank" rel="noopener" class="adn-link">

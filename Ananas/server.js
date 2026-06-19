@@ -33,10 +33,10 @@ const ROOM_MAX_USERS  = parseInt(process.env.ROOM_MAX_USERS)        || 200;   //
 const SERVER_MAX_CONN = parseInt(process.env.SERVER_MAX_CONNECTIONS)|| 1000;  // 서버 전체 최대
 const MAX_MESSAGES    = parseInt(process.env.MAX_MESSAGES_PER_ROOM) || 500;
 const SOCKET_RATE_LIM = parseInt(process.env.SOCKET_RATE_LIMIT)     || 60;    // 분당 이벤트
-const EMPTY_ROOM_TTL  = parseInt(process.env.EMPTY_ROOM_TTL_MS)     || 120000; // 빈 방 자동삭제 유예(ms)
-const ANTHROPIC_KEY   = process.env.ANTHROPIC_API_KEY || '';
+const EMPTY_ROOM_TTL  = parseInt(process.env.EMPTY_ROOM_TTL_MS)     || 3000;   // 빈 방 자동삭제 유예(ms) — 거의 즉시
+const GEMINI_KEY      = process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY || '';
 const ADMIN_KEY       = process.env.ADMIN_KEY || '';   // 관리자 토큰(미설정 시 관리자 기능 비활성)
-let   runtimeAiKey    = ANTHROPIC_KEY;                  // 관리자가 런타임에 교체 가능
+let   runtimeAiKey    = GEMINI_KEY;                     // 관리자가 런타임에 교체 가능 (Google Gemini)
 
 const app    = express();
 const server = http.createServer(app);
@@ -239,8 +239,8 @@ io.on('connection', (socket) => {
       return socket.emit('adminAiKeyResult', { ok: false, msg: '관리자 권한이 없습니다.' });
     }
     const k = typeof key === 'string' ? key.trim() : '';
-    if (k && !/^sk-ant-[A-Za-z0-9_\-]{10,}$/.test(k)) {
-      return socket.emit('adminAiKeyResult', { ok: false, msg: '키 형식이 올바르지 않습니다. (sk-ant-…)' });
+    if (k && !/^[A-Za-z0-9_\-]{20,100}$/.test(k)) {
+      return socket.emit('adminAiKeyResult', { ok: false, msg: '키 형식이 올바르지 않습니다. (Gemini: AIza…)' });
     }
     runtimeAiKey = k;   // 빈 문자열이면 비활성화
     log(`🔑 관리자가 AI 키를 ${k ? '설정' : '해제'}했습니다.`);
@@ -645,34 +645,44 @@ function log(msg) {
   }
 }
 
-/* ─── AI 어시스턴트 프록시 (키는 서버에만) ─── */
+/* ─── AI 어시스턴트 프록시 — Google Gemini (무료) ─── */
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const AI_SYSTEM = '당신은 아나나스(Ananas) 메신저의 AI 어시스턴트입니다. 파인애플 아지트 세계관의 따뜻한 도우미예요. 한국어로 친절하고 간결하게 답하세요.';
 app.post('/api/ai', aiLimiter, async (req, res) => {
   try {
     if (!runtimeAiKey) {
-      return res.json({ reply: '아직 AI가 활성화되지 않았어요. 관리자가 AI 키를 설정하면 사용할 수 있습니다.' });
+      return res.json({ reply: '아직 AI가 활성화되지 않았어요. 관리자가 Gemini API 키를 설정하면 사용할 수 있습니다.' });
     }
     const messages = Array.isArray(req.body?.messages) ? req.body.messages.slice(-10) : [];
-    const clean = messages
+    /* Gemini 형식으로 변환: assistant→model, content→parts[{text}] */
+    const contents = messages
       .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-      .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }));
-    if (!clean.length) return res.status(400).json({ error: '메시지가 비어 있습니다.' });
+      .map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content.slice(0, 2000) }] }));
+    if (!contents.length) return res.status(400).json({ error: '메시지가 비어 있습니다.' });
 
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(runtimeAiKey)}`;
+    const r = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': runtimeAiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 1000,
-        system: '당신은 아나나스(Ananas) 메신저의 AI 어시스턴트입니다. 파인애플 아지트 세계관의 따뜻한 도우미예요. 한국어로 친절하고 간결하게 답하세요.',
-        messages: clean,
+        system_instruction: { parts: [{ text: AI_SYSTEM }] },
+        contents,
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.8 },
       }),
     });
     const data = await r.json();
-    const reply = data?.content?.[0]?.text || '답변을 가져올 수 없습니다.';
+    if (!r.ok) {
+      const msg = data?.error?.message || '';
+      console.error('[Gemini]', r.status, msg);
+      if (r.status === 400 || r.status === 403) {
+        return res.json({ reply: 'AI 키가 올바르지 않거나 권한이 없어요. 관리자에게 Gemini 키 확인을 요청해주세요.' });
+      }
+      if (r.status === 429) {
+        return res.json({ reply: '지금 AI 요청이 많아요. 잠시 후 다시 시도해주세요. (무료 한도)' });
+      }
+      return res.status(502).json({ error: 'AI 연결이 원활하지 않습니다.' });
+    }
+    const reply = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '답변을 가져올 수 없습니다.';
     res.json({ reply });
   } catch (err) {
     console.error('[AI Proxy]', err.message);

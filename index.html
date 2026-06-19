@@ -327,60 +327,69 @@
       </div>
 
       <!-- 공유 방법 가이드 -->
-      <div class="share-guide">
-        <div class="share-guide-header">
-          <canvas class="px" data-sprite="key" data-scale="3"></canvas>
-          <div>
-            <h3>아지트를 친구와 함께하려면?</h3>
-            <p>아지트를 만들면 초대 코드와 링크가 생깁니다. 아래 방법 중 하나로 공유하세요!</p>
-          </div>
+      <div class="share-guide retro-window">
+        <div class="rw-titlebar">
+          <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt=""> 친구 초대 방법</span>
+          <span class="rw-btns"><i class="rw-x"></i></span>
         </div>
-        <div class="share-steps">
-          <div class="share-step">
-            <div class="ss-num">1</div>
-            <div class="ss-body">
-              <strong>아지트 만들기</strong>
-              <p>우측 상단 <b>「톡 시작」</b> 버튼 → 닉네임·기분 설정 → 방 이름 입력 → 만들기</p>
+        <div class="sgb-inner">
+          <p class="sgb-subtitle">📱 딱 4단계만 따라하면 끝이에요!</p>
+
+          <div class="sgb-step">
+            <div class="sgb-num">1</div>
+            <div class="sgb-body">
+              <strong class="sgb-title">아지트 만들기</strong>
+              <p>화면 오른쪽 위 <b>「톡 시작」</b> 버튼을 눌러요<br>
+                 닉네임(별명)을 입력하고 방 이름을 정한 뒤 <b>만들기</b>를 눌러요</p>
             </div>
           </div>
-          <div class="share-step">
-            <div class="ss-num">2</div>
-            <div class="ss-body">
-              <strong>초대 코드 복사</strong>
-              <p>생성 완료 화면에 나오는 <b>6자리 코드</b>를 복사해 친구에게 카카오톡·문자로 전송</p>
-              <div class="share-code-demo">
+
+          <div class="sgb-arrow">↓</div>
+
+          <div class="sgb-step">
+            <div class="sgb-num">2</div>
+            <div class="sgb-body">
+              <strong class="sgb-title">초대 코드 복사해서 보내기</strong>
+              <p>방이 만들어지면 <b>6자리 코드</b>가 화면에 나와요<br>
+                 그 코드를 복사해서 <b>카카오톡이나 문자</b>로 친구에게 보내요</p>
+              <div class="sgb-demo-code">
                 <span class="scd-code">A1B2C3</span>
                 <span class="scd-arrow">→</span>
-                <span class="scd-label">친구에게 전송</span>
+                <span class="scd-label">카카오톡으로 전송</span>
               </div>
             </div>
           </div>
-          <div class="share-step">
-            <div class="ss-num">3</div>
-            <div class="ss-body">
-              <strong>링크로 바로 초대 (더 간편!)</strong>
-              <p>채팅방 상단 <b>「초대」</b> 버튼 클릭 → URL 자동 복사 → 친구에게 붙여넣기</p>
+
+          <div class="sgb-arrow">↓</div>
+
+          <div class="sgb-step">
+            <div class="sgb-num">3</div>
+            <div class="sgb-body">
+              <strong class="sgb-title">링크로 더 쉽게 초대할 수도 있어요</strong>
+              <p>채팅방 위쪽 <b>🔗 버튼</b>을 누르면<br>
+                 링크가 자동으로 복사돼요 — 그걸 친구에게 보내면 끝!</p>
               <div class="share-url-demo">
                 <span class="sud-url">https://ananas.app/?room=A1B2C3</span>
               </div>
-              <p class="share-tip">👆 링크를 받은 친구는 클릭만 하면 자동으로 그 아지트로 입장!</p>
+              <p class="share-tip">👆 친구가 링크를 누르기만 해도 아지트에 바로 들어와요!</p>
             </div>
           </div>
-          <div class="share-step">
-            <div class="ss-num">4</div>
-            <div class="ss-body">
-              <strong>친구가 참여하는 법</strong>
-              <p>「톡 시작」 → 닉네임 설정 → <b>「코드로 참여」</b> 탭 → 코드 입력 → 입장</p>
+
+          <div class="sgb-arrow">↓</div>
+
+          <div class="sgb-step">
+            <div class="sgb-num">4</div>
+            <div class="sgb-body">
+              <strong class="sgb-title">친구가 들어오는 법</strong>
+              <p><b>「톡 시작」</b> 버튼 → 닉네임 입력 →<br>
+                 <b>「코드로 참여」</b> 탭 클릭 → 받은 코드 입력 → <b>입장!</b></p>
             </div>
           </div>
-        </div>
-        <div class="share-cta">
-          <button class="cta-primary" onclick="openModal()">
-            지금 아지트 만들기 →
-          </button>
-          <button class="cta-secondary" onclick="switchPage('rooms')">
-            공개 아지트 둘러보기
-          </button>
+
+          <div class="sgb-cta">
+            <button class="cta-primary" onclick="openModal()">지금 아지트 만들기</button>
+            <button class="cta-secondary" onclick="switchPage('rooms')">공개 아지트 둘러보기</button>
+          </div>
         </div>
       </div>
 
@@ -493,29 +502,45 @@
           <!-- 번역기 패널 -->
           <div id="aiTranslatePanel" class="ai-panel hidden">
             <div class="tr-body">
-              <div class="tr-lang-row">
-                <button class="tr-lang-btn active" data-pair="ko-en">한국어 → 영어</button>
-                <button class="tr-lang-btn" data-pair="en-ko">영어 → 한국어</button>
-                <button class="tr-lang-btn" data-pair="ko-ja">한국어 → 일본어</button>
-                <button class="tr-lang-btn" data-pair="ja-ko">일본어 → 한국어</button>
+
+              <!-- 번역 대상 언어 선택 -->
+              <div class="tr-target-row">
+                <span class="tr-target-label">번역할 언어</span>
+                <div class="tr-lang-row">
+                  <button class="tr-lang-btn" data-lang="ko">한국어</button>
+                  <button class="tr-lang-btn active" data-lang="en">영어</button>
+                  <button class="tr-lang-btn" data-lang="ja">일본어</button>
+                  <button class="tr-lang-btn" data-lang="de">독일어</button>
+                </div>
               </div>
+
               <div class="tr-panels">
+                <!-- 입력 패널 -->
                 <div class="tr-panel">
-                  <label class="tr-label" id="trFromLabel">한국어</label>
-                  <textarea id="trInput" class="tr-textarea" placeholder="번역할 텍스트를 입력하세요… (Ctrl+Enter로 번역)" rows="5" maxlength="1000"></textarea>
+                  <div class="tr-input-header">
+                    <label class="tr-label">입력</label>
+                    <label class="tr-img-btn" for="trImgInput" title="사진 속 글자 번역">📁 사진 업로드</label>
+                    <input type="file" id="trImgInput" accept="image/*" style="display:none">
+                  </div>
+                  <!-- 사진 미리보기 -->
+                  <div id="trImgPreview" class="tr-img-preview hidden">
+                    <img id="trImgPreviewEl" src="" alt="업로드 사진">
+                    <button class="tr-img-clear" id="trImgClear">✕ 사진 제거</button>
+                  </div>
+                  <textarea id="trInput" class="tr-textarea" placeholder="번역할 글을 입력하거나 사진을 올려주세요 (Ctrl+Enter로 번역)" rows="5" maxlength="1000"></textarea>
                   <div class="tr-char-count"><span id="trCharCount">0</span> / 1000</div>
                 </div>
-                <div class="tr-divider">
-                  <button class="tr-swap-btn" id="trSwapBtn" title="언어 방향 바꾸기">⇄</button>
-                </div>
+
+                <!-- 결과 패널 -->
                 <div class="tr-panel">
-                  <label class="tr-label" id="trToLabel">영어</label>
+                  <label class="tr-label">번역 결과</label>
                   <div class="tr-output" id="trOutput">
                     <span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>
                   </div>
                   <button class="tr-copy-btn hidden" id="trCopyBtn">복사</button>
                 </div>
               </div>
+
               <button class="tr-translate-btn" id="trTranslateBtn">번역하기</button>
             </div>
           </div>

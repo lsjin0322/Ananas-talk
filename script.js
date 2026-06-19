@@ -2245,65 +2245,98 @@ window.switchAiMode = switchAiMode;
    번역기
 ═══════════════════════════════════════════ */
 (function initTranslator() {
-  const PAIRS = {
-    'ko-en': { from: '한국어', to: '영어',   prompt: (t) => `다음 한국어 문장을 영어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'en-ko': { from: '영어',   to: '한국어', prompt: (t) => `다음 영어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'ko-ja': { from: '한국어', to: '일본어', prompt: (t) => `다음 한국어 문장을 일본어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'ja-ko': { from: '일본어', to: '한국어', prompt: (t) => `다음 일본어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
-  };
-  let currentPair = 'ko-en';
+  const LANG_NAMES = { ko: '한국어', en: '영어', ja: '일본어', de: '독일어' };
+  let targetLang = 'en';
+  let pendingImage = null; // { dataUrl, mimeType }
 
   const input   = $('#trInput');
   const output  = $('#trOutput');
-  const fromLbl = $('#trFromLabel');
-  const toLbl   = $('#trToLabel');
   const copyBtn = $('#trCopyBtn');
   const charCnt = $('#trCharCount');
+  const imgInput   = $('#trImgInput');
+  const imgPreview = $('#trImgPreview');
+  const imgEl      = $('#trImgPreviewEl');
+  const imgClear   = $('#trImgClear');
   if (!input) return;
 
-  function setPair(pair) {
-    currentPair = pair;
-    const p = PAIRS[pair];
-    if (fromLbl) fromLbl.textContent = p.from;
-    if (toLbl)   toLbl.textContent   = p.to;
-    $$('.tr-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.pair === pair));
+  /* 타겟 언어 선택 */
+  function setLang(lang) {
+    targetLang = lang;
+    $$('.tr-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
     clearOutput();
   }
+  $$('.tr-lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 
   function clearOutput() {
     if (output) output.innerHTML = '<span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>';
     if (copyBtn) copyBtn.classList.add('hidden');
   }
 
-  $$('.tr-lang-btn').forEach(b => b.addEventListener('click', () => setPair(b.dataset.pair)));
-
   input.addEventListener('input', () => {
     if (charCnt) charCnt.textContent = input.value.length;
   });
 
-  /* 언어 방향 스왑 */
-  const SWAP_MAP = { 'ko-en': 'en-ko', 'en-ko': 'ko-en', 'ko-ja': 'ja-ko', 'ja-ko': 'ko-ja' };
-  $('#trSwapBtn') && $('#trSwapBtn').addEventListener('click', () => {
-    const swapped = SWAP_MAP[currentPair];
-    if (swapped) setPair(swapped);
+  /* 이미지 업로드 */
+  imgInput && imgInput.addEventListener('change', () => {
+    const file = imgInput.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) { showToast('사진이 너무 커요 (최대 4MB)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      pendingImage = { dataUrl, mimeType: file.type };
+      if (imgEl) imgEl.src = dataUrl;
+      if (imgPreview) imgPreview.classList.remove('hidden');
+      input.placeholder = '사진 속 글자를 자동으로 인식해요. 추가 설명을 입력해도 돼요.';
+    };
+    reader.readAsDataURL(file);
+    imgInput.value = '';
+  });
+
+  /* 이미지 제거 */
+  imgClear && imgClear.addEventListener('click', () => {
+    pendingImage = null;
+    if (imgPreview) imgPreview.classList.add('hidden');
+    if (imgEl) imgEl.src = '';
+    input.placeholder = '번역할 글을 입력하거나 사진을 올려주세요 (Ctrl+Enter로 번역)';
   });
 
   /* 번역 실행 */
   async function doTranslate() {
     const text = (input.value || '').trim();
-    if (!text) { showToast('번역할 텍스트를 입력해주세요.', 'error'); return; }
+    const targetName = LANG_NAMES[targetLang] || targetLang;
+    if (!text && !pendingImage) { showToast('번역할 텍스트를 입력하거나 사진을 올려주세요.', 'error'); return; }
+
     const btn = $('#trTranslateBtn');
     if (btn) { btn.disabled = true; btn.textContent = '번역 중…'; }
     if (output) output.innerHTML = '<span class="tr-loading">번역 중…</span>';
+
     try {
-      const prompt = PAIRS[currentPair].prompt(text);
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
-      });
-      const data = await res.json();
-      const reply = data.reply || data.error || '번역 실패';
+      let reply;
+
+      if (pendingImage) {
+        /* 이미지 번역 (Vision) */
+        const extra = text ? `\n추가 지시: ${text}` : '';
+        const prompt = `이 사진 속의 글자를 모두 인식해서 ${targetName}로 번역해줘. 번역문만 출력해.${extra}`;
+        const res = await fetch('/api/ai-vision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: pendingImage.dataUrl, prompt }),
+        });
+        const data = await res.json();
+        reply = data.reply || data.error || '번역 실패';
+      } else {
+        /* 텍스트 번역 */
+        const prompt = `다음 텍스트를 ${targetName}로 번역해줘. 번역문만 출력해:\n${text}`;
+        const res = await fetch('/api/ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+        });
+        const data = await res.json();
+        reply = data.reply || data.error || '번역 실패';
+      }
+
       if (output) output.textContent = reply;
       if (copyBtn) copyBtn.classList.remove('hidden');
     } catch (e) {
@@ -2317,7 +2350,6 @@ window.switchAiMode = switchAiMode;
   $('#trTranslateBtn') && $('#trTranslateBtn').addEventListener('click', doTranslate);
   input.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') doTranslate(); });
 
-  /* 결과 복사 */
   copyBtn && copyBtn.addEventListener('click', () => {
     copyText(output.textContent, '번역 결과');
   });

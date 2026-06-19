@@ -47,9 +47,242 @@ function showToast(msg, type) {
   setTimeout(() => t.remove(), 3300);
 }
 
+/* ═══════════════════════════════════════════
+   설정 모달 (알림 위치 · 알림음)
+═══════════════════════════════════════════ */
+const NOTIFY_POSITIONS = {
+  left:   { style: 'left:18px;right:auto;align-items:flex-start', dotStyle: 'top:5px;left:5px;right:auto', label: '왼쪽 상단' },
+  center: { style: 'left:50%;right:auto;transform:translateX(-50%);align-items:center', dotStyle: 'top:5px;left:50%;transform:translateX(-50%)', label: '가운데 상단' },
+  right:  { style: 'right:18px;left:auto;align-items:flex-end', dotStyle: 'top:5px;right:5px;left:auto', label: '오른쪽 상단' },
+};
+
+function applyNotifyPos(pos) {
+  const stack = document.getElementById('chatNotifyStack');
+  if (!stack) return;
+  const cfg = NOTIFY_POSITIONS[pos] || NOTIFY_POSITIONS.right;
+  stack.setAttribute('style', cfg.style);
+  const dot = document.getElementById('nppDot');
+  if (dot) dot.setAttribute('style', cfg.dotStyle);
+  const lbl = document.getElementById('nppLabel');
+  if (lbl) lbl.textContent = cfg.label;
+  document.querySelectorAll('.notify-pos-btn').forEach(b => b.classList.toggle('active', b.dataset.pos === pos));
+}
+
+function setNotifyPos(pos) {
+  localStorage.setItem('ananas_notify_pos', pos);
+  applyNotifyPos(pos);
+}
+
+function openSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
+  const savedPos = localStorage.getItem('ananas_notify_pos') || 'right';
+  applyNotifyPos(savedPos);
+  const soundToggle = document.getElementById('soundToggle');
+  if (soundToggle) soundToggle.checked = localStorage.getItem('ananas_sound') !== 'off';
+}
+
+function closeSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+function setSoundEnabled(enabled) {
+  localStorage.setItem('ananas_sound', enabled ? 'on' : 'off');
+}
+
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.setNotifyPos = setNotifyPos;
+window.setSoundEnabled = setSoundEnabled;
+
+/* ══ 계정 모달 ══════════════════════════════ */
+let accMoodMain = 'happy';
+let accMoodSub = 'happy';
+
+function openAccount() {
+  const el = document.getElementById('accountOverlay');
+  if (!el) return;
+  el.classList.remove('hidden');
+  /* 저장된 프로필 불러오기 */
+  ['main','sub'].forEach(t => {
+    loadAccPhoto(t);
+    const raw = localStorage.getItem('ananas_' + t + '_profile');
+    if (!raw) return;
+    try {
+      const p = JSON.parse(raw);
+      const nickEl = document.getElementById(t === 'main' ? 'accMainNick' : 'accSubNick');
+      if (nickEl && p.nickname) nickEl.value = p.nickname;
+      if (t === 'main' && p.mood) { accMoodMain = p.mood; highlightAccMood('main', p.mood); }
+      if (t === 'sub' && p.mood) { accMoodSub = p.mood; highlightAccMood('sub', p.mood); }
+    } catch(e) {}
+  });
+}
+function closeAccount() {
+  const el = document.getElementById('accountOverlay');
+  if (el) el.classList.add('hidden');
+}
+function switchAccTab(type) {
+  document.getElementById('accMainSection').style.display = type === 'main' ? '' : 'none';
+  document.getElementById('accSubSection').style.display = type === 'sub' ? '' : 'none';
+  document.getElementById('accTabMain').classList.toggle('active', type === 'main');
+  document.getElementById('accTabSub').classList.toggle('active', type === 'sub');
+}
+function setAccMood(mood, btn) { accMoodMain = mood; highlightAccMood('main', mood); }
+function setAccMood2(mood, btn) { accMoodSub = mood; highlightAccMood('sub', mood); }
+function highlightAccMood(type, mood) {
+  const section = document.getElementById(type === 'main' ? 'accMainSection' : 'accSubSection');
+  if (!section) return;
+  section.querySelectorAll('.acc-mood-btn').forEach(b => b.classList.toggle('active', b.dataset.mood === mood));
+}
+function setAccPhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const imgId = type === 'main' ? 'accMainPhotoImg' : 'accSubPhotoImg';
+    const canvasId = type === 'main' ? 'accMainCanvas' : 'accSubCanvas';
+    const img = document.getElementById(imgId);
+    const cv = document.getElementById(canvasId);
+    if (img) { img.src = dataUrl; img.style.display = 'block'; }
+    if (cv) cv.style.display = 'none';
+    localStorage.setItem('ananas_' + type + '_photo', dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+function loadAccPhoto(type) {
+  const dataUrl = localStorage.getItem('ananas_' + type + '_photo');
+  const imgId = type === 'main' ? 'accMainPhotoImg' : 'accSubPhotoImg';
+  const canvasId = type === 'main' ? 'accMainCanvas' : 'accSubCanvas';
+  const img = document.getElementById(imgId);
+  const cv = document.getElementById(canvasId);
+  if (dataUrl && img) {
+    img.src = dataUrl; img.style.display = 'block';
+    if (cv) cv.style.display = 'none';
+  } else {
+    if (img) img.style.display = 'none';
+    if (cv) cv.style.display = 'block';
+  }
+}
+function saveAccProfile(type) {
+  const nick = (document.getElementById(type === 'main' ? 'accMainNick' : 'accSubNick')?.value || '').trim();
+  if (!nick) { showToast('닉네임을 입력해주세요.', 'error'); return; }
+  const mood = type === 'main' ? accMoodMain : accMoodSub;
+  const photo = localStorage.getItem('ananas_' + type + '_photo') || '';
+  const profile = { nickname: nick, avatar: typeof state !== 'undefined' ? (state.avatar || 'A') : 'A', mood, profileImage: photo };
+  localStorage.setItem('ananas_' + type + '_profile', JSON.stringify(profile));
+  showToast((type === 'main' ? '메인' : '서브') + ' 프로필 저장됨!', 'success');
+}
+function applyAccProfile(type) {
+  saveAccProfile(type);
+  const raw = localStorage.getItem('ananas_' + type + '_profile');
+  if (!raw) return;
+  try {
+    const p = JSON.parse(raw);
+    if (typeof state !== 'undefined') { state.nickname = p.nickname; state.mood = p.mood; if (p.profileImage) state.profileImage = p.profileImage; }
+    localStorage.setItem('ananas_nickname', p.nickname);
+    showToast('아지트 프로필에 적용됐어요!', 'success');
+    closeAccount();
+  } catch(e) {}
+}
+function deleteAccProfile(type) {
+  localStorage.removeItem('ananas_' + type + '_profile');
+  localStorage.removeItem('ananas_' + type + '_photo');
+  const nickEl = document.getElementById(type === 'main' ? 'accMainNick' : 'accSubNick');
+  if (nickEl) nickEl.value = '';
+  showToast('프로필이 삭제됐어요.', 'success');
+}
+function setProfilePhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('ananas_' + type + '_photo', e.target.result);
+    const box = document.getElementById(type === 'main' ? 'mainProfilePreview' : 'subProfilePreview');
+    if (box) { box.style.backgroundImage = `url(${e.target.result})`; box.style.backgroundSize = 'cover'; }
+    showToast('사진이 설정됐어요.', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+window.openAccount = openAccount;
+window.closeAccount = closeAccount;
+window.switchAccTab = switchAccTab;
+window.setAccMood = setAccMood;
+window.setAccMood2 = setAccMood2;
+window.setAccPhoto = setAccPhoto;
+window.saveAccProfile = saveAccProfile;
+window.applyAccProfile = applyAccProfile;
+window.deleteAccProfile = deleteAccProfile;
+window.setProfilePhoto = setProfilePhoto;
+
+/* ══ 스크롤 모션 (fade-up) ══════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+});
+
+function saveProfile(type) {
+  const nickEl = document.getElementById(type === 'main' ? 'mainNickInput' : 'subNickInput');
+  const nick = (nickEl?.value || '').trim();
+  if (!nick) { showToast('닉네임을 입력해주세요.', 'error'); return; }
+  if (nick.length > 10) { showToast('닉네임은 10자까지예요!', 'error'); return; }
+  const profile = {
+    nickname: nick,
+    avatar: typeof state !== 'undefined' ? (state.avatar || 'A') : 'A',
+    mood: typeof state !== 'undefined' ? (state.mood || 'happy') : 'happy',
+    profileImage: typeof state !== 'undefined' ? (state.profileImage || '') : ''
+  };
+  localStorage.setItem('ananas_' + type + '_profile', JSON.stringify(profile));
+  const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+  if (savedEl) savedEl.textContent = '저장됨: ' + nick;
+  showToast((type === 'main' ? '메인' : '서브') + ' 프로필이 저장됐어요!', 'success');
+}
+
+function loadProfile(type) {
+  const raw = localStorage.getItem('ananas_' + type + '_profile');
+  if (!raw) { showToast('저장된 프로필이 없어요.', 'error'); return; }
+  try {
+    const p = JSON.parse(raw);
+    if (typeof state !== 'undefined') {
+      state.nickname = p.nickname;
+      if (p.avatar) state.avatar = p.avatar;
+      if (p.mood) state.mood = p.mood;
+      if (p.profileImage) state.profileImage = p.profileImage;
+    }
+    localStorage.setItem('ananas_nickname', p.nickname);
+    if (p.avatar) localStorage.setItem('ananas_avatar', p.avatar);
+    const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+    if (savedEl) savedEl.textContent = '불러옴: ' + p.nickname;
+    showToast((type === 'main' ? '메인' : '서브') + ' 프로필을 불러왔어요!', 'success');
+  } catch(e) { showToast('프로필 불러오기 실패', 'error'); }
+}
+
+function deleteProfile(type) {
+  localStorage.removeItem('ananas_' + type + '_profile');
+  const nickEl = document.getElementById(type === 'main' ? 'mainNickInput' : 'subNickInput');
+  if (nickEl) nickEl.value = '';
+  const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+  if (savedEl) savedEl.textContent = '';
+  showToast('프로필이 삭제됐어요.', 'success');
+}
+
+window.saveProfile = saveProfile;
+window.loadProfile = loadProfile;
+window.deleteProfile = deleteProfile;
+
+/* 초기 알림 위치 적용 */
+document.addEventListener('DOMContentLoaded', () => {
+  applyNotifyPos(localStorage.getItem('ananas_notify_pos') || 'right');
+});
+
 /* 효과음 (WebAudio 블립) */
 let _audioCtx = null, _lastBeep = 0;
 function playBeep(freq = 740) {
+  if (localStorage.getItem('ananas_sound') === 'off') return;
   try {
     const now = Date.now();
     if (now - _lastBeep < 900) return;
@@ -579,36 +812,36 @@ function drawHalftoneStatic(canvas, shape, size, color) {
   later(() => {
     icons.forEach((cv, i) => {
       const shape = cv.dataset.shape, size = parseInt(cv.dataset.size, 10) || 120;
-      cancels.push(animateHalftone(cv, shape, size, cv.dataset.color || '#1F1B13', 620, 45 * i, true));
+      cancels.push(animateHalftone(cv, shape, size, cv.dataset.color || '#1F1B13', 700, 55 * i, true));
     });
-  }, 2400);
+  }, 3200);
 
   later(() => {
     sc1.classList.add('fade-out');
     sc2.classList.remove('hidden');
     /* 씬2 큰 로고: 같은 도트 언어로 재조립 → 연속성 */
     const big = $('#sc2BigCanvas');
-    if (big) cancels.push(animateHalftone(big, 'logo', parseInt(big.dataset.size, 10) || 500, big.dataset.color || '#FFC400', 1500, 150));
+    if (big) cancels.push(animateHalftone(big, 'logo', parseInt(big.dataset.size, 10) || 500, big.dataset.color || '#FFC400', 1800, 180));
     /* 카피 순차 점등 */
-    $$('.sc2-line', sc2).forEach((line, i) => later(() => line.classList.add('active'), 350 + i * 430));
-  }, 3150);
+    $$('.sc2-line', sc2).forEach((line, i) => later(() => line.classList.add('active'), 400 + i * 560));
+  }, 4200);
 
   /* ── 씬2 → 씬3 ── */
   later(() => {
     const big = $('#sc2BigCanvas');
-    if (big) cancels.push(animateHalftone(big, 'logo', parseInt(big.dataset.size, 10) || 500, big.dataset.color || '#FFC400', 600, 0, true));
-  }, 6450);
+    if (big) cancels.push(animateHalftone(big, 'logo', parseInt(big.dataset.size, 10) || 500, big.dataset.color || '#FFC400', 700, 0, true));
+  }, 8800);
 
   later(() => {
     sc2.classList.add('fade-out');
     sc3.classList.remove('hidden');
     const cv = $('#sc3Canvas');
     /* 씬3 로고: 짧게 재조립 후 정지 — 마무리 */
-    if (cv) cancels.push(animateHalftone(cv, 'logo', parseInt(cv.dataset.size, 10) || 340, cv.dataset.color || '#FFC400', 900, 120));
-  }, 7150);
+    if (cv) cancels.push(animateHalftone(cv, 'logo', parseInt(cv.dataset.size, 10) || 340, cv.dataset.color || '#FFC400', 1000, 140));
+  }, 9700);
 
-  /* 15초 폴백 */
-  later(exitIntro, 15000);
+  /* 20초 폴백 */
+  later(exitIntro, 20000);
 })();
 
 /* ═══════════════════════════════════════════
@@ -1392,11 +1625,37 @@ window.copyLink = copyLink;
 /* ═══════════════════════════════════════════
    10. 채팅앱 진입/퇴장
 ═══════════════════════════════════════════ */
+
+/* BGM */
+const bgmAudio = new Audio('/sounds/bgm.mp3');
+bgmAudio.loop = true;
+bgmAudio.volume = 0.35;
+let bgmOn = true;
+
+function startBgm() {
+  bgmOn = true;
+  bgmAudio.currentTime = 0;
+  bgmAudio.play().catch(() => {});
+  const btn = $('#bgmToggleBtn');
+  if (btn) { btn.textContent = '🔊'; btn.classList.remove('muted'); btn.title = '음악 끄기'; }
+}
+function stopBgm() {
+  bgmOn = false;
+  bgmAudio.pause();
+  const btn = $('#bgmToggleBtn');
+  if (btn) { btn.textContent = '🔇'; btn.classList.add('muted'); btn.title = '음악 켜기'; }
+}
+function toggleBgm() {
+  bgmOn ? stopBgm() : startBgm();
+}
+window.toggleBgm = toggleBgm;
+
 function launchChatApp() {
   $('#siteWrapper').style.display = 'none';
   const app = $('#chatApp');
   app.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  startBgm();
 
   /* 내 프로필 */
   $('#myNicknameDisplay').textContent = state.nickname;
@@ -1435,6 +1694,7 @@ function resetMessagesView() {
 
 /* 완전히 나가기: 서버에서 퇴장(비면 방 삭제) */
 function exitChat(toHome) {
+  stopBgm();
   socket.emit('leaveRoom');
   state.room = null; state.roomName = ''; state.isHost = false;
   $('#chatApp').classList.add('hidden');
@@ -1448,6 +1708,7 @@ function exitChat(toHome) {
 /* 나가지 않고 홈으로(채팅 세션 유지 → 백그라운드 알림 동작) */
 function goHomeKeepChat() {
   if (!state.room) return exitChat(true);
+  stopBgm();
   $('#chatApp').classList.add('hidden');
   const w = $('#siteWrapper');
   w.style.display = '';
@@ -2219,68 +2480,143 @@ $('#joinDirectInput') && $('#joinDirectInput').addEventListener('keydown', e => 
 });
 
 /* ═══════════════════════════════════════════
+   AI 탭 전환
+═══════════════════════════════════════════ */
+function switchAiMode(mode) {
+  const chatPanel = $('#aiChatPanel');
+  const trPanel   = $('#aiTranslatePanel');
+  const tabChat   = $('#tabAiChat');
+  const tabTr     = $('#tabAiTr');
+  if (!chatPanel || !trPanel) return;
+  if (mode === 'chat') {
+    chatPanel.classList.remove('hidden');
+    trPanel.classList.add('hidden');
+    if (tabChat) tabChat.classList.add('active');
+    if (tabTr)   tabTr.classList.remove('active');
+  } else {
+    chatPanel.classList.add('hidden');
+    trPanel.classList.remove('hidden');
+    if (tabChat) tabChat.classList.remove('active');
+    if (tabTr)   tabTr.classList.add('active');
+  }
+}
+window.switchAiMode = switchAiMode;
+
+/* ═══════════════════════════════════════════
    번역기
 ═══════════════════════════════════════════ */
 (function initTranslator() {
-  const PAIRS = {
-    'ko-en': { from: '한국어', to: '영어',   prompt: (t) => `다음 한국어 문장을 영어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'en-ko': { from: '영어',   to: '한국어', prompt: (t) => `다음 영어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'ko-ja': { from: '한국어', to: '일본어', prompt: (t) => `다음 한국어 문장을 일본어로 번역해줘. 번역문만 출력해:\n${t}` },
-    'ja-ko': { from: '일본어', to: '한국어', prompt: (t) => `다음 일본어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
+  const LANG_NAMES = {
+    auto: '자동 감지', ko: '한국어', en: '영어', ja: '일본어',
+    de: '독일어', zh: '중국어', fr: '프랑스어', es: '스페인어'
   };
-  let currentPair = 'ko-en';
+  let pendingImage = null;
 
-  const input   = $('#trInput');
-  const output  = $('#trOutput');
-  const fromLbl = $('#trFromLabel');
-  const toLbl   = $('#trToLabel');
-  const copyBtn = $('#trCopyBtn');
-  const charCnt = $('#trCharCount');
+  const input    = $('#trInput');
+  const output   = $('#trOutput');
+  const copyBtn  = $('#trCopyBtn');
+  const charCnt  = $('#trCharCount');
+  const imgInput   = $('#trImgInput');
+  const imgPreview = $('#trImgPreview');
+  const imgEl      = $('#trImgPreviewEl');
+  const imgClear   = $('#trImgClear');
+  const srcSel   = $('#trSrcLang');
+  const tgtSel   = $('#trTgtLang');
+  const swapBtn  = $('#trSwapBtn');
   if (!input) return;
 
-  function setPair(pair) {
-    currentPair = pair;
-    const p = PAIRS[pair];
-    if (fromLbl) fromLbl.textContent = p.from;
-    if (toLbl)   toLbl.textContent   = p.to;
-    $$('.tr-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.pair === pair));
-    clearOutput();
-  }
-
   function clearOutput() {
-    if (output) output.innerHTML = '<span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>';
+    if (output) output.innerHTML = '<span class="tr-placeholder">번역</span>';
     if (copyBtn) copyBtn.classList.add('hidden');
   }
 
-  $$('.tr-lang-btn').forEach(b => b.addEventListener('click', () => setPair(b.dataset.pair)));
+  /* 언어 스왑 */
+  swapBtn && swapBtn.addEventListener('click', () => {
+    const src = srcSel.value;
+    const tgt = tgtSel.value;
+    if (src === 'auto') return;
+    srcSel.value = tgt;
+    tgtSel.value = src;
+    /* 텍스트도 스왑 */
+    const outText = output.textContent.trim();
+    const inText  = input.value.trim();
+    if (outText && outText !== '번역') {
+      input.value = outText;
+      if (charCnt) charCnt.textContent = outText.length;
+    }
+    clearOutput();
+  });
+
+  /* 소스 언어 바뀌면 출력 초기화 */
+  srcSel && srcSel.addEventListener('change', clearOutput);
+  tgtSel && tgtSel.addEventListener('change', clearOutput);
 
   input.addEventListener('input', () => {
     if (charCnt) charCnt.textContent = input.value.length;
   });
 
-  /* 언어 방향 스왑 */
-  const SWAP_MAP = { 'ko-en': 'en-ko', 'en-ko': 'ko-en', 'ko-ja': 'ja-ko', 'ja-ko': 'ko-ja' };
-  $('#trSwapBtn') && $('#trSwapBtn').addEventListener('click', () => {
-    const swapped = SWAP_MAP[currentPair];
-    if (swapped) setPair(swapped);
+  /* 이미지 업로드 */
+  imgInput && imgInput.addEventListener('change', () => {
+    const file = imgInput.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) { showToast('사진이 너무 커요 (최대 4MB)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      pendingImage = { dataUrl: e.target.result, mimeType: file.type };
+      if (imgEl) imgEl.src = e.target.result;
+      if (imgPreview) imgPreview.classList.remove('hidden');
+      input.placeholder = '사진 속 글자를 자동으로 인식해요. 추가 설명을 입력해도 돼요.';
+    };
+    reader.readAsDataURL(file);
+    imgInput.value = '';
+  });
+
+  imgClear && imgClear.addEventListener('click', () => {
+    pendingImage = null;
+    if (imgPreview) imgPreview.classList.add('hidden');
+    if (imgEl) imgEl.src = '';
+    input.placeholder = '입력, 말하기 또는 사진 촬영';
   });
 
   /* 번역 실행 */
   async function doTranslate() {
     const text = (input.value || '').trim();
-    if (!text) { showToast('번역할 텍스트를 입력해주세요.', 'error'); return; }
+    const srcLang = srcSel ? srcSel.value : 'auto';
+    const tgtLang = tgtSel ? tgtSel.value : 'ko';
+    const srcName = LANG_NAMES[srcLang] || srcLang;
+    const tgtName = LANG_NAMES[tgtLang] || tgtLang;
+
+    if (!text && !pendingImage) { showToast('번역할 텍스트를 입력하거나 사진을 올려주세요.', 'error'); return; }
+
     const btn = $('#trTranslateBtn');
     if (btn) { btn.disabled = true; btn.textContent = '번역 중…'; }
     if (output) output.innerHTML = '<span class="tr-loading">번역 중…</span>';
+
     try {
-      const prompt = PAIRS[currentPair].prompt(text);
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
-      });
-      const data = await res.json();
-      const reply = data.reply || data.error || '번역 실패';
+      let reply;
+      const srcHint = srcLang === 'auto' ? '' : `입력 언어: ${srcName}. `;
+
+      if (pendingImage) {
+        const extra = text ? `\n추가 지시: ${text}` : '';
+        const prompt = `${srcHint}이 사진 속의 글자를 모두 인식해서 ${tgtName}로만 번역해줘. 번역문만 출력해.${extra}`;
+        const res = await fetch('/api/ai-vision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: pendingImage.dataUrl, prompt }),
+        });
+        const data = await res.json();
+        reply = data.reply || data.error || '번역 실패';
+      } else {
+        const prompt = `${srcHint}다음 텍스트를 ${tgtName}로만 번역해줘. 설명 없이 번역문만 출력해:\n${text}`;
+        const res = await fetch('/api/ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+        });
+        const data = await res.json();
+        reply = data.reply || data.error || '번역 실패';
+      }
+
       if (output) output.textContent = reply;
       if (copyBtn) copyBtn.classList.remove('hidden');
     } catch (e) {
@@ -2293,11 +2629,7 @@ $('#joinDirectInput') && $('#joinDirectInput').addEventListener('keydown', e => 
 
   $('#trTranslateBtn') && $('#trTranslateBtn').addEventListener('click', doTranslate);
   input.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') doTranslate(); });
-
-  /* 결과 복사 */
-  copyBtn && copyBtn.addEventListener('click', () => {
-    copyText(output.textContent, '번역 결과');
-  });
+  copyBtn && copyBtn.addEventListener('click', () => { copyText(output.textContent, '번역 결과'); });
 })();
 
 /* ─── AI 빠른 질문 미니 모달 ─── */

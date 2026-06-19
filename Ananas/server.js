@@ -690,6 +690,45 @@ app.post('/api/ai', aiLimiter, async (req, res) => {
   }
 });
 
+/* ─── AI 이미지 번역 프록시 ─── */
+app.post('/api/ai-vision', aiLimiter, async (req, res) => {
+  try {
+    if (!runtimeAiKey) {
+      return res.json({ reply: '아직 AI가 활성화되지 않았어요.' });
+    }
+    const { image, prompt } = req.body || {};
+    if (!image || typeof image !== 'string') return res.status(400).json({ error: '이미지가 없습니다.' });
+    if (!prompt || typeof prompt !== 'string') return res.status(400).json({ error: '프롬프트가 없습니다.' });
+    const match = image.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,(.+)$/);
+    if (!match) return res.status(400).json({ error: '지원하지 않는 이미지 형식입니다.' });
+    const [, mimeType, b64] = match;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(runtimeAiKey)}`;
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [
+          { inlineData: { mimeType, data: b64 } },
+          { text: prompt.slice(0, 500) },
+        ]}],
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.4 },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      const msg = data?.error?.message || '';
+      console.error('[Gemini Vision]', r.status, msg);
+      if (r.status === 429) return res.json({ reply: '지금 AI 요청이 많아요. 잠시 후 다시 시도해주세요.' });
+      return res.status(502).json({ error: 'AI 연결이 원활하지 않습니다.' });
+    }
+    const reply = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '번역 결과를 가져올 수 없습니다.';
+    res.json({ reply });
+  } catch (err) {
+    console.error('[AI Vision]', err.message);
+    res.status(502).json({ error: 'AI 연결이 원활하지 않습니다.' });
+  }
+});
+
 /* ─── 통계/헬스체크 ────────────────────────── */
 app.get('/api/stats', (req, res) => {
   res.json({ today: visitStats.today, total: visitStats.total, rooms: rooms.size, users: io.sockets.sockets.size });

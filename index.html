@@ -131,33 +131,74 @@
         <span class="rw-btns" onclick="closeSettings()"><i class="rw-x"></i></span>
       </div>
       <div class="settings-body">
-        <!-- 알림 위치 -->
-        <div class="settings-section">
-          <div class="settings-label">💬 채팅 알림 위치</div>
-          <div class="settings-desc">홈 화면에서 새 메시지가 오면 어디에 알림을 표시할까요?</div>
-          <div class="notify-pos-row">
-            <button class="notify-pos-btn" data-pos="left" onclick="setNotifyPos('left')">왼쪽</button>
-            <button class="notify-pos-btn" data-pos="center" onclick="setNotifyPos('center')">가운데</button>
-            <button class="notify-pos-btn active" data-pos="right" onclick="setNotifyPos('right')">오른쪽</button>
-          </div>
-          <div class="notify-pos-preview" id="notifyPosPreview">
-            <div class="npp-screen">
-              <div class="npp-dot" id="nppDot"></div>
+
+        <!-- 알림 위치 + 알림음 가로 배치 -->
+        <div class="settings-row2">
+          <div class="settings-section">
+            <div class="settings-label">💬 알림 위치</div>
+            <div class="notify-pos-row">
+              <button class="notify-pos-btn" data-pos="left"   onclick="setNotifyPos('left')">왼쪽</button>
+              <button class="notify-pos-btn" data-pos="center" onclick="setNotifyPos('center')">가운데</button>
+              <button class="notify-pos-btn active" data-pos="right" onclick="setNotifyPos('right')">오른쪽</button>
             </div>
-            <span class="npp-label" id="nppLabel">오른쪽 상단</span>
+            <div class="notify-pos-preview" id="notifyPosPreview">
+              <div class="npp-screen"><div class="npp-dot" id="nppDot"></div></div>
+              <span class="npp-label" id="nppLabel">오른쪽 상단</span>
+            </div>
+          </div>
+          <div class="settings-section settings-section-sm">
+            <div class="settings-label">🔔 알림음</div>
+            <label class="settings-toggle">
+              <input type="checkbox" id="soundToggle" onchange="setSoundEnabled(this.checked)">
+              <span class="stg-track"><span class="stg-thumb"></span></span>
+              <span class="stg-text">켜기</span>
+            </label>
           </div>
         </div>
+
         <hr class="settings-hr">
-        <!-- 알림음 -->
+
+        <!-- 메인 프로필 -->
         <div class="settings-section">
-          <div class="settings-label">🔔 알림음</div>
-          <div class="settings-desc">새 메시지 도착 시 효과음을 재생합니다.</div>
-          <label class="settings-toggle">
-            <input type="checkbox" id="soundToggle" onchange="setSoundEnabled(this.checked)">
-            <span class="stg-track"><span class="stg-thumb"></span></span>
-            <span class="stg-text">알림음 켜기</span>
-          </label>
+          <div class="settings-label">👤 메인 프로필</div>
+          <div class="settings-desc">아지트 입장 시 기본으로 사용됩니다. 나만 수정할 수 있어요.</div>
+          <div class="peb-box">
+            <div class="peb-preview" id="mainProfilePreview">
+              <canvas class="px" data-sprite="pine" data-scale="3" id="mainPreviewCanvas"></canvas>
+            </div>
+            <div class="peb-fields">
+              <input type="text" class="peb-nick" id="mainNickInput" placeholder="닉네임 (최대 10자)" maxlength="10">
+              <div class="peb-actions">
+                <button class="peb-save" onclick="saveProfile('main')">저장</button>
+                <button class="peb-load" onclick="loadProfile('main')">불러오기</button>
+                <span class="peb-saved-name" id="mainSavedName"></span>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <hr class="settings-hr">
+
+        <!-- 서브 프로필 -->
+        <div class="settings-section">
+          <div class="settings-label">🎭 서브 프로필</div>
+          <div class="settings-desc">필요할 때만 쓰는 별도 프로필입니다. 나만 수정할 수 있어요.</div>
+          <div class="peb-box">
+            <div class="peb-preview" id="subProfilePreview">
+              <canvas class="px" data-sprite="pine" data-scale="3" id="subPreviewCanvas"></canvas>
+            </div>
+            <div class="peb-fields">
+              <input type="text" class="peb-nick" id="subNickInput" placeholder="닉네임 (최대 10자)" maxlength="10">
+              <div class="peb-actions">
+                <button class="peb-save" onclick="saveProfile('sub')">저장</button>
+                <button class="peb-load" onclick="loadProfile('sub')">불러오기</button>
+                <button class="peb-del" onclick="deleteProfile('sub')">삭제</button>
+                <span class="peb-saved-name" id="subSavedName"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -370,16 +411,10 @@
           <p>😊 버튼으로 다양한 이모티콘을 골라 감정을 표현하세요. 메시지에 공감 반응도 가능.</p>
           <span class="feat-cta">체험하기 →</span></div>
         </div>
-        <div class="feat-card feat-clickable" id="feat-profile" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="pineSleep" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">10</span><h3>프로필 · 기분 설정</h3>
-          <p>닉네임·아바타·기분을 자유롭게. 방에 있는 동안 내 개성이 그대로 유지됩니다.</p>
-          <span class="feat-cta">프로필 만들기 →</span></div>
-        </div>
-        <div class="feat-card fc-wide feat-clickable" id="feat-notify" onclick="openSettings()">
+        <div class="feat-card feat-clickable" id="feat-notify" onclick="openSettings()">
           <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">11</span><h3>알림 · 설정</h3>
-          <p>홈 화면에서도 새 채팅 알림을 받을 수 있어요. 알림 위치(왼쪽·가운데·오른쪽)를 원하는 곳으로 설정하세요.</p>
+          <div class="feat-body"><span class="fn">10</span><h3>알림 · 설정</h3>
+          <p>홈에서도 새 채팅 알림을 받아요. 알림 위치·알림음을 자유롭게 설정하세요.</p>
           <span class="feat-cta">설정 열기 →</span></div>
         </div>
       </div>
@@ -620,11 +655,12 @@
             </ul>
             <div class="ai-quota-info">
               <b>⚡ 무료 한도 안내</b>
-              <p>Gemini 2.0 Flash 무료 기준:<br>
-              · 분당 최대 <b>15회</b> 요청<br>
-              · 하루 최대 <b>1,500회</b> 요청<br>
-              · 월 최대 <b>100만 토큰</b><br>
-              한도 초과 시 잠시 후 다시 시도해주세요.</p>
+              <ul class="ai-quota-list">
+                <li>분당 최대 <b>15회</b> 요청</li>
+                <li>하루 최대 <b>1,500회</b> 요청</li>
+                <li>월 최대 <b>100만 토큰</b></li>
+              </ul>
+              <p class="ai-quota-note">한도 초과 시 잠시 후 다시 시도해주세요.</p>
             </div>
           </div>
           <div class="ai-key-notice retro-window admin-only">

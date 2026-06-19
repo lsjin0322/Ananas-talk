@@ -97,6 +97,55 @@ window.closeSettings = closeSettings;
 window.setNotifyPos = setNotifyPos;
 window.setSoundEnabled = setSoundEnabled;
 
+function saveProfile(type) {
+  const nickEl = document.getElementById(type === 'main' ? 'mainNickInput' : 'subNickInput');
+  const nick = (nickEl?.value || '').trim();
+  if (!nick) { showToast('닉네임을 입력해주세요.', 'error'); return; }
+  if (nick.length > 10) { showToast('닉네임은 10자까지예요!', 'error'); return; }
+  const profile = {
+    nickname: nick,
+    avatar: typeof state !== 'undefined' ? (state.avatar || 'A') : 'A',
+    mood: typeof state !== 'undefined' ? (state.mood || 'happy') : 'happy',
+    profileImage: typeof state !== 'undefined' ? (state.profileImage || '') : ''
+  };
+  localStorage.setItem('ananas_' + type + '_profile', JSON.stringify(profile));
+  const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+  if (savedEl) savedEl.textContent = '저장됨: ' + nick;
+  showToast((type === 'main' ? '메인' : '서브') + ' 프로필이 저장됐어요!', 'success');
+}
+
+function loadProfile(type) {
+  const raw = localStorage.getItem('ananas_' + type + '_profile');
+  if (!raw) { showToast('저장된 프로필이 없어요.', 'error'); return; }
+  try {
+    const p = JSON.parse(raw);
+    if (typeof state !== 'undefined') {
+      state.nickname = p.nickname;
+      if (p.avatar) state.avatar = p.avatar;
+      if (p.mood) state.mood = p.mood;
+      if (p.profileImage) state.profileImage = p.profileImage;
+    }
+    localStorage.setItem('ananas_nickname', p.nickname);
+    if (p.avatar) localStorage.setItem('ananas_avatar', p.avatar);
+    const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+    if (savedEl) savedEl.textContent = '불러옴: ' + p.nickname;
+    showToast((type === 'main' ? '메인' : '서브') + ' 프로필을 불러왔어요!', 'success');
+  } catch(e) { showToast('프로필 불러오기 실패', 'error'); }
+}
+
+function deleteProfile(type) {
+  localStorage.removeItem('ananas_' + type + '_profile');
+  const nickEl = document.getElementById(type === 'main' ? 'mainNickInput' : 'subNickInput');
+  if (nickEl) nickEl.value = '';
+  const savedEl = document.getElementById(type === 'main' ? 'mainSavedName' : 'subSavedName');
+  if (savedEl) savedEl.textContent = '';
+  showToast('프로필이 삭제됐어요.', 'success');
+}
+
+window.saveProfile = saveProfile;
+window.loadProfile = loadProfile;
+window.deleteProfile = deleteProfile;
+
 /* 초기 알림 위치 적용 */
 document.addEventListener('DOMContentLoaded', () => {
   applyNotifyPos(localStorage.getItem('ananas_notify_pos') || 'right');

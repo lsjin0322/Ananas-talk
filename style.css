@@ -488,7 +488,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 
 /* ═════════════ AI PAGE ═════════════ */
 .ai-layout{display:grid;grid-template-columns:1fr 280px;gap:22px;align-items:start}
-.ai-chat-area{min-height:560px;display:flex;flex-direction:column}
+.ai-chat-area{display:flex;flex-direction:column}
 .ai-messages{flex:1;padding:22px 20px;overflow-y:auto;max-height:430px;
   display:flex;flex-direction:column;gap:14px}
 .ai-welcome{text-align:center;padding:26px 14px;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -1276,8 +1276,8 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 .tr-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
 .tr-panel{display:flex;flex-direction:column;gap:6px;min-width:0}
 .tr-label{font-size:.78rem;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
-.tr-textarea{width:100%;min-height:130px;padding:10px 12px;border:1.5px solid var(--border);
-  border-radius:var(--rs);font-family:var(--font);font-size:.9rem;resize:vertical;
+.tr-textarea{width:100%;height:150px;padding:10px 12px;border:1.5px solid var(--border);
+  border-radius:var(--rs);font-family:var(--font);font-size:.9rem;resize:none;
   background:var(--c2);color:var(--ink);line-height:1.55;box-sizing:border-box}
 .tr-textarea:focus{outline:none;border-color:var(--ink)}
 .tr-char-count{font-size:.75rem;color:var(--gray);text-align:right}
@@ -1286,10 +1286,10 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   width:36px;height:36px;cursor:pointer;font-size:1.1rem;transition:background .13s}
 .tr-swap-btn:hover{background:var(--ink);color:#fff}
 /* 번역 결과 칸 — 입력 칸과 동일한 디자인 */
-.tr-output{min-height:130px;padding:10px 12px;border:1.5px solid var(--border);
+.tr-output{height:150px;overflow-y:auto;padding:10px 12px;border:1.5px solid var(--border);
   border-radius:var(--rs);font-size:.9rem;background:var(--c2);color:var(--ink);
-  line-height:1.55;white-space:pre-wrap;word-break:break-word;position:relative;
-  font-family:var(--font)}
+  line-height:1.55;white-space:pre-wrap;word-break:break-word;
+  font-family:var(--font);box-sizing:border-box}
 .tr-placeholder{color:var(--gray);font-size:.85rem}
 .tr-loading{color:var(--gray);font-style:italic}
 .tr-copy-btn{align-self:flex-end;font-size:.8rem;font-weight:700;padding:4px 12px;

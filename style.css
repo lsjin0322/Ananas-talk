@@ -214,9 +214,6 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 
 /* STORY HOOK — 아직도 글자만 치니? */
 .story-hook{max-width:760px;margin:30px auto 10px;padding:54px 24px 60px;text-align:center}
-.sh-badge{display:inline-flex;align-items:center;justify-content:center;width:74px;height:74px;
-  border-radius:50%;background:var(--ye,#F5C518);color:var(--ink);font-weight:800;font-size:1.05rem;
-  border:2px solid var(--ink);box-shadow:0 4px 0 rgba(0,0,0,.12);margin-bottom:30px}
 .sh-head{margin:0 0 30px;line-height:1.02;font-weight:900;letter-spacing:-.02em;
   font-size:clamp(2.6rem,8vw,4.4rem)}
 .sh-head-1,.sh-head-2{display:block}
@@ -387,8 +384,34 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ticker-track b{color:var(--y);font-size:0.8rem}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
+/* QR 섹션 */
+.qr-section{display:flex;align-items:center;justify-content:space-between;gap:40px;
+  padding:56px 0 48px;border-top:2px dashed var(--border)}
+.qr-left{display:flex;flex-direction:column;gap:18px}
+.qr-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.15;margin:0}
+.qr-cta-btn{align-self:flex-start;font-size:1rem;padding:14px 28px}
+.qr-hint{font-size:.85rem;color:var(--gray);margin:0}
+.qr-box{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}
+.qr-placeholder{width:140px;height:140px;border:2px solid var(--ink);border-radius:12px;
+  background:var(--c2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.qr-icon{font-size:2rem;font-weight:900;color:var(--ink2)}
+.qr-placeholder p{font-size:.72rem;color:var(--gray);text-align:center;margin:0;line-height:1.4}
+.qr-sub{font-size:.8rem;color:var(--gray);text-align:center;line-height:1.6;margin:0}
+
+/* Engagement Stat */
+.engagement-stat{text-align:center;padding:56px 24px 48px;border-bottom:2px dashed var(--border);
+  margin-bottom:40px}
+.eng-label{display:block;font-family:var(--pxfont);font-size:.78rem;letter-spacing:.18em;
+  color:var(--gray);margin-bottom:12px}
+.eng-number-row{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:14px}
+.eng-num{font-size:clamp(4rem,14vw,7.5rem);font-weight:900;color:var(--y);line-height:1;
+  -webkit-text-stroke:2px var(--ink)}
+.eng-unit{font-size:clamp(1.4rem,4vw,2.8rem);font-weight:900;color:var(--ink)}
+.eng-desc{font-size:.95rem;color:var(--gray);margin:0}
+
 /* ═════════════ HOME GRID ═════════════ */
 .home-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:56px 0}
+.home-feat-grid{margin-top:56px}
 .hg-card{display:flex;flex-direction:column;gap:14px;padding:24px 20px;
   border:2px solid var(--ink);border-radius:var(--r);cursor:pointer;position:relative;
   box-shadow:var(--shadow-px);transition:transform 0.18s var(--ease),box-shadow 0.18s var(--ease)}

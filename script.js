@@ -47,9 +47,65 @@ function showToast(msg, type) {
   setTimeout(() => t.remove(), 3300);
 }
 
+/* ═══════════════════════════════════════════
+   설정 모달 (알림 위치 · 알림음)
+═══════════════════════════════════════════ */
+const NOTIFY_POSITIONS = {
+  left:   { style: 'left:18px;right:auto;align-items:flex-start', dotStyle: 'top:5px;left:5px;right:auto', label: '왼쪽 상단' },
+  center: { style: 'left:50%;right:auto;transform:translateX(-50%);align-items:center', dotStyle: 'top:5px;left:50%;transform:translateX(-50%)', label: '가운데 상단' },
+  right:  { style: 'right:18px;left:auto;align-items:flex-end', dotStyle: 'top:5px;right:5px;left:auto', label: '오른쪽 상단' },
+};
+
+function applyNotifyPos(pos) {
+  const stack = document.getElementById('chatNotifyStack');
+  if (!stack) return;
+  const cfg = NOTIFY_POSITIONS[pos] || NOTIFY_POSITIONS.right;
+  stack.setAttribute('style', cfg.style);
+  const dot = document.getElementById('nppDot');
+  if (dot) dot.setAttribute('style', cfg.dotStyle);
+  const lbl = document.getElementById('nppLabel');
+  if (lbl) lbl.textContent = cfg.label;
+  document.querySelectorAll('.notify-pos-btn').forEach(b => b.classList.toggle('active', b.dataset.pos === pos));
+}
+
+function setNotifyPos(pos) {
+  localStorage.setItem('ananas_notify_pos', pos);
+  applyNotifyPos(pos);
+}
+
+function openSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
+  const savedPos = localStorage.getItem('ananas_notify_pos') || 'right';
+  applyNotifyPos(savedPos);
+  const soundToggle = document.getElementById('soundToggle');
+  if (soundToggle) soundToggle.checked = localStorage.getItem('ananas_sound') !== 'off';
+}
+
+function closeSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+function setSoundEnabled(enabled) {
+  localStorage.setItem('ananas_sound', enabled ? 'on' : 'off');
+}
+
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.setNotifyPos = setNotifyPos;
+window.setSoundEnabled = setSoundEnabled;
+
+/* 초기 알림 위치 적용 */
+document.addEventListener('DOMContentLoaded', () => {
+  applyNotifyPos(localStorage.getItem('ananas_notify_pos') || 'right');
+});
+
 /* 효과음 (WebAudio 블립) */
 let _audioCtx = null, _lastBeep = 0;
 function playBeep(freq = 740) {
+  if (localStorage.getItem('ananas_sound') === 'off') return;
   try {
     const now = Date.now();
     if (now - _lastBeep < 900) return;

@@ -118,9 +118,49 @@
         <div class="nav-item" id="navItem-about">
           <button class="nav-btn" data-page="about" onclick="switchPage('about')">스토리</button>
         </div>
+        <button class="nav-settings-btn" id="navSettingsBtn" onclick="openSettings()" title="설정">⚙</button>
       </nav>
     </div>
   </header>
+
+  <!-- 설정 모달 -->
+  <div class="settings-overlay hidden" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+    <div class="settings-modal retro-window">
+      <div class="rw-titlebar">
+        <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt="">설정</span>
+        <span class="rw-btns" onclick="closeSettings()"><i class="rw-x"></i></span>
+      </div>
+      <div class="settings-body">
+        <!-- 알림 위치 -->
+        <div class="settings-section">
+          <div class="settings-label">💬 채팅 알림 위치</div>
+          <div class="settings-desc">홈 화면에서 새 메시지가 오면 어디에 알림을 표시할까요?</div>
+          <div class="notify-pos-row">
+            <button class="notify-pos-btn" data-pos="left" onclick="setNotifyPos('left')">왼쪽</button>
+            <button class="notify-pos-btn" data-pos="center" onclick="setNotifyPos('center')">가운데</button>
+            <button class="notify-pos-btn active" data-pos="right" onclick="setNotifyPos('right')">오른쪽</button>
+          </div>
+          <div class="notify-pos-preview" id="notifyPosPreview">
+            <div class="npp-screen">
+              <div class="npp-dot" id="nppDot"></div>
+            </div>
+            <span class="npp-label" id="nppLabel">오른쪽 상단</span>
+          </div>
+        </div>
+        <hr class="settings-hr">
+        <!-- 알림음 -->
+        <div class="settings-section">
+          <div class="settings-label">🔔 알림음</div>
+          <div class="settings-desc">새 메시지 도착 시 효과음을 재생합니다.</div>
+          <label class="settings-toggle">
+            <input type="checkbox" id="soundToggle" onchange="setSoundEnabled(this.checked)">
+            <span class="stg-track"><span class="stg-thumb"></span></span>
+            <span class="stg-text">알림음 켜기</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main class="site-main">
 
@@ -323,6 +363,24 @@
           <div class="feat-body"><span class="fn">08</span><h3>AI 어시스턴트 내장</h3>
           <p>질문 · 번역 · 글쓰기 · 아이디어까지. 아지트 안의 똑똑한 친구가 되어줍니다.</p>
           <span class="feat-cta">AI 사용해보기 →</span></div>
+        </div>
+        <div class="feat-card feat-clickable" id="feat-emoji" onclick="openModal()">
+          <div class="feat-pixel"><canvas class="px" data-sprite="pineHappy" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">09</span><h3>이모티콘 피커</h3>
+          <p>😊 버튼으로 다양한 이모티콘을 골라 감정을 표현하세요. 메시지에 공감 반응도 가능.</p>
+          <span class="feat-cta">체험하기 →</span></div>
+        </div>
+        <div class="feat-card feat-clickable" id="feat-profile" onclick="openModal()">
+          <div class="feat-pixel"><canvas class="px" data-sprite="pineSleep" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">10</span><h3>프로필 · 기분 설정</h3>
+          <p>닉네임·아바타·기분을 자유롭게. 방에 있는 동안 내 개성이 그대로 유지됩니다.</p>
+          <span class="feat-cta">프로필 만들기 →</span></div>
+        </div>
+        <div class="feat-card fc-wide feat-clickable" id="feat-notify" onclick="openSettings()">
+          <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="4"></canvas></div>
+          <div class="feat-body"><span class="fn">11</span><h3>알림 · 설정</h3>
+          <p>홈 화면에서도 새 채팅 알림을 받을 수 있어요. 알림 위치(왼쪽·가운데·오른쪽)를 원하는 곳으로 설정하세요.</p>
+          <span class="feat-cta">설정 열기 →</span></div>
         </div>
       </div>
 
@@ -555,11 +613,20 @@
             </div>
             <ul class="ai-tips-list">
               <li>아지트 사용법 · 기능 질문</li>
-              <li>한국어 ↔ 영어 · 일어 번역</li>
+              <li>한국어 ↔ 영어 · 일어 · 독일어 번역</li>
+              <li>사진 속 글자 인식 · 번역</li>
               <li>방명록 · 상태메시지 문구 작성</li>
               <li>아이디어 브레인스토밍</li>
               <li>일반 지식 · 검색 대화</li>
             </ul>
+            <div class="ai-quota-info">
+              <b>⚡ 무료 한도 안내</b>
+              <p>Gemini 2.0 Flash 무료 기준:<br>
+              · 분당 최대 <b>15회</b> 요청<br>
+              · 하루 최대 <b>1,500회</b> 요청<br>
+              · 월 최대 <b>100만 토큰</b><br>
+              한도 초과 시 잠시 후 다시 시도해주세요.</p>
+            </div>
           </div>
           <div class="ai-key-notice retro-window admin-only">
             <div class="rw-titlebar rw-mini">

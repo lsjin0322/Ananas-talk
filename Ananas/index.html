@@ -129,7 +129,7 @@
 
       <div class="hero-section">
         <div class="hero-content">
-          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD · SINCE 2025</div>
+          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD · SINCE 2026 · <span id="heroTodayDate"></span></div>
           <h1 class="hero-title">
             <span class="curtain-line"><span class="ct">우리만의</span></span>
             <span class="curtain-line"><span class="ct accent-stroke">아지트에서</span></span>
@@ -254,7 +254,10 @@
           </div>
         </div>
         <div class="cg-dao-note">
-          <strong>누구나 접속:</strong> 클라우드에 배포된 아나나스 주소를 친구에게 공유하면, 설치 없이 브라우저만으로 같은 아지트에서 대화할 수 있어요. 대화는 암호화된 서버에 안전하게 보관됩니다.
+          <strong>누구나 접속:</strong> 클라우드에 배포된 아나나스 주소를<br>
+          친구에게 공유하면, 설치 없이 브라우저만으로<br>
+          같은 아지트에서 대화할 수 있어요.<br>
+          대화는 암호화된 서버에 안전하게 보관됩니다.
         </div>
       </div>
     </section>
@@ -273,45 +276,53 @@
 
       <!-- 기능 그리드 -->
       <div class="feat-grid">
-        <div class="feat-card fc-wide fc-dark" id="feat-chat">
+        <div class="feat-card fc-wide fc-dark feat-clickable" id="feat-chat" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="5"></canvas></div>
           <div class="feat-body"><span class="fn">01</span><h3>초저지연 실시간 채팅</h3>
-          <p>WebSocket으로 보내는 순간 상대방에게 도착. 타이핑 중인 상태도 실시간으로 표시됩니다.</p></div>
+          <p>WebSocket으로 보내는 순간 상대방에게 도착. 타이핑 중인 상태도 실시간으로 표시됩니다.</p>
+          <span class="feat-cta">아지트 열기 →</span></div>
         </div>
-        <div class="feat-card" id="feat-react">
+        <div class="feat-card feat-clickable" id="feat-react" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="heart" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">02</span><h3>공감 · 답장</h3>
-          <p>❤️ 👍 😂 😮 😢 🍍 여섯 가지 공감, 특정 말풍선에 바로 인용 답장.</p></div>
+          <p>❤️ 👍 😂 😮 😢 🍍 여섯 가지 공감, 특정 말풍선에 바로 인용 답장.</p>
+          <span class="feat-cta">체험하기 →</span></div>
         </div>
-        <div class="feat-card" id="feat-guest">
+        <div class="feat-card feat-clickable" id="feat-guest" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="mail" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">03</span><h3>방명록</h3>
-          <p>아지트마다 한 줄 방명록. 누가 다녀갔는지 흔적이 쌓입니다.</p></div>
+          <p>아지트마다 한 줄 방명록. 누가 다녀갔는지 흔적이 쌓입니다.</p>
+          <span class="feat-cta">체험하기 →</span></div>
         </div>
-        <div class="feat-card fc-yellow" id="feat-wave">
+        <div class="feat-card fc-yellow feat-clickable" id="feat-wave" onclick="doWaveSurf()">
           <div class="feat-pixel"><canvas class="px" data-sprite="wave" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">04</span><h3>파도타기</h3>
-          <p>버튼 하나로 무작위 공개 아지트에 입장. 새로운 사람들과 우연한 만남.</p></div>
+          <p>버튼 하나로 무작위 공개 아지트에 입장. 새로운 사람들과 우연한 만남.</p>
+          <span class="feat-cta">🌊 파도타기 →</span></div>
         </div>
-        <div class="feat-card" id="feat-invite">
+        <div class="feat-card feat-clickable" id="feat-invite" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="key" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">05</span><h3>코드 · 링크 초대</h3>
-          <p>6자리 코드 또는 URL 링크로 원하는 사람만 초대. 카카오톡에 붙여넣기 OK.</p></div>
+          <p>6자리 코드 또는 URL 링크로 원하는 사람만 초대. 카카오톡에 붙여넣기 OK.</p>
+          <span class="feat-cta">아지트 만들기 →</span></div>
         </div>
-        <div class="feat-card" id="feat-notice">
+        <div class="feat-card feat-clickable" id="feat-notice" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="pin" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">06</span><h3>공지 고정 · 검색</h3>
-          <p>방장 공지 상단 고정, 키워드 메시지 검색 + 하이라이트.</p></div>
+          <p>방장 공지 상단 고정, 키워드 메시지 검색 + 하이라이트.</p>
+          <span class="feat-cta">체험하기 →</span></div>
         </div>
-        <div class="feat-card" id="feat-photo">
+        <div class="feat-card feat-clickable" id="feat-photo" onclick="openModal()">
           <div class="feat-pixel"><canvas class="px" data-sprite="camera" data-scale="4"></canvas></div>
           <div class="feat-body"><span class="fn">07</span><h3>사진 공유</h3>
-          <p>JPG · PNG · WEBP 원본 비율 그대로 채팅 안에서 전송.</p></div>
+          <p>JPG · PNG · WEBP 원본 비율 그대로 채팅 안에서 전송.</p>
+          <span class="feat-cta">체험하기 →</span></div>
         </div>
-        <div class="feat-card fc-wide fc-yellow" id="feat-ai">
+        <div class="feat-card fc-wide fc-yellow feat-clickable" id="feat-ai" onclick="switchPage('ai')">
           <div class="feat-pixel"><canvas class="px" data-sprite="star" data-scale="5"></canvas></div>
           <div class="feat-body"><span class="fn">08</span><h3>AI 어시스턴트 내장</h3>
-          <p>질문 · 번역 · 글쓰기 · 아이디어까지. 아지트 안의 똑똑한 친구가 되어줍니다.</p></div>
+          <p>질문 · 번역 · 글쓰기 · 아이디어까지. 아지트 안의 똑똑한 친구가 되어줍니다.</p>
+          <span class="feat-cta">AI 사용해보기 →</span></div>
         </div>
       </div>
 
@@ -648,7 +659,7 @@
         </div>
         <div class="fg">
           <label class="fl" for="nicknameInput">닉네임</label>
-          <input type="text" id="nicknameInput" class="fi" placeholder="사용할 닉네임" maxlength="16" autocomplete="off">
+          <input type="text" id="nicknameInput" class="fi" placeholder="사용할 닉네임 (최대 10자)" maxlength="10" autocomplete="off">
         </div>
         <button class="mb mb-y" id="toStep2Btn">다음 →</button>
         <p class="sh">코드 있나요? <a href="#" onclick="goToJoinStep();return false;">바로 참여하기</a></p>
@@ -774,7 +785,7 @@
 
   <main class="chat-main retro-window">
     <div class="rw-titlebar">
-      <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt=""><span id="chatRoomTitle">아지트</span></span>
+      <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt=""><span id="chatRoomTitle">아지트</span><button class="rw-invite-btn" id="titleInviteBtn" onclick="copyText(location.origin+'/?room='+state.room,'초대 링크')" title="초대 링크 복사">🔗</button></span>
       <span class="rw-btns"><button class="rw-x rw-x-btn" id="chatHomeBtn" aria-label="홈으로"></button></span>
     </div>
 
@@ -801,6 +812,12 @@
     <div class="search-bar hidden" id="searchBar">
       <input type="text" id="searchInput" class="search-inp" placeholder="메시지 검색…">
       <button id="searchCloseBtn" class="search-x">✕</button>
+    </div>
+
+    <!-- 혼자 남으면 친구 초대 유도 배너 -->
+    <div class="alone-invite-banner hidden" id="aloneInviteBanner">
+      <span>아직 아무도 없어요! 친구를 초대해볼까요?</span>
+      <button class="aib-btn" onclick="copyText(location.origin+'/?room='+state.room,'초대 링크')">🔗 초대 링크 복사</button>
     </div>
 
     <div class="messages-area" id="messagesArea">
@@ -879,9 +896,6 @@
   </div>
 </div>
 
-<!-- 채팅 백그라운드 시 복귀 버튼 -->
-<button class="resume-chat hidden" id="resumeChatBtn">💬 채팅으로 돌아가기</button>
-
 <!-- 백그라운드 채팅 알림 팝업 -->
 <div class="chat-notify-stack" id="chatNotifyStack"></div>
 
@@ -936,5 +950,14 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
+<script>
+  /* 오늘 날짜 표시 */
+  (function() {
+    const el = document.getElementById('heroTodayDate');
+    if (!el) return;
+    const d = new Date();
+    el.textContent = `${d.getMonth()+1}월 ${d.getDate()}일`;
+  })();
+</script>
 </body>
 </html>

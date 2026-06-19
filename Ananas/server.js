@@ -264,7 +264,7 @@ io.on('connection', (socket) => {
   socket.on('createRoom', (data) => {
     if (!checkSocketRate(socket.id, 3)) return socket.emit('errorMsg', '요청이 너무 많습니다.');
 
-    const nickname = sanitize(data?.nickname, 20);
+    const nickname = sanitize(data?.nickname, 10);
     const roomName = sanitize(data?.roomName, 40);
     const roomDesc = sanitize(data?.roomDesc, 80);
     const category = sanitize(data?.category, 20);
@@ -298,7 +298,7 @@ io.on('connection', (socket) => {
     addClientAzit(socket.cid, code);
 
     socket.emit('roomCreated', { code, roomName, isHost: true });
-    pushSystem(code, `${nickname}님이 아지트를 열었습니다.`);
+    pushSystem(code, `${nickname}님이 아지트를 열었습니다! 🍍`);
     broadcastOnline(code);
     if (isPublic) markRoomListDirty();
     log(`방 생성: ${code} (${roomName})${isPublic ? ' [공개]' : ''} — ${nickname}`);
@@ -308,7 +308,7 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     if (!checkSocketRate(socket.id, 2)) return socket.emit('errorMsg', '요청이 너무 많습니다.');
 
-    const nickname = sanitize(data?.nickname, 20);
+    const nickname = sanitize(data?.nickname, 10);
     const code     = (data?.code || '').toUpperCase().trim();
     const avatar   = sanitize(data?.avatar, 4);
     const mood     = ALLOWED_MOODS.includes(data?.mood) ? data.mood : 'happy';
@@ -344,7 +344,7 @@ io.on('connection', (socket) => {
     if (room.notice)    socket.emit('notice', room.notice);
     socket.emit('guestbook', room.guestbook.slice(-50));
 
-    pushSystem(code, `${nickname}님이 합류했습니다.`);
+    if (!data?.silent) pushSystem(code, `${nickname}님이 입장하였습니다.`);
     broadcastOnline(code);
     if (room.isPublic) markRoomListDirty();
     log(`방 참여: ${code} — ${nickname}`);
@@ -571,7 +571,7 @@ function doLeave(socket, silent = false, immediate = false) {
     socket.leave(code);
 
     if (!silent && socket.nickname) {
-      pushSystem(code, `${socket.nickname}님이 아지트를 떠났습니다.`);
+      pushSystem(code, `${socket.nickname}님이 퇴장하였습니다.`);
     }
 
     /* 방장 승계: 방장이 나가면 남은 사람 중 첫 번째에게 위임 */
@@ -716,6 +716,10 @@ app.use((err, req, res, next) => {
   console.error('[Error]', err.message);
   res.status(500).json({ error: '서버 오류가 발생했습니다.' });
 });
+
+/* ─── 30일 메시지 자동 정리 (하루 1회) ──────── */
+db.pruneOldMessages();
+setInterval(() => db.pruneOldMessages(), 24 * 60 * 60 * 1000);
 
 /* ─── 서버 시작 ────────────────────────────── */
 server.listen(PORT, () => {

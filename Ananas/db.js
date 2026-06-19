@@ -215,5 +215,11 @@ module.exports = {
     return result;
   },
 
+  /* 30일 이상 된 메시지 일괄 정리 */
+  pruneOldMessages() {
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    db.prepare(`DELETE FROM messages WHERE time < ?`).run(cutoff);
+  },
+
   close() { try { db.close(); } catch (_) {} },
 };

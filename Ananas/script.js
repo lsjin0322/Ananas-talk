@@ -785,9 +785,9 @@ socket.on('connect', () => {
   if (st) st.classList.add('connected');
   if (txt) txt.textContent = '서버 연결됨 · 실시간 업데이트 중';
   setConnBadge(true);
-  /* 채팅 중 끊겼다 복귀하면 현재 방으로 자동 재입장 */
+  /* 채팅 중 끊겼다 복귀하면 현재 방으로 자동 재입장 (입장 메시지 없이) */
   if (state.room && state.nickname) {
-    socket.emit('joinRoom', { nickname: state.nickname, code: state.room, avatar: state.avatar, mood: state.mood, profileImage: state.profileImage || '' });
+    socket.emit('joinRoom', { nickname: state.nickname, code: state.room, avatar: state.avatar, mood: state.mood, profileImage: state.profileImage || '', silent: true });
   }
 });
 socket.on('disconnect', () => {
@@ -868,10 +868,10 @@ window.addEventListener('scroll', () => {
   if (!body) return;
   const script = [
     { user: '파인', av: 'pine',      text: '얘들아 오늘 아지트 모임 어때? 🍍', mine: false },
-    { user: '나',   av: 'pineHappy', text: '콜! 방명록에 글 남겨놨어 ㅎㅎ',   mine: true },
+    { user: '해피', av: 'pineHappy', text: '콜! 방명록에 글 남겨놨어 ㅎㅎ',   mine: false },
     { user: '쿨파', av: 'pineCool',  text: '파도타다가 옆 아지트 구경하고 옴ㅋㅋ', mine: false },
     { user: '윙크', av: 'pineWink',  text: '여기가 제일 아늑하지 😊',         mine: false, react: '❤️ 3' },
-    { user: '나',   av: 'pineHappy', text: '그 시절 감성 그대로다…',          mine: true },
+    { user: '해피', av: 'pineHappy', text: '그 시절 감성 그대로다…',          mine: false },
   ];
   let i = 0;
   function pushDemo() {
@@ -1036,7 +1036,9 @@ renderRecent();
    8-b. 내 채팅 목록 (카톡식) — 다시 입장 / 개설자 삭제
 ═══════════════════════════════════════════ */
 function relTime(t) {
-  const diff = Date.now() - Number(t || 0);
+  const ts = Number(t);
+  if (!t || isNaN(ts) || ts <= 0) return '—';
+  const diff = Date.now() - ts;
   const m = Math.floor(diff / 60000);
   if (m < 1) return '방금';
   if (m < 60) return m + '분 전';
@@ -1044,7 +1046,7 @@ function relTime(t) {
   if (h < 24) return h + '시간 전';
   const d = Math.floor(h / 24);
   if (d < 7) return d + '일 전';
-  return new Date(Number(t)).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' });
+  return new Date(ts).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' });
 }
 function openMyChats() {
   const screen = $('#myChatsScreen');
@@ -1181,13 +1183,18 @@ function openModal() {
   if (!modal) return;
   modal.classList.remove('hidden');
   showStep(1);
-  /* 매번 새로 입력: 닉네임·프로필 사진 리셋 */
   const ni = $('#nicknameInput');
-  if (ni) { ni.value = ''; setTimeout(() => ni.focus(), 80); }
-  state.profileImage = '';
-  state.avatar = 'A';
-  localStorage.removeItem('ananas_profile');
-  $$('.av-btn').forEach(b => b.classList.toggle('active', b.dataset.emoji === 'A'));
+  if (ni) {
+    /* 저장된 닉네임이 있으면 유지, 없으면 빈칸 */
+    const saved = localStorage.getItem('ananas_nickname') || '';
+    ni.value = saved;
+    setTimeout(() => ni.focus(), 80);
+  }
+  /* 프로필 사진은 이미 설정된 경우 유지 */
+  if (!state.profileImage) {
+    state.avatar = localStorage.getItem('ananas_avatar') || 'A';
+  }
+  $$('.av-btn').forEach(b => b.classList.toggle('active', b.dataset.emoji === state.avatar));
   applyProfilePreview();
   $$('.mood-grid .mood').forEach(b => b.classList.toggle('active', b.dataset.mood === state.mood));
 }
@@ -1266,6 +1273,7 @@ window.selectCat    = selectCat;
 $('#toStep2Btn') && $('#toStep2Btn').addEventListener('click', () => {
   const nick = ($('#nicknameInput').value || '').trim();
   if (!nick) { showToast('닉네임을 입력해주세요!', 'error'); $('#nicknameInput').focus(); return; }
+  if (nick.length > 10) { showToast('닉네임은 10자까지 입력할 수 있어요!', 'error'); $('#nicknameInput').focus(); return; }
   state.nickname = nick;
   state.nicknameEsc = serverEscape(nick);
   localStorage.setItem('ananas_nickname', nick);
@@ -1375,6 +1383,7 @@ function copyText(txt, label) {
       showToast(`${label} 복사 완료!`, 'success');
     });
 }
+window.copyText = copyText;
 function copyCode() { copyText($('#inviteCodeDisplay').textContent.trim(), '초대 코드'); }
 function copyLink() { copyText($('#inviteLinkDisplay').textContent.trim(), '초대 링크'); }
 window.copyCode = copyCode;
@@ -1429,7 +1438,6 @@ function exitChat(toHome) {
   socket.emit('leaveRoom');
   state.room = null; state.roomName = ''; state.isHost = false;
   $('#chatApp').classList.add('hidden');
-  $('#resumeChatBtn') && $('#resumeChatBtn').classList.add('hidden');
   const w = $('#siteWrapper');
   w.style.display = '';
   w.classList.add('visible');
@@ -1446,17 +1454,14 @@ function goHomeKeepChat() {
   w.classList.add('visible');
   document.body.style.overflow = '';
   switchPage('home');
-  $('#resumeChatBtn') && $('#resumeChatBtn').classList.remove('hidden');
 }
 function resumeChat() {
   if (!state.room) return;
   $('#siteWrapper').style.display = 'none';
   $('#chatApp').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-  $('#resumeChatBtn') && $('#resumeChatBtn').classList.add('hidden');
   scrollBottom();
 }
-$('#resumeChatBtn') && $('#resumeChatBtn').addEventListener('click', resumeChat);
 
 /* 나가기 확인 팝업 */
 function showLeaveConfirm() {
@@ -1546,6 +1551,9 @@ socket.on('onlineUsers', users => {
   $('#chatOnlineCount').textContent = `${n}명`;
   $('#memberCnt').textContent = n;
   renderMembers(users);
+  /* 혼자 남으면 친구 초대 배너 표시 */
+  const banner = $('#aloneInviteBanner');
+  if (banner) banner.classList.toggle('hidden', n > 1);
 });
 
 /* 친구 추가 (이벤트 위임) */
@@ -1840,7 +1848,27 @@ $('#imageFileInput') && $('#imageFileInput').addEventListener('change', e => {
     if (dataURL.length > 4.8 * 1024 * 1024) {
       showToast('사진이 너무 커요. 더 작은 사진으로 시도해주세요.', 'error'); return;
     }
-    socket.emit('chatMessage', dataURL);
+    /* 전송 전 미리보기 확인 */
+    const preview = document.createElement('div');
+    preview.className = 'img-confirm-overlay';
+    preview.innerHTML = `
+      <div class="img-confirm-box retro-window">
+        <div class="rw-titlebar"><span class="rw-title">📷 사진 전송 확인</span><span class="rw-btns"><i class="rw-x"></i></span></div>
+        <div class="img-confirm-body">
+          <img src="${dataURL}" class="img-confirm-preview" alt="전송할 사진">
+          <div class="img-confirm-btns">
+            <button class="cf-btn cf-yes" id="imgSendOk">전송</button>
+            <button class="cf-btn cf-no" id="imgSendCancel">취소</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(preview);
+    preview.querySelector('#imgSendOk').addEventListener('click', () => {
+      preview.remove();
+      socket.emit('chatMessage', dataURL);
+    });
+    preview.querySelector('#imgSendCancel').addEventListener('click', () => preview.remove());
+    preview.querySelector('.rw-x').addEventListener('click', () => preview.remove());
   };
   img.onerror = () => { URL.revokeObjectURL(url); showToast('사진을 읽을 수 없어요.', 'error'); };
   img.src = url;

@@ -177,7 +177,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .av-hint{font-size:.7rem;line-height:1.55;color:#5c5648;margin:10px 0 0;background:var(--c2);
   border:1.5px dashed var(--ink);border-radius:10px;padding:9px 11px}
 /* 아바타 자리에 들어가는 실제 사진 */
-.av-photo{width:100%;height:100%;object-fit:contain;display:block;background:#fff}
+.av-photo{width:100%;height:100%;object-fit:cover;display:block;background:#fff}
 .member-av,.msg-av,.csb-av,#myAvatarDisplay{overflow:hidden}
 /* 미니프로필 사진 변경 (채팅방 내) */
 #myAvatarDisplay{cursor:pointer;position:relative}
@@ -1218,3 +1218,39 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 .recent-item .ri-name{font-weight:800;font-size:.9rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .recent-item .ri-code{font-family:var(--pxfont);font-size:.64rem;color:var(--br);letter-spacing:.08em}
 .recent-item .ri-enter{font-size:.72rem;font-weight:700;color:var(--leafD);flex-shrink:0}
+
+/* ── 기능 카드 클릭 활성화 ──────────────── */
+.feat-clickable{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.feat-clickable:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.feat-cta{display:inline-block;margin-top:10px;font-size:.8rem;font-weight:800;
+  color:var(--leaf);letter-spacing:.03em}
+
+/* ── 혼자 남으면 친구 초대 배너 ───────── */
+.alone-invite-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--c2);border-bottom:1.5px solid var(--border);padding:8px 14px;font-size:.82rem;flex-shrink:0}
+.alone-invite-banner.hidden{display:none}
+.aib-btn{font-size:.8rem;font-weight:700;background:var(--leaf);color:#fff;border:none;
+  border-radius:var(--rs);padding:4px 10px;cursor:pointer}
+.aib-btn:hover{opacity:.85}
+
+/* ── 사진 전송 확인 팝업 ─────────────── */
+.img-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;
+  display:flex;align-items:center;justify-content:center}
+.img-confirm-box{max-width:380px;width:92%;background:var(--paper)}
+.img-confirm-body{padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.img-confirm-preview{max-width:100%;max-height:260px;border-radius:8px;object-fit:contain;border:1.5px solid var(--border)}
+.img-confirm-btns{display:flex;gap:10px;width:100%;justify-content:center}
+
+/* ── 채팅 타이틀바 초대 버튼 ────────── */
+.rw-invite-btn{background:none;border:none;cursor:pointer;font-size:1rem;padding:0 4px;
+  opacity:.7;transition:opacity .15s;vertical-align:middle;margin-left:6px}
+.rw-invite-btn:hover{opacity:1}
+
+/* ── 이모지 피커 오버플로우 수정 ──────── */
+.emoji-pop{max-height:180px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:2px;
+  padding:8px;background:var(--paper);border:1.5px solid var(--border);
+  border-radius:var(--rs);position:absolute;bottom:calc(100% + 6px);left:0;z-index:300;
+  box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.emoji-pop button{background:none;border:none;font-size:1.3rem;cursor:pointer;
+  padding:3px;border-radius:4px;line-height:1}
+.emoji-pop button:hover{background:var(--c2)}

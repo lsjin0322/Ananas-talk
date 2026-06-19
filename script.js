@@ -2263,6 +2263,10 @@ window.switchAiMode = switchAiMode;
   function setLang(lang) {
     targetLang = lang;
     $$('.tr-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    if (input) { input.value = ''; if (charCnt) charCnt.textContent = '0'; }
+    pendingImage = null;
+    if (imgPreview) imgPreview.classList.add('hidden');
+    if (imgEl) imgEl.src = '';
     clearOutput();
   }
   $$('.tr-lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));

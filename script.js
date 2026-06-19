@@ -97,6 +97,114 @@ window.closeSettings = closeSettings;
 window.setNotifyPos = setNotifyPos;
 window.setSoundEnabled = setSoundEnabled;
 
+/* ══ 계정 모달 ══════════════════════════════ */
+let accMoodMain = 'happy';
+let accMoodSub = 'happy';
+
+function openAccount() {
+  const el = document.getElementById('accountOverlay');
+  if (!el) return;
+  el.classList.remove('hidden');
+  /* 저장된 프로필 불러오기 */
+  ['main','sub'].forEach(t => {
+    const raw = localStorage.getItem('ananas_' + t + '_profile');
+    if (!raw) return;
+    try {
+      const p = JSON.parse(raw);
+      const nickEl = document.getElementById(t === 'main' ? 'accMainNick' : 'accSubNick');
+      if (nickEl && p.nickname) nickEl.value = p.nickname;
+      if (t === 'main' && p.mood) { accMoodMain = p.mood; highlightAccMood('main', p.mood); }
+      if (t === 'sub' && p.mood) { accMoodSub = p.mood; highlightAccMood('sub', p.mood); }
+    } catch(e) {}
+  });
+}
+function closeAccount() {
+  const el = document.getElementById('accountOverlay');
+  if (el) el.classList.add('hidden');
+}
+function switchAccTab(type) {
+  document.getElementById('accMainSection').style.display = type === 'main' ? '' : 'none';
+  document.getElementById('accSubSection').style.display = type === 'sub' ? '' : 'none';
+  document.getElementById('accTabMain').classList.toggle('active', type === 'main');
+  document.getElementById('accTabSub').classList.toggle('active', type === 'sub');
+}
+function setAccMood(mood, btn) { accMoodMain = mood; highlightAccMood('main', mood); }
+function setAccMood2(mood, btn) { accMoodSub = mood; highlightAccMood('sub', mood); }
+function highlightAccMood(type, mood) {
+  const section = document.getElementById(type === 'main' ? 'accMainSection' : 'accSubSection');
+  if (!section) return;
+  section.querySelectorAll('.acc-mood-btn').forEach(b => b.classList.toggle('active', b.dataset.mood === mood));
+}
+function setAccPhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const box = document.getElementById(type === 'main' ? 'accMainAvatarBox' : 'accSubAvatarBox');
+    if (box) { box.style.backgroundImage = `url(${e.target.result})`; box.style.backgroundSize = 'cover'; }
+    localStorage.setItem('ananas_' + type + '_photo', e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+function saveAccProfile(type) {
+  const nick = (document.getElementById(type === 'main' ? 'accMainNick' : 'accSubNick')?.value || '').trim();
+  if (!nick) { showToast('닉네임을 입력해주세요.', 'error'); return; }
+  const mood = type === 'main' ? accMoodMain : accMoodSub;
+  const photo = localStorage.getItem('ananas_' + type + '_photo') || '';
+  const profile = { nickname: nick, avatar: typeof state !== 'undefined' ? (state.avatar || 'A') : 'A', mood, profileImage: photo };
+  localStorage.setItem('ananas_' + type + '_profile', JSON.stringify(profile));
+  showToast((type === 'main' ? '메인' : '서브') + ' 프로필 저장됨!', 'success');
+}
+function applyAccProfile(type) {
+  saveAccProfile(type);
+  const raw = localStorage.getItem('ananas_' + type + '_profile');
+  if (!raw) return;
+  try {
+    const p = JSON.parse(raw);
+    if (typeof state !== 'undefined') { state.nickname = p.nickname; state.mood = p.mood; if (p.profileImage) state.profileImage = p.profileImage; }
+    localStorage.setItem('ananas_nickname', p.nickname);
+    showToast('아지트 프로필에 적용됐어요!', 'success');
+    closeAccount();
+  } catch(e) {}
+}
+function deleteAccProfile(type) {
+  localStorage.removeItem('ananas_' + type + '_profile');
+  localStorage.removeItem('ananas_' + type + '_photo');
+  const nickEl = document.getElementById(type === 'main' ? 'accMainNick' : 'accSubNick');
+  if (nickEl) nickEl.value = '';
+  showToast('프로필이 삭제됐어요.', 'success');
+}
+function setProfilePhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('ananas_' + type + '_photo', e.target.result);
+    const box = document.getElementById(type === 'main' ? 'mainProfilePreview' : 'subProfilePreview');
+    if (box) { box.style.backgroundImage = `url(${e.target.result})`; box.style.backgroundSize = 'cover'; }
+    showToast('사진이 설정됐어요.', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+window.openAccount = openAccount;
+window.closeAccount = closeAccount;
+window.switchAccTab = switchAccTab;
+window.setAccMood = setAccMood;
+window.setAccMood2 = setAccMood2;
+window.setAccPhoto = setAccPhoto;
+window.saveAccProfile = saveAccProfile;
+window.applyAccProfile = applyAccProfile;
+window.deleteAccProfile = deleteAccProfile;
+window.setProfilePhoto = setProfilePhoto;
+
+/* ══ 스크롤 모션 (fade-up) ══════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+});
+
 function saveProfile(type) {
   const nickEl = document.getElementById(type === 'main' ? 'mainNickInput' : 'subNickInput');
   const nick = (nickEl?.value || '').trim();

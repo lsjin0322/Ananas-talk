@@ -1509,13 +1509,13 @@ function startBgm() {
   bgmAudio.currentTime = 0;
   bgmAudio.play().catch(() => {});
   const btn = $('#bgmToggleBtn');
-  if (btn) { btn.textContent = '🎵 음악 끄기'; btn.classList.remove('muted'); }
+  if (btn) { btn.textContent = '🔊'; btn.classList.remove('muted'); btn.title = '음악 끄기'; }
 }
 function stopBgm() {
   bgmOn = false;
   bgmAudio.pause();
   const btn = $('#bgmToggleBtn');
-  if (btn) { btn.textContent = '🎵 음악 켜기'; btn.classList.add('muted'); }
+  if (btn) { btn.textContent = '🔇'; btn.classList.add('muted'); btn.title = '음악 켜기'; }
 }
 function toggleBgm() {
   bgmOn ? stopBgm() : startBgm();

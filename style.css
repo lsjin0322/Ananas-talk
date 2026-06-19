@@ -287,8 +287,26 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .hero-title.cr .curtain-line:nth-child(3) .ct{animation:curtainUp 0.85s var(--ease) 0.35s both}
 @keyframes curtainUp{0%{transform:translateY(110%);opacity:0}
   60%{transform:translateY(-3%);opacity:1}80%{transform:translateY(2%)}100%{transform:translateY(0);opacity:1}}
-.accent-stroke{color:var(--y);-webkit-text-stroke:2.5px var(--ink);
-  text-shadow:4px 4px 0 rgba(31,27,19,0.12)}
+.accent-stroke{color:var(--y)}
+/* 아지트 노란색 + 형광 그라데이션 하이라이트 */
+.accent-yellow{
+  color:var(--y);
+  position:relative;
+  display:inline-block;
+}
+.accent-yellow::before{
+  content:'';
+  position:absolute;
+  left:-4px; right:-4px;
+  bottom:4px; top:auto;
+  height:55%;
+  background:linear-gradient(90deg,#ffe01a 0%,#fff700 40%,#aaff00 80%,#00ffcc 100%);
+  opacity:.55;
+  border-radius:3px;
+  z-index:-1;
+  filter:blur(2px);
+}
+.accent-plain{color:var(--ink)}
 .title-dot{color:var(--coral)}
 .hero-desc{font-size:1.04rem;color:var(--ink2);line-height:1.75;margin-bottom:28px}
 .hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
@@ -803,8 +821,8 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ch-btn{padding:8px 13px;border:2px solid var(--ink);border-radius:var(--rs);background:#FFFEF8;
   font-size:0.78rem;font-weight:600;transition:background 0.13s ease}
 .ch-btn:hover{background:var(--ys)}
-.ch-bgm-btn{background:var(--ys);font-weight:800}
-.ch-bgm-btn.muted{background:#FFFEF8;opacity:.7}
+.ch-bgm-btn{background:var(--ys);font-size:1.1rem;padding:6px 10px;line-height:1}
+.ch-bgm-btn.muted{background:#FFFEF8;opacity:.65}
 .notice-bar{display:flex;align-items:center;gap:9px;padding:10px 16px;
   background:var(--ys);border-bottom:2px solid var(--ink);font-size:0.84rem;flex-shrink:0;
   animation:pgIn 0.3s ease}

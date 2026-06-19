@@ -239,8 +239,8 @@ io.on('connection', (socket) => {
       return socket.emit('adminAiKeyResult', { ok: false, msg: '관리자 권한이 없습니다.' });
     }
     const k = typeof key === 'string' ? key.trim() : '';
-    if (k && !/^[A-Za-z0-9_\-]{20,100}$/.test(k)) {
-      return socket.emit('adminAiKeyResult', { ok: false, msg: '키 형식이 올바르지 않습니다. (Gemini: AIza…)' });
+    if (k && !/^[A-Za-z0-9_\-\.]{20,200}$/.test(k)) {
+      return socket.emit('adminAiKeyResult', { ok: false, msg: '키 형식이 올바르지 않습니다.' });
     }
     runtimeAiKey = k;   // 빈 문자열이면 비활성화
     log(`🔑 관리자가 AI 키를 ${k ? '설정' : '해제'}했습니다.`);
@@ -724,7 +724,7 @@ server.listen(PORT, () => {
   console.log(`🔗  http://localhost:${PORT}`);
   console.log(`🌍  환경: ${NODE_ENV}`);
   console.log(`👥  방당 최대: ${ROOM_MAX_USERS}명 / 서버 전체: ${SERVER_MAX_CONN}명`);
-  console.log(`🤖  AI 프록시: ${ANTHROPIC_KEY ? '활성' : '키 미설정'}`);
+  console.log(`🤖  AI 프록시: ${runtimeAiKey ? '활성 (Gemini)' : '키 미설정'}`);
   console.log('═══════════════════════════════════════');
 });
 

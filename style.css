@@ -1256,10 +1256,19 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 
 /* ── 번역기 ──────────────────────────────── */
 .tr-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px}
-.tr-target-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.tr-target-label{font-size:.82rem;font-weight:800;color:var(--gray);text-transform:uppercase;
-  letter-spacing:.05em;white-space:nowrap}
-.tr-lang-row{display:flex;gap:8px;flex-wrap:wrap}
+/* 언어 선택 바 */
+.tr-lang-bar{display:flex;align-items:center;gap:8px}
+.tr-lang-sel-wrap{flex:1;min-width:0}
+.tr-lang-sel{width:100%;padding:7px 10px;border:2px solid var(--ink);border-radius:var(--rs);
+  font-family:var(--font);font-size:.88rem;font-weight:700;background:#FFFEF8;color:var(--ink);
+  cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231F1B13' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.tr-lang-sel:focus{outline:none;border-color:var(--y)}
+.tr-swap-btn{flex-shrink:0;padding:6px 10px;font-size:1rem;border:2px solid var(--ink);
+  border-radius:var(--rs);background:#FFFEF8;cursor:pointer;font-weight:900;
+  transition:background .13s;line-height:1}
+.tr-swap-btn:hover{background:var(--ys)}
 .tr-input-header{display:flex;align-items:center;gap:10px;height:28px}
 .tr-img-btn{font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:16px;
   border:1.5px solid var(--border);background:var(--c2);cursor:pointer;
@@ -1294,9 +1303,9 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   font-family:var(--font);box-sizing:border-box}
 .tr-placeholder{color:var(--gray);font-size:.85rem}
 .tr-loading{color:var(--gray);font-style:italic}
-.tr-copy-btn{align-self:flex-end;font-size:.8rem;font-weight:700;padding:4px 12px;
-  border:1.5px solid var(--border);border-radius:var(--rs);background:var(--paper);
-  cursor:pointer;margin-top:2px}
+.tr-copy-btn{font-size:.78rem;font-weight:700;padding:3px 10px;margin-left:auto;
+  border:1.5px solid var(--border);border-radius:var(--rs);background:#FFFEF8;
+  cursor:pointer;flex-shrink:0}
 .tr-copy-btn:hover{background:var(--ink);color:#fff}
 .tr-translate-btn{width:100%;padding:12px;font-size:.95rem;font-weight:800;
   background:var(--ink);color:#fff;border:none;border-radius:var(--rs);cursor:pointer;
@@ -1382,7 +1391,7 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   .sgb-title{font-size:.96rem}
   .sgb-body p{font-size:.88rem}
   .tr-body{padding:12px 14px;gap:10px}
-  .tr-target-row{flex-wrap:wrap}
+  .tr-lang-bar{flex-wrap:nowrap}
   .tr-panels{grid-template-columns:1fr}
   .settings-modal{width:95vw}
   .notify-pos-row{gap:5px}

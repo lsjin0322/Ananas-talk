@@ -595,14 +595,31 @@
           <div id="aiTranslatePanel" class="ai-panel hidden">
             <div class="tr-body">
 
-              <!-- 번역 대상 언어 선택 -->
-              <div class="tr-target-row">
-                <span class="tr-target-label">번역할 언어</span>
-                <div class="tr-lang-row">
-                  <button class="tr-lang-btn" data-lang="ko">한국어</button>
-                  <button class="tr-lang-btn active" data-lang="en">영어</button>
-                  <button class="tr-lang-btn" data-lang="ja">일본어</button>
-                  <button class="tr-lang-btn" data-lang="de">독일어</button>
+              <!-- 언어 선택 행 -->
+              <div class="tr-lang-bar">
+                <div class="tr-lang-sel-wrap">
+                  <select id="trSrcLang" class="tr-lang-sel">
+                    <option value="auto">자동 감지</option>
+                    <option value="ko">한국어</option>
+                    <option value="en">영어</option>
+                    <option value="ja">일본어</option>
+                    <option value="de">독일어</option>
+                    <option value="zh">중국어</option>
+                    <option value="fr">프랑스어</option>
+                    <option value="es">스페인어</option>
+                  </select>
+                </div>
+                <button class="tr-swap-btn" id="trSwapBtn" title="언어 바꾸기">⇄</button>
+                <div class="tr-lang-sel-wrap">
+                  <select id="trTgtLang" class="tr-lang-sel">
+                    <option value="ko">한국어</option>
+                    <option value="en" selected>영어</option>
+                    <option value="ja">일본어</option>
+                    <option value="de">독일어</option>
+                    <option value="zh">중국어</option>
+                    <option value="fr">프랑스어</option>
+                    <option value="es">스페인어</option>
+                  </select>
                 </div>
               </div>
 
@@ -614,22 +631,23 @@
                     <label class="tr-img-btn" for="trImgInput" title="사진 속 글자 번역">📁 사진 업로드</label>
                     <input type="file" id="trImgInput" accept="image/*" style="display:none">
                   </div>
-                  <!-- 사진 미리보기 -->
                   <div id="trImgPreview" class="tr-img-preview hidden">
                     <img id="trImgPreviewEl" src="" alt="업로드 사진">
                     <button class="tr-img-clear" id="trImgClear">✕ 사진 제거</button>
                   </div>
-                  <textarea id="trInput" class="tr-textarea" placeholder="번역할 글을 입력하거나 사진을 올려주세요 (Ctrl+Enter로 번역)" rows="5" maxlength="1000"></textarea>
+                  <textarea id="trInput" class="tr-textarea" placeholder="입력, 말하기 또는 사진 촬영" rows="5" maxlength="1000"></textarea>
                   <div class="tr-char-count"><span id="trCharCount">0</span> / 1000</div>
                 </div>
 
                 <!-- 결과 패널 -->
                 <div class="tr-panel">
-                  <label class="tr-label">번역 결과</label>
-                  <div class="tr-output" id="trOutput">
-                    <span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>
+                  <div class="tr-input-header">
+                    <label class="tr-label">번역 결과</label>
+                    <button class="tr-copy-btn hidden" id="trCopyBtn">복사</button>
                   </div>
-                  <button class="tr-copy-btn hidden" id="trCopyBtn">복사</button>
+                  <div class="tr-output" id="trOutput">
+                    <span class="tr-placeholder">번역</span>
+                  </div>
                 </div>
               </div>
 

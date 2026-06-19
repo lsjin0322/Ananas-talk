@@ -1497,11 +1497,37 @@ window.copyLink = copyLink;
 /* ═══════════════════════════════════════════
    10. 채팅앱 진입/퇴장
 ═══════════════════════════════════════════ */
+
+/* BGM */
+const bgmAudio = new Audio('/sounds/bgm.mp3');
+bgmAudio.loop = true;
+bgmAudio.volume = 0.35;
+let bgmOn = true;
+
+function startBgm() {
+  bgmOn = true;
+  bgmAudio.currentTime = 0;
+  bgmAudio.play().catch(() => {});
+  const btn = $('#bgmToggleBtn');
+  if (btn) { btn.textContent = '🎵 음악 끄기'; btn.classList.remove('muted'); }
+}
+function stopBgm() {
+  bgmOn = false;
+  bgmAudio.pause();
+  const btn = $('#bgmToggleBtn');
+  if (btn) { btn.textContent = '🎵 음악 켜기'; btn.classList.add('muted'); }
+}
+function toggleBgm() {
+  bgmOn ? stopBgm() : startBgm();
+}
+window.toggleBgm = toggleBgm;
+
 function launchChatApp() {
   $('#siteWrapper').style.display = 'none';
   const app = $('#chatApp');
   app.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  startBgm();
 
   /* 내 프로필 */
   $('#myNicknameDisplay').textContent = state.nickname;
@@ -1540,6 +1566,7 @@ function resetMessagesView() {
 
 /* 완전히 나가기: 서버에서 퇴장(비면 방 삭제) */
 function exitChat(toHome) {
+  stopBgm();
   socket.emit('leaveRoom');
   state.room = null; state.roomName = ''; state.isHost = false;
   $('#chatApp').classList.add('hidden');
@@ -1553,6 +1580,7 @@ function exitChat(toHome) {
 /* 나가지 않고 홈으로(채팅 세션 유지 → 백그라운드 알림 동작) */
 function goHomeKeepChat() {
   if (!state.room) return exitChat(true);
+  stopBgm();
   $('#chatApp').classList.add('hidden');
   const w = $('#siteWrapper');
   w.style.display = '';

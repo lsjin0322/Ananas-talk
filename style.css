@@ -803,6 +803,8 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ch-btn{padding:8px 13px;border:2px solid var(--ink);border-radius:var(--rs);background:#FFFEF8;
   font-size:0.78rem;font-weight:600;transition:background 0.13s ease}
 .ch-btn:hover{background:var(--ys)}
+.ch-bgm-btn{background:var(--ys);font-weight:800}
+.ch-bgm-btn.muted{background:#FFFEF8;opacity:.7}
 .notice-bar{display:flex;align-items:center;gap:9px;padding:10px 16px;
   background:var(--ys);border-bottom:2px solid var(--ink);font-size:0.84rem;flex-shrink:0;
   animation:pgIn 0.3s ease}

@@ -2218,6 +2218,88 @@ $('#joinDirectInput') && $('#joinDirectInput').addEventListener('keydown', e => 
   if (e.key === 'Enter') $('#joinDirectSubmitBtn').click();
 });
 
+/* ═══════════════════════════════════════════
+   번역기
+═══════════════════════════════════════════ */
+(function initTranslator() {
+  const PAIRS = {
+    'ko-en': { from: '한국어', to: '영어',   prompt: (t) => `다음 한국어 문장을 영어로 번역해줘. 번역문만 출력해:\n${t}` },
+    'en-ko': { from: '영어',   to: '한국어', prompt: (t) => `다음 영어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
+    'ko-ja': { from: '한국어', to: '일본어', prompt: (t) => `다음 한국어 문장을 일본어로 번역해줘. 번역문만 출력해:\n${t}` },
+    'ja-ko': { from: '일본어', to: '한국어', prompt: (t) => `다음 일본어 문장을 한국어로 번역해줘. 번역문만 출력해:\n${t}` },
+  };
+  let currentPair = 'ko-en';
+
+  const input   = $('#trInput');
+  const output  = $('#trOutput');
+  const fromLbl = $('#trFromLabel');
+  const toLbl   = $('#trToLabel');
+  const copyBtn = $('#trCopyBtn');
+  const charCnt = $('#trCharCount');
+  if (!input) return;
+
+  function setPair(pair) {
+    currentPair = pair;
+    const p = PAIRS[pair];
+    if (fromLbl) fromLbl.textContent = p.from;
+    if (toLbl)   toLbl.textContent   = p.to;
+    $$('.tr-lang-btn').forEach(b => b.classList.toggle('active', b.dataset.pair === pair));
+    clearOutput();
+  }
+
+  function clearOutput() {
+    if (output) output.innerHTML = '<span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>';
+    if (copyBtn) copyBtn.classList.add('hidden');
+  }
+
+  $$('.tr-lang-btn').forEach(b => b.addEventListener('click', () => setPair(b.dataset.pair)));
+
+  input.addEventListener('input', () => {
+    if (charCnt) charCnt.textContent = input.value.length;
+  });
+
+  /* 언어 방향 스왑 */
+  const SWAP_MAP = { 'ko-en': 'en-ko', 'en-ko': 'ko-en', 'ko-ja': 'ja-ko', 'ja-ko': 'ko-ja' };
+  $('#trSwapBtn') && $('#trSwapBtn').addEventListener('click', () => {
+    const swapped = SWAP_MAP[currentPair];
+    if (swapped) setPair(swapped);
+  });
+
+  /* 번역 실행 */
+  async function doTranslate() {
+    const text = (input.value || '').trim();
+    if (!text) { showToast('번역할 텍스트를 입력해주세요.', 'error'); return; }
+    const btn = $('#trTranslateBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '번역 중…'; }
+    if (output) output.innerHTML = '<span class="tr-loading">번역 중…</span>';
+    try {
+      const prompt = PAIRS[currentPair].prompt(text);
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+      });
+      const data = await res.json();
+      const reply = data.reply || data.error || '번역 실패';
+      if (output) output.textContent = reply;
+      if (copyBtn) copyBtn.classList.remove('hidden');
+    } catch (e) {
+      if (output) output.textContent = '네트워크 오류가 발생했어요.';
+      showToast('번역 요청 실패', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '번역하기'; }
+    }
+  }
+
+  $('#trTranslateBtn') && $('#trTranslateBtn').addEventListener('click', doTranslate);
+  input.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') doTranslate(); });
+
+  /* 결과 복사 */
+  copyBtn && copyBtn.addEventListener('click', () => {
+    copyText(output.textContent, '번역 결과');
+  });
+})();
+
 /* ─── AI 빠른 질문 미니 모달 ─── */
 function openAiQuickChat() {
   const m = $('#aiQuickModal');

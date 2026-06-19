@@ -514,6 +514,41 @@
           </div>
         </div>
       </div>
+
+      <!-- 번역기 -->
+      <div class="translator-section retro-window" id="translatorSection">
+        <div class="rw-titlebar">
+          <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt="">번역기</span>
+          <span class="rw-btns"><i class="rw-x"></i></span>
+        </div>
+        <div class="tr-body">
+          <div class="tr-lang-row">
+            <button class="tr-lang-btn active" data-pair="ko-en">한국어 → 영어</button>
+            <button class="tr-lang-btn" data-pair="en-ko">영어 → 한국어</button>
+            <button class="tr-lang-btn" data-pair="ko-ja">한국어 → 일본어</button>
+            <button class="tr-lang-btn" data-pair="ja-ko">일본어 → 한국어</button>
+          </div>
+          <div class="tr-panels">
+            <div class="tr-panel">
+              <label class="tr-label" id="trFromLabel">한국어</label>
+              <textarea id="trInput" class="tr-textarea" placeholder="번역할 텍스트를 입력하세요…" rows="4" maxlength="1000"></textarea>
+              <div class="tr-char-count"><span id="trCharCount">0</span> / 1000</div>
+            </div>
+            <div class="tr-divider">
+              <button class="tr-swap-btn" id="trSwapBtn" title="언어 방향 바꾸기">⇄</button>
+            </div>
+            <div class="tr-panel">
+              <label class="tr-label" id="trToLabel">영어</label>
+              <div class="tr-output" id="trOutput">
+                <span class="tr-placeholder">번역 결과가 여기에 표시됩니다</span>
+              </div>
+              <button class="tr-copy-btn hidden" id="trCopyBtn">복사</button>
+            </div>
+          </div>
+          <button class="tr-translate-btn" id="trTranslateBtn">번역하기</button>
+        </div>
+      </div>
+
     </section>
 
     <section id="page-about" class="page hidden">
@@ -776,7 +811,6 @@
     </div>
 
     <div class="csb-actions">
-      <button class="csb-btn csb-share" id="shareInviteBtn">초대 링크 복사</button>
       <button class="csb-btn csb-list" onclick="openMyChats()">내 채팅 목록</button>
       <button class="csb-btn csb-home" id="toHomeBtn">홈으로</button>
       <button class="csb-btn csb-out" id="chatLogoutBtn">아지트 나가기</button>
@@ -799,7 +833,6 @@
       </div>
       <div class="ch-acts">
         <button class="ch-btn" id="searchToggleBtn">🔍 검색</button>
-        <button class="ch-btn" id="showCodeBtn">🔑 초대 코드</button>
       </div>
     </header>
 
@@ -849,7 +882,7 @@
         <label class="ci-img-btn" for="imageFileInput" title="사진 첨부">📷</label>
         <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
         <button class="ci-emoji-btn" id="emojiBtn" title="이모티콘">😊</button>
-        <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요…" maxlength="500" autocomplete="off">
+        <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요…" maxlength="2000" autocomplete="off">
         <button class="ci-send" id="sendBtn">전송</button>
       </div>
     </div>

@@ -29,10 +29,10 @@ const { SocialGraph, WaveEngine, isValidCid } = require('./social');
 const PORT            = process.env.PORT || 4000;
 const NODE_ENV        = process.env.NODE_ENV || 'development';
 const CORS_ORIGIN     = process.env.CORS_ORIGIN || `http://localhost:${PORT}`;
-const ROOM_MAX_USERS  = parseInt(process.env.ROOM_MAX_USERS)        || 200;   // 방 1개 최대
-const SERVER_MAX_CONN = parseInt(process.env.SERVER_MAX_CONNECTIONS)|| 1000;  // 서버 전체 최대
-const MAX_MESSAGES    = parseInt(process.env.MAX_MESSAGES_PER_ROOM) || 500;
-const SOCKET_RATE_LIM = parseInt(process.env.SOCKET_RATE_LIMIT)     || 60;    // 분당 이벤트
+const ROOM_MAX_USERS  = parseInt(process.env.ROOM_MAX_USERS)        || 500;   // 방 1개 최대
+const SERVER_MAX_CONN = parseInt(process.env.SERVER_MAX_CONNECTIONS)|| 5000;  // 서버 전체 최대
+const MAX_MESSAGES    = parseInt(process.env.MAX_MESSAGES_PER_ROOM) || 1000;
+const SOCKET_RATE_LIM = parseInt(process.env.SOCKET_RATE_LIMIT)     || 120;   // 분당 이벤트
 const EMPTY_ROOM_TTL  = parseInt(process.env.EMPTY_ROOM_TTL_MS)     || 3000;   // 빈 방 자동삭제 유예(ms) — 거의 즉시
 const GEMINI_KEY      = process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY || '';
 const ADMIN_KEY       = process.env.ADMIN_KEY || '';   // 관리자 토큰(미설정 시 관리자 기능 비활성)
@@ -68,16 +68,16 @@ app.use(express.json({ limit: '64kb' }));
 
 /* ─── HTTP Rate Limit ─────────────────────── */
 const httpLimiter = rateLimit({
-  windowMs: 60 * 1000, max: 240,
+  windowMs: 60 * 1000, max: 600,
   standardHeaders: true, legacyHeaders: false,
   message: { error: '요청이 너무 많습니다. 잠시 후 다시 시도하세요.' },
   skip: (req) => req.path.startsWith('/socket.io'),
 });
 app.use(httpLimiter);
 
-/* AI 프록시는 더 엄격하게: 분당 10회 */
+/* AI 프록시는 더 엄격하게: 분당 20회 */
 const aiLimiter = rateLimit({
-  windowMs: 60 * 1000, max: 10,
+  windowMs: 60 * 1000, max: 20,
   standardHeaders: true, legacyHeaders: false,
   message: { error: 'AI 요청이 너무 많습니다. 1분 후 다시 시도하세요.' },
 });
@@ -366,7 +366,7 @@ io.on('connection', (socket) => {
       if (!/^data:image\/(png|jpeg|webp|gif);base64,/.test(raw)) return;
       text = raw;
     } else {
-      text = sanitize(raw, 500);
+      text = sanitize(raw, 2000);
       if (!text) return;
     }
 

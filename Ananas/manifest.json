@@ -1,6 +1,6 @@
 {
-  "name": "Ananas — 우리만의 아지트",
-  "short_name": "Ananas",
+  "name": "Ananas Talk — 우리만의 아지트",
+  "short_name": "Ananas Talk",
   "description": "채팅은 기본, 방명록과 파도타기까지. 그 시절 감성의 우리만의 아지트 메신저.",
   "start_url": "/",
   "scope": "/",

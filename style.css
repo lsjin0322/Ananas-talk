@@ -2233,8 +2233,8 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   padding:0 14px;height:46px;border-bottom:2px solid var(--ink);
   background:var(--c2);gap:8px;flex-shrink:0;
 }
-.ch-info{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden}
-.ch-title-txt{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.ch-info{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;flex:1}
+.ch-title-txt{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ch-code-badge{font-family:var(--pxfont);font-size:.72rem;background:var(--ink);color:#FFFEF8;
   padding:2px 7px;letter-spacing:.06em;flex-shrink:0;
   cursor:pointer;border-radius:3px;transition:opacity .1s;user-select:all;title:"클릭해서 복사"}

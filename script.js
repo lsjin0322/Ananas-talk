@@ -2472,9 +2472,7 @@ function renderMessage(m, isHistory) {
   const bubbleCls = m.isImage ? ' has-img' : m.isSticker ? ' has-sticker' : '';
 
   row.innerHTML = `
-    <span class="msg-av${grouped ? ' ghost' : ''}">
-      ${avatarMarkup(m.avatar, profileImageOf(m.user, m.avatar), 2)}
-    </span>
+    ${!mine ? `<span class="msg-av${grouped ? ' ghost' : ''}">${avatarMarkup(m.avatar, profileImageOf(m.user, m.avatar), 2)}</span>` : ''}
     <div class="msg-col">
       ${!grouped && !mine ? `<span class="msg-user">${m.user} <small>${MOOD_EMOJI[m.mood] || ''}</small></span>` : ''}
       <div class="msg-line">

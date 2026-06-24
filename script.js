@@ -257,8 +257,7 @@ function openMemberProfile(u) {
 
   /* 아바타 */
   const avEl = $('#mpAvatar');
-  avEl.innerHTML = memberAvatarHtml(photo, u.avatar);
-  renderAllSprites(avEl);
+  avEl.innerHTML = memberAvatarHtml(photo, u.nickname);
 
   /* 닉네임·기분 */
   $('#mpName').textContent = u.nickname || '—';
@@ -2150,11 +2149,18 @@ window.switchSbTab = switchSbTab;
 })();
 
 /* 접속자 목록 */
-function memberAvatarHtml(photo, avatar) {
+const AV_COLORS = ['#F6C94E','#7EC8A4','#7BB8E8','#E89A7B','#C4A8E2','#E8C87B','#85C9C9'];
+function memberAvatarHtml(photo, nickname) {
   if (photo && /^data:image\//.test(photo)) {
-    return `<img class="av-photo" src="${photo}" alt="프로필" draggable="false">`;
+    return `<img class="av-photo" src="${photo}" alt="프로필" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
   }
-  return `<canvas class="px" data-sprite="${AVATAR_SPRITE[avatar] || 'pine'}" data-scale="2"></canvas>`;
+  const ch  = (nickname || '?').trim()[0].toUpperCase();
+  const idx = [...(nickname || '?')].reduce((s, c) => s + c.charCodeAt(0), 0) % AV_COLORS.length;
+  const bg  = AV_COLORS[idx];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" style="width:100%;height:100%;border-radius:50%;display:block">
+    <circle cx="20" cy="20" r="20" fill="${bg}"/>
+    <text x="20" y="27" text-anchor="middle" font-size="18" font-weight="bold" font-family="sans-serif" fill="#fff">${ch}</text>
+  </svg>`;
 }
 
 function renderMembers(users) {
@@ -2167,12 +2173,11 @@ function renderMembers(users) {
     const uData    = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: photo, isHost: u.isHost }));
     return `
     <div class="member-row" style="cursor:pointer" data-uinfo="${uData}">
-      <span class="member-av">${memberAvatarHtml(photo, u.avatar)}</span>
+      <span class="member-av">${memberAvatarHtml(photo, u.nickname)}</span>
       <span class="member-name">${u.nickname}${u.isHost ? ' <span class="host-badge">👑</span>' : ''}${isMe ? ' <span class="member-me">나</span>' : ''}</span>
       <span class="member-mood">${MOOD_EMOJI[u.mood] || '😊'}</span>
     </div>`;
   }).join('');
-  renderAllSprites(panel);
   panel.onclick = e => {
     const row = e.target.closest('.member-row[data-uinfo]');
     if (!row) return;
@@ -2209,7 +2214,7 @@ function renderRoster(roster) {
     const isMe = u.cid && u.cid === myCid;
     const isOnline = u.online !== false;
     const effectivePhoto = isMe ? (state.profileImage || u.profileImage) : u.profileImage;
-    const photoHtml = memberAvatarHtml(effectivePhoto, u.avatar);
+    const photoHtml = memberAvatarHtml(effectivePhoto, u.nickname);
     const uData = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: effectivePhoto, isHost: u.isHost }));
     return `<div class="roster-item" style="cursor:pointer" data-uinfo="${uData}">
       <div class="roster-av">${photoHtml}<span class="roster-dot ${isOnline ? 'online' : 'offline'}"></span></div>
@@ -2222,7 +2227,6 @@ function renderRoster(roster) {
       </div>
     </div>`;
   }).join('');
-  renderAllSprites(panel);
   panel.onclick = e => {
     const row = e.target.closest('.roster-item[data-uinfo]');
     if (!row) return;

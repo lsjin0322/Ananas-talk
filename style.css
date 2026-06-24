@@ -528,7 +528,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .rooms-no-room p{color:var(--gray);line-height:1.7}
 .rooms-direct{margin:0;padding:20px 24px;
   background:var(--c2);border:2px solid var(--ink);border-radius:var(--r);width:100%;max-width:480px}
-.rd-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rd-inner{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
 .rd-inner h4{font-weight:800;margin:0 0 4px}
 .rd-inner p{color:var(--gray);font-size:.9rem;margin:0}
 

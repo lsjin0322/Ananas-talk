@@ -1,96 +1,27 @@
-﻿# 📌 ANANAS Messenger
-
-실시간 WebSocket 기반 채팅 + 아지트(방) 시스템 + AI 어시스턴트 웹 애플리케이션
-
----
-## 이미지
-
-<img width="674" height="1777" alt="스크린샷 2026-06-20 171014" src="https://github.com/user-attachments/assets/cb37e335-3fa4-48dd-85c0-bda04101ed89" />
-
+## 🌐 Language: Web
+> **Focus**: HTML/CSS/JavaScript 기반 웹 구조 이해 및 UI 구현 능력 향상
 
 ---
 
-## 🎬 Demo
-
-
-https://github.com/user-attachments/assets/79b55e44-7d32-415f-b7d4-1ed24889a0f5
-
-
-
-
-
----
-
-## 📖 프로젝트 소개
-
-ANANAS Messenger는 사용자가 직접 채팅방(아지트)을 생성하고 참여하며 실시간으로 소통할 수 있는 웹 기반 메신저입니다.  
-Socket.IO 기반 실시간 통신과 AI 기능을 결합하여 확장 가능한 채팅 시스템을 구현했습니다.
+### 📖 Learning Scope
+- [x] HTML5 구조 및 시맨틱 태그
+- [x] CSS 기본 스타일링 및 선택자
+- [x] Flexbox / Grid 레이아웃
+- [ ] Responsive Web Design (반응형)
+- [ ] JavaScript 기본 문법 및 DOM 조작
+- [ ] 간단한 인터랙션 구현
 
 ---
 
-## 🧰 Tech Stack
-
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- Node.js
-- Express
-- Socket.IO
-- Claude API (Anthropic)
+### 📂 Directory Structure
+- `/html-css`: 기본 마크업 및 스타일링 실습
+- `/layout`: Flexbox, Grid 레이아웃 구현
+- `/responsive`: 반응형 웹 디자인 실습
+- `/javascript`: DOM 조작 및 이벤트 처리
+- `/mini-project`: 정적 웹 페이지 및 간단한 인터랙션 프로젝트
 
 ---
 
-## ⚙️ Run Project
-
-## Install
-git clone https://github.com/lsjin0322/web.git  
-cd web/Ananas  
-npm install  
-
-## Start
-npm start  
-
-## Open
-http://localhost:4000  
-
----
-
-## 💡 Features
-
-### Real-time Chat
-Socket.IO 기반 실시간 메시지 송수신
-
-### Room System
-6자리 코드 기반 채팅방 생성 및 참여
-
-### Image Support
-이미지 업로드 및 채팅 내 렌더링
-
-### Notice System
-방장 공지 메시지 고정 기능
-
-### Message Search
-채팅 메시지 검색 기능
-
-### AI Assistant
-Claude AI 기반 챗봇 기능
-
----
-
-## 🎯 Goal
-
-WebSocket 기반 실시간 구조 이해  
-방 기반 커뮤니티 시스템 구현  
-확장 가능한 채팅 구조 설계  
-AI 기능 통합 경험
-
----
-
-## 🔮 Future Plan
-
-MongoDB / Firebase 연동  
-모바일 UI 최적화  
-알림 시스템 추가  
-권한 시스템 구현  
-배포 (Vercel / Render)
-
+### 📘 Deep Dive (Notion)
+웹 이론정리 노션 바로가기 ↓
+(https://app.notion.com/p/Web-34bf07c99a898017979ffca55467ad4c?source=copy_link)

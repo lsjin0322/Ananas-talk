@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANANAS — 우리만의 아지트, 아나나스</title>
+  <title>Ananas Talk — 우리만의 아지트</title>
   <meta name="description" content="채팅은 기본, 방명록과 파도타기까지. 그 시절 감성으로 만나는 우리만의 아지트 메신저.">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/images/app-icon-192.png">
@@ -12,10 +12,11 @@
   <!-- PWA 매니페스트 (안드로이드 홈 화면 추가) -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FFC400">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Ananas">
-  <meta name="application-name" content="Ananas">
+  <meta name="apple-mobile-web-app-title" content="Ananas Talk">
+  <meta name="application-name" content="Ananas Talk">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -100,14 +101,18 @@
       <a class="header-logo" href="#" onclick="switchPage('home');return false;">
         <img class="logo-img" src="images/logo.png" alt="Ananas 로고" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'">
         <svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" style="display:none"><use href="#ananas-logo-shape"/></svg>
-        <span class="logo-text">Ananas</span>
+        <span class="logo-text">Ananas Talk</span>
       </a>
       <nav class="site-nav">
         <div class="nav-item" id="navItem-home">
           <button class="nav-btn active" data-page="home" onclick="switchPage('home')">홈</button>
         </div>
-        <div class="nav-item" id="navItem-rooms">
-          <button class="nav-btn" data-page="rooms" onclick="switchPage('rooms')">아지트</button>
+        <div class="nav-item nav-has-sub" id="navItem-rooms">
+          <button class="nav-btn" data-page="rooms" onclick="switchPage('rooms')">방 목록 <span class="nav-arrow">▾</span></button>
+          <div class="nav-sub-menu">
+            <button class="nsm-item" onclick="doWaveSurf()">🌊 파도타기</button>
+            <button class="nsm-item" onclick="openModal()">+ 새 방 만들기</button>
+          </div>
         </div>
         <div class="nav-item" id="navItem-ai">
           <button class="nav-btn" data-page="ai" onclick="switchPage('ai')">AI</button>
@@ -115,7 +120,9 @@
         <div class="nav-item" id="navItem-about">
           <button class="nav-btn" data-page="about" onclick="switchPage('about')">스토리</button>
         </div>
-        <button class="nav-account-btn" id="navAccountBtn" onclick="openAccount()" title="내 계정">👤</button>
+        <div class="nav-item" id="navItem-profile">
+          <button class="nav-btn" data-page="profile" onclick="switchPage('profile')">프로필</button>
+        </div>
         <button class="nav-settings-btn" id="navSettingsBtn" onclick="openSettings()" title="설정">⚙</button>
       </nav>
     </div>
@@ -156,47 +163,11 @@
 
         <hr class="settings-hr">
 
-        <!-- 메인 프로필 -->
+        <!-- 프로필 관리 진입 -->
         <div class="settings-section">
-          <div class="settings-label">👤 메인 프로필</div>
-          <div class="settings-desc">아지트 입장 시 기본으로 사용됩니다. 나만 수정할 수 있어요.</div>
-          <div class="peb-box">
-            <label class="peb-preview" id="mainProfilePreview" for="mainProfileImgInput" title="사진 변경">
-              <canvas class="px" data-sprite="pine" data-scale="3" id="mainPreviewCanvas"></canvas>
-              <input type="file" id="mainProfileImgInput" accept="image/*" style="display:none" onchange="setProfilePhoto('main',this)">
-            </label>
-            <div class="peb-fields">
-              <input type="text" class="peb-nick" id="mainNickInput" placeholder="닉네임 (최대 10자)" maxlength="10">
-              <div class="peb-actions">
-                <button class="peb-save" onclick="saveProfile('main')">저장</button>
-                <button class="peb-load" onclick="loadProfile('main')">불러오기</button>
-                <span class="peb-saved-name" id="mainSavedName"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <hr class="settings-hr">
-
-        <!-- 서브 프로필 -->
-        <div class="settings-section">
-          <div class="settings-label">🎭 서브 프로필</div>
-          <div class="settings-desc">필요할 때만 쓰는 별도 프로필입니다. 나만 수정할 수 있어요.</div>
-          <div class="peb-box">
-            <label class="peb-preview" id="subProfilePreview" for="subProfileImgInput" title="사진 변경">
-              <canvas class="px" data-sprite="pine" data-scale="3" id="subPreviewCanvas"></canvas>
-              <input type="file" id="subProfileImgInput" accept="image/*" style="display:none" onchange="setProfilePhoto('sub',this)">
-            </label>
-            <div class="peb-fields">
-              <input type="text" class="peb-nick" id="subNickInput" placeholder="닉네임 (최대 10자)" maxlength="10">
-              <div class="peb-actions">
-                <button class="peb-save" onclick="saveProfile('sub')">저장</button>
-                <button class="peb-load" onclick="loadProfile('sub')">불러오기</button>
-                <button class="peb-del" onclick="deleteProfile('sub')">삭제</button>
-                <span class="peb-saved-name" id="subSavedName"></span>
-              </div>
-            </div>
-          </div>
+          <div class="settings-label">👤 프로필 관리</div>
+          <div class="settings-desc">메인·서브 프로필 사진, 닉네임, 기분을 한 곳에서 설정하세요.</div>
+          <button class="settings-profile-btn" onclick="closeSettings();openAccount()">프로필 관리 열기 →</button>
         </div>
 
       </div>
@@ -219,61 +190,49 @@
         <!-- 메인 프로필 편집 -->
         <div id="accMainSection" class="acc-profile-section">
           <div class="acc-avatar-row">
-            <label class="acc-avatar-box" id="accMainAvatarBox" for="accMainPhotoInput" title="사진 업로드">
-              <canvas class="px" data-sprite="pine" data-scale="4" id="accMainCanvas"></canvas>
+            <label class="acc-avatar-box" id="accMainAvatarBox" for="accMainPhotoInput" title="클릭해서 사진 변경">
+              <canvas class="px acc-default-canvas" data-sprite="pine" data-scale="4" id="accMainCanvas"></canvas>
+              <img class="acc-photo-img" id="accMainPhotoImg" src="" alt="" style="display:none">
+              <div class="acc-photo-overlay">📷 변경</div>
               <input type="file" id="accMainPhotoInput" accept="image/*" style="display:none" onchange="setAccPhoto('main',this)">
             </label>
-            <label class="acc-photo-box" for="accMainPhotoInput">
-              <span>+</span>
-              <p>내 사진</p>
-            </label>
-            <div class="acc-fields">
-              <input type="text" class="acc-nick-input" id="accMainNick" placeholder="닉네임 (최대 10자)" maxlength="10">
-            </div>
           </div>
-          <div class="settings-label" style="margin-top:4px">오늘의 기분</div>
-          <div class="acc-mood-row">
-            <button class="acc-mood-btn active" data-mood="happy" onclick="setAccMood('happy',this)">😊 행복</button>
-            <button class="acc-mood-btn" data-mood="excited" onclick="setAccMood('excited',this)">🤩 신남</button>
-            <button class="acc-mood-btn" data-mood="neutral" onclick="setAccMood('neutral',this)">😐 그냥</button>
-            <button class="acc-mood-btn" data-mood="bored" onclick="setAccMood('bored',this)">😑 졸림</button>
-            <button class="acc-mood-btn" data-mood="sad" onclick="setAccMood('sad',this)">🫥 우울</button>
-            <button class="acc-mood-btn" data-mood="love" onclick="setAccMood('love',this)">🥰 설렘</button>
+          <div class="acc-nick-wrap">
+            <span class="acc-nick-label">닉네임</span>
+            <input type="text" class="acc-nick-input" id="accMainNick" placeholder="닉네임을 입력하세요 (최대 10자)" maxlength="10">
+            <span class="acc-nick-hint">방에서 표시될 이름이에요</span>
           </div>
           <div class="acc-actions">
             <button class="acc-save-btn" onclick="saveAccProfile('main')">저장</button>
-            <button class="acc-apply-btn" onclick="applyAccProfile('main')">아지트에 적용</button>
+            <button class="acc-apply-btn" onclick="applyAccProfile('main')">방에 적용</button>
           </div>
         </div>
 
         <!-- 서브 프로필 편집 -->
         <div id="accSubSection" class="acc-profile-section" style="display:none">
           <div class="acc-avatar-row">
-            <label class="acc-avatar-box" id="accSubAvatarBox" for="accSubPhotoInput" title="사진 업로드">
-              <canvas class="px" data-sprite="pine" data-scale="4" id="accSubCanvas"></canvas>
+            <label class="acc-avatar-box" id="accSubAvatarBox" for="accSubPhotoInput" title="클릭해서 사진 변경">
+              <canvas class="px acc-default-canvas" data-sprite="pine" data-scale="4" id="accSubCanvas"></canvas>
+              <img class="acc-photo-img" id="accSubPhotoImg" src="" alt="" style="display:none">
+              <div class="acc-photo-overlay">📷 변경</div>
               <input type="file" id="accSubPhotoInput" accept="image/*" style="display:none" onchange="setAccPhoto('sub',this)">
             </label>
-            <label class="acc-photo-box" for="accSubPhotoInput">
-              <span>+</span>
-              <p>내 사진</p>
-            </label>
-            <div class="acc-fields">
-              <input type="text" class="acc-nick-input" id="accSubNick" placeholder="닉네임 (최대 10자)" maxlength="10">
-            </div>
           </div>
-          <div class="settings-label" style="margin-top:4px">오늘의 기분</div>
-          <div class="acc-mood-row">
-            <button class="acc-mood-btn active" data-mood="happy" onclick="setAccMood2('happy',this)">😊 행복</button>
-            <button class="acc-mood-btn" data-mood="excited" onclick="setAccMood2('excited',this)">🤩 신남</button>
-            <button class="acc-mood-btn" data-mood="neutral" onclick="setAccMood2('neutral',this)">😐 그냥</button>
-            <button class="acc-mood-btn" data-mood="bored" onclick="setAccMood2('bored',this)">😑 졸림</button>
-            <button class="acc-mood-btn" data-mood="sad" onclick="setAccMood2('sad',this)">🫥 우울</button>
-            <button class="acc-mood-btn" data-mood="love" onclick="setAccMood2('love',this)">🥰 설렘</button>
+          <div class="acc-nick-wrap">
+            <span class="acc-nick-label">닉네임</span>
+            <input type="text" class="acc-nick-input" id="accSubNick" placeholder="닉네임을 입력하세요 (최대 10자)" maxlength="10">
+            <span class="acc-nick-hint">방에서 표시될 이름이에요</span>
           </div>
           <div class="acc-actions">
             <button class="acc-save-btn" onclick="saveAccProfile('sub')">저장</button>
-            <button class="acc-apply-btn" onclick="applyAccProfile('sub')">아지트에 적용</button>
-            <button class="peb-del" onclick="deleteAccProfile('sub')">삭제</button>
+            <button class="acc-apply-btn" onclick="applyAccProfile('sub')">방에 적용</button>
+          </div>
+          <div class="prf-danger-zone">
+            <div class="prf-danger-label">
+              서브 프로필 삭제
+              <span>삭제하면 사진과 닉네임이 모두 지워져요</span>
+            </div>
+            <button class="prf-del" onclick="deleteAccProfile('sub')">🗑 삭제</button>
           </div>
         </div>
       </div>
@@ -287,7 +246,7 @@
 
       <div class="hero-section">
         <div class="hero-content">
-          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD · SINCE 2026 · <span id="heroTodayDate"></span></div>
+          <div class="hero-eyebrow"><span class="eyebrow-dot"></span>ANANAS WORLD · SINCE 2026</div>
           <h1 class="hero-title">
             <span class="curtain-line"><span class="ct">우리만의</span></span>
             <span class="curtain-line"><span class="ct"><span class="accent-yellow">아지트</span><span class="accent-plain">에서</span></span></span>
@@ -295,11 +254,11 @@
           </h1>
           <p class="hero-desc">채팅은 기본 — 방명록에 기억을 남기고, 파도타기로 새 아지트를 만나요.<br>미니홈피 시절의 설렘을 지금의 메신저로.</p>
           <div class="hero-cta">
-            <button class="cta-primary" onclick="openModal()">아지트 만들기</button>
+            <button class="cta-primary" onclick="openModal()">방 만들기</button>
             <button class="cta-wave" id="heroWaveBtn">🌊 파도타기</button>
           </div>
           <div class="recent-wrap" id="recentRoomsWrap" style="display:none">
-            <p class="recent-label">최근 방문한 아지트 <button class="recent-all-btn" onclick="openMyChats()">내 채팅 목록 →</button></p>
+            <p class="recent-label">최근 방문한 방 <button class="recent-all-btn" onclick="openMyChats()">내 채팅 목록 →</button></p>
             <div id="recentRoomsList" class="recent-list"></div>
           </div>
         </div>
@@ -323,71 +282,63 @@
           </div>
           <div class="hv-badge hv-b1"><canvas class="px" data-sprite="heart" data-scale="3"></canvas><span>공감 +1</span></div>
           <div class="hv-badge hv-b2"><canvas class="px" data-sprite="mail" data-scale="3"></canvas><span>방명록 도착</span></div>
-          <img class="hero-character" src="images/hero-character.png" alt="아나나스 캐릭터" onerror="this.style.display='none'">
         </div>
       </div>
 
-      <!-- 기능 그리드 (홈에 통합) -->
-      <div class="feat-grid home-feat-grid fade-up">
-        <div class="feat-card fc-wide fc-dark feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="5"></canvas></div>
-          <div class="feat-body"><span class="fn">01</span><h3>초저지연 실시간 채팅</h3>
-          <p>WebSocket으로 보내는 순간 상대방에게 도착. 타이핑 중인 상태도 실시간으로 표시됩니다.</p>
-          <span class="feat-cta">아지트 열기 →</span></div>
+      <!-- ── 풀너비 기능 섹션들 ── -->
+
+      <!-- 공감·답장 -->
+      <div class="ls-section ls-dark fade-up" onclick="openModal()">
+        <div class="ls-text">
+          <span class="ls-tag">방 기능</span>
+          <h2 class="ls-title">공감 · 답장</h2>
+          <p class="ls-desc">❤️ 👍 😂 😮 😢 🍍 여섯 가지 공감으로 감정을 표현하고,<br>특정 메시지에 바로 인용 답장할 수 있어요.</p>
+          <button class="ls-btn">방 열기 →</button>
         </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="heart" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">02</span><h3>공감 · 답장</h3>
-          <p>❤️ 👍 😂 😮 😢 🍍 여섯 가지 공감, 특정 말풍선에 바로 인용 답장.</p>
-          <span class="feat-cta">체험하기 →</span></div>
+        <div class="ls-visual">
+          <canvas class="px ls-canvas" data-sprite="heart" data-scale="8"></canvas>
         </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="mail" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">03</span><h3>방명록</h3>
-          <p>아지트마다 한 줄 방명록. 누가 다녀갔는지 흔적이 쌓입니다.</p>
-          <span class="feat-cta">체험하기 →</span></div>
+      </div>
+
+      <!-- 방명록 + 앨범 (2열) -->
+      <div class="ls-duo fade-up fade-up-delay-1">
+        <div class="ls-duo-item ls-light" onclick="openModal()">
+          <canvas class="px" data-sprite="mail" data-scale="6"></canvas>
+          <h3>방명록</h3>
+          <p>방마다 한 줄 방명록.<br>누가 다녀갔는지 흔적이 쌓입니다.</p>
+          <span class="ls-link">남기러 가기 →</span>
         </div>
-        <div class="feat-card fc-yellow feat-clickable" onclick="doWaveSurf()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="wave" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">04</span><h3>파도타기</h3>
-          <p>버튼 하나로 무작위 공개 아지트에 입장. 새로운 사람들과 우연한 만남.</p>
-          <span class="feat-cta">🌊 파도타기 →</span></div>
+        <div class="ls-duo-item ls-yellow" onclick="openModal()">
+          <canvas class="px" data-sprite="camera" data-scale="6"></canvas>
+          <h3>앨범 · 사진 공유</h3>
+          <p>JPG · PNG · WEBP를 채팅 안에서<br>원본 비율 그대로 전송합니다.</p>
+          <span class="ls-link">사진 올리기 →</span>
         </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="key" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">05</span><h3>코드 · 링크 초대</h3>
-          <p>6자리 코드 또는 URL 링크로 원하는 사람만 초대. 카카오톡에 붙여넣기 OK.</p>
-          <span class="feat-cta">아지트 만들기 →</span></div>
+      </div>
+
+      <!-- 파도타기 -->
+      <div class="ls-section ls-wave fade-up fade-up-delay-2" onclick="doWaveSurf()">
+        <div class="ls-visual ls-visual-left">
+          <canvas class="px ls-canvas" data-sprite="wave" data-scale="8"></canvas>
         </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="pin" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">06</span><h3>공지 고정 · 검색</h3>
-          <p>방장 공지 상단 고정, 키워드 메시지 검색 + 하이라이트.</p>
-          <span class="feat-cta">체험하기 →</span></div>
+        <div class="ls-text ls-text-right">
+          <span class="ls-tag">랜덤 입장</span>
+          <h2 class="ls-title">파도타기 🌊</h2>
+          <p class="ls-desc">버튼 하나로 무작위 공개 방에 풍덩.<br>새로운 사람들과의 우연한 만남을 즐겨요.</p>
+          <button class="ls-btn ls-btn-dark">파도 타러 가기 →</button>
         </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="camera" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">07</span><h3>사진 공유</h3>
-          <p>JPG · PNG · WEBP 원본 비율 그대로 채팅 안에서 전송.</p>
-          <span class="feat-cta">체험하기 →</span></div>
+      </div>
+
+      <!-- AI 어시스턴트 -->
+      <div class="ls-section ls-ai fade-up" onclick="switchPage('ai')">
+        <div class="ls-text">
+          <span class="ls-tag">내장 AI</span>
+          <h2 class="ls-title">AI 어시스턴트</h2>
+          <p class="ls-desc">질문 · 번역 · 글쓰기 · 아이디어까지.<br>방 안의 똑똑한 친구가 되어줍니다.</p>
+          <button class="ls-btn ls-btn-ai">AI 사용해보기 →</button>
         </div>
-        <div class="feat-card fc-wide fc-yellow feat-clickable" onclick="switchPage('ai')">
-          <div class="feat-pixel"><canvas class="px" data-sprite="star" data-scale="5"></canvas></div>
-          <div class="feat-body"><span class="fn">08</span><h3>AI 어시스턴트 내장</h3>
-          <p>질문 · 번역 · 글쓰기 · 아이디어까지. 아지트 안의 똑똑한 친구가 되어줍니다.</p>
-          <span class="feat-cta">AI 사용해보기 →</span></div>
-        </div>
-        <div class="feat-card feat-clickable" onclick="openModal()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="pineHappy" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">09</span><h3>이모티콘 피커</h3>
-          <p>😊 버튼으로 다양한 이모티콘을 골라 감정을 표현하세요. 메시지에 공감 반응도 가능.</p>
-          <span class="feat-cta">체험하기 →</span></div>
-        </div>
-        <div class="feat-card feat-clickable" onclick="openSettings()">
-          <div class="feat-pixel"><canvas class="px" data-sprite="bolt" data-scale="4"></canvas></div>
-          <div class="feat-body"><span class="fn">10</span><h3>알림 · 설정</h3>
-          <p>홈에서도 새 채팅 알림을 받아요. 알림 위치·알림음을 자유롭게 설정하세요.</p>
-          <span class="feat-cta">설정 열기 →</span></div>
+        <div class="ls-visual">
+          <canvas class="px ls-canvas" data-sprite="star" data-scale="8"></canvas>
         </div>
       </div>
 
@@ -395,14 +346,18 @@
       <div class="qr-section fade-up">
         <div class="qr-left">
           <h2 class="qr-title">지금 바로<br>시작하세요.</h2>
-          <button class="cta-primary qr-cta-btn" onclick="openModal()">아지트 만들기 → 무료</button>
-          <p class="qr-hint">설치 없이 브라우저만으로 — PC · 모바일 모두 OK</p>
+          <button class="install-btn" id="pwaInstallBtn" onclick="triggerInstall()" style="display:none">
+            📲 홈 화면에 추가
+          </button>
+          <button class="install-btn install-btn-ios hidden" id="iosInstallBtn">
+            📲 홈 화면에 추가 (iOS)
+          </button>
+          <p class="qr-hint">설치 없이 브라우저만으로 — PC · 모바일 모두 OK<br>
+            <span class="qr-hint-small">홈 화면에 추가하면 앱처럼 바로 실행돼요</span>
+          </p>
         </div>
         <div class="qr-box" id="qrBox">
-          <div class="qr-placeholder">
-            <span class="qr-icon">QR</span>
-            <p>배포 후 QR코드 삽입 예정</p>
-          </div>
+          <img src="/images/qr.png" alt="아나나스 QR코드" class="qr-img">
           <p class="qr-sub">QR코드를 스캔하거나 주소창에<br>'아나나스'를 검색하세요.</p>
         </div>
       </div>
@@ -424,8 +379,8 @@
           <div class="cg-step">
             <div class="cgs-num">02</div>
             <div class="cgs-img"><canvas class="px" data-sprite="pine" data-scale="4"></canvas></div>
-            <h4>아지트 개설</h4>
-            <p>[톡 시작] → 아지트 만들기로<br>6자리 초대 코드 발급</p>
+            <h4>방 개설</h4>
+            <p>[톡 시작] → 방 만들기로<br>6자리 초대 코드 발급</p>
           </div>
           <div class="cg-arrow-divider">→</div>
           <div class="cg-step">
@@ -445,7 +400,7 @@
         <div class="cg-dao-note">
           <strong>누구나 접속:</strong> 클라우드에 배포된 아나나스 주소를<br>
           친구에게 공유하면, 설치 없이 브라우저만으로<br>
-          같은 아지트에서 대화할 수 있어요.<br>
+          같은 방에서 대화할 수 있어요.<br>
           대화는 암호화된 서버에 안전하게 보관됩니다.
         </div>
       </div>
@@ -454,66 +409,204 @@
     <!-- page-features 홈에 통합됨 -->
 
     <section id="page-rooms" class="page hidden">
-      <div class="page-header">
-        <span class="page-eyebrow">OPEN AZIT</span>
-        <h2 class="page-title">지금 열려 있는 아지트</h2>
-        <p class="page-sub">공개 아지트에 입장하거나, 파도를 타고 우연한 만남을 즐기세요</p>
-      </div>
+      <div class="rooms-split-layout">
 
-      <!-- 검색·필터 바 -->
-      <div class="rooms-bar">
-        <div class="rooms-filters">
-          <button class="rf active" onclick="filterRooms('all',this)">전체</button>
-          <button class="rf" onclick="filterRooms('daily',this)">일상</button>
-          <button class="rf" onclick="filterRooms('study',this)">공부</button>
-          <button class="rf" onclick="filterRooms('music',this)">음악</button>
-          <button class="rf" onclick="filterRooms('hobby',this)">취미</button>
-          <button class="rf" onclick="filterRooms('info',this)">정보</button>
-          <button class="rf" onclick="filterRooms('club',this)">친목</button>
-        </div>
-        <div class="rooms-bar-acts">
-          <button class="rooms-wave-btn" id="roomsWaveBtn">🌊 파도타기</button>
-          <button class="rooms-new-btn" onclick="openModal()">+ 새 아지트</button>
-        </div>
-      </div>
-
-      <!-- 서버 연결 상태 배너 -->
-      <div class="rooms-status" id="roomsStatus">
-        <span class="rs-dot"></span>
-        <span id="roomsStatusText">서버에 연결 중…</span>
-      </div>
-
-      <!-- 아지트 카드 그리드 -->
-      <div class="rooms-grid" id="roomsGrid">
-        <div class="rooms-empty" id="roomsEmpty">
-          <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
-          <p>아직 열린 공개 아지트가 없어요.<br>첫 번째 아지트의 주인이 되어 보세요!</p>
-          <button class="cta-primary" onclick="openModal()">아지트 만들기</button>
-        </div>
-      </div>
-
-      <!-- 초대 코드로 직접 입장 -->
-      <div class="rooms-direct">
-        <div class="rd-inner">
-          <canvas class="px" data-sprite="key" data-scale="3"></canvas>
-          <div>
-            <h4>코드로 바로 입장</h4>
-            <p>초대 코드가 있다면 여기에 입력하세요</p>
+        <!-- ── 왼쪽: 방 목록 사이드바 ── -->
+        <div class="rooms-split-left">
+          <div class="rooms-split-top">
+            <button class="rooms-wave-btn" id="roomsWaveBtn">🌊 파도타기</button>
+            <button class="rooms-new-btn" onclick="openModal()">+ 새 방</button>
           </div>
-          <div class="rd-input-row">
-            <input type="text" id="directCodeInput" class="rd-input" maxlength="6"
-              placeholder="A1B2C3" oninput="this.value=this.value.toUpperCase()">
-            <button class="rd-btn" onclick="directJoin()">입장</button>
+          <div class="rooms-status" id="roomsStatus">
+            <span class="rs-dot"></span>
+            <span id="roomsStatusText">서버에 연결 중…</span>
+          </div>
+          <div class="rooms-list" id="roomsGrid">
+            <div class="rooms-empty" id="roomsEmpty">
+              <canvas class="px" data-sprite="pineSleep" data-scale="4"></canvas>
+              <p>아직 열린 공개 방이 없어요.</p>
+              <button class="cta-primary" onclick="openModal()">방 만들기</button>
+            </div>
           </div>
         </div>
-      </div>
+
+        <!-- ── 오른쪽: 채팅 영역 ── -->
+        <div class="rooms-split-right">
+
+          <!-- 방 미선택 플레이스홀더 -->
+          <div class="rooms-no-room" id="roomsNoRoom">
+            <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
+            <p>왼쪽에서 방을 선택하거나<br>새로운 방을 만들어보세요!</p>
+            <div class="rooms-direct">
+              <div class="rd-inner">
+                <canvas class="px" data-sprite="key" data-scale="3"></canvas>
+                <div>
+                  <h4>코드로 바로 입장</h4>
+                  <p>초대 코드가 있다면 여기에 입력하세요</p>
+                </div>
+                <div class="rd-input-row">
+                  <input type="text" id="directCodeInput" class="rd-input" maxlength="6"
+                    placeholder="A1B2C3" oninput="this.value=this.value.toUpperCase()">
+                  <button class="rd-btn" onclick="directJoin()">입장</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 채팅 앱 (방 입장 시 표시) -->
+          <div class="chat-app hidden" id="chatApp">
+
+            <!-- 멤버 팝업 (≡ 버튼으로 열고 닫음) -->
+            <aside class="chat-sb hidden" id="chatSb">
+              <div class="csb-logo">
+                <img class="logo-mark" src="/images/logo.png" alt="">
+                <span>Ananas Talk</span>
+              </div>
+
+              <div class="csb-profile retro-window">
+                <div class="rw-titlebar rw-mini"><span class="rw-title">MY 미니프로필</span></div>
+                <div class="csb-profile-body">
+                  <div class="csb-av" id="myAvatarDisplay"><canvas class="px" data-sprite="pine" data-scale="3"></canvas></div>
+                  <div class="csb-pinfo">
+                    <div class="csb-name" id="myNicknameDisplay">—</div>
+                    <button class="csb-mood" id="myMoodBtn" title="기분 바꾸기">😊 행복</button>
+                  </div>
+                </div>
+                <div class="csb-mood-pop hidden" id="moodPop"></div>
+              </div>
+
+              <div class="csb-tabs">
+                <button class="csb-tab active" id="tabMembers" onclick="switchSbTab('members')"><span class="tab-ico">👥</span><span id="myTabName">멤버</span> <span class="tab-cnt" id="memberCnt"></span></button>
+                <button class="csb-tab" id="tabGuestbook" onclick="switchSbTab('guestbook')"><span class="tab-ico">📮</span>방명록</button>
+              </div>
+              <div class="csb-panel" id="membersPanel"></div>
+              <div class="csb-panel hidden" id="guestbookPanel">
+                <div class="gb-list" id="gbList">
+                  <p class="gb-empty">아직 방명록이 비어 있어요.<br>첫 흔적을 남겨보세요!</p>
+                </div>
+                <div class="gb-input-row">
+                  <input type="text" id="gbInput" class="gb-input" placeholder="한 줄 남기기…" maxlength="120">
+                  <button class="gb-send" id="gbSendBtn">남기기</button>
+                </div>
+              </div>
+
+              <div class="csb-actions">
+                <button class="csb-btn csb-settings-btn" onclick="openChatSettings()" title="방 설정">⚙ 설정</button>
+                <button class="csb-btn csb-list" onclick="openMyChats()">채팅 목록</button>
+                <button class="csb-btn csb-home" id="toHomeBtn">홈으로</button>
+                <button class="csb-btn csb-out" id="chatLogoutBtn">나가기</button>
+              </div>
+
+              <div class="chat-room-settings hidden" id="chatRoomSettings">
+                <div class="crs-header">
+                  <span class="crs-title">⚙ 방 설정</span>
+                  <button class="crs-close" onclick="closeChatSettings()">✕</button>
+                </div>
+                <div class="crs-section">
+                  <div class="crs-section-title">🎨 채팅 배경</div>
+                  <div class="crs-colors">
+                    <button class="crs-color" style="background:#FFFEF8;border:2px solid #1F1B13" onclick="setChatBg('#FFFEF8')" title="기본"></button>
+                    <button class="crs-color" style="background:#FFF5CC" onclick="setChatBg('#FFF5CC')" title="노랑"></button>
+                    <button class="crs-color" style="background:#E8F4E8" onclick="setChatBg('#E8F4E8')" title="초록"></button>
+                    <button class="crs-color" style="background:#E8EEF4" onclick="setChatBg('#E8EEF4')" title="파랑"></button>
+                    <button class="crs-color" style="background:#F4E8EE" onclick="setChatBg('#F4E8EE')" title="핑크"></button>
+                    <button class="crs-color" style="background:#2A2A2A" onclick="setChatBg('#2A2A2A')" title="다크"></button>
+                  </div>
+                  <label class="crs-file-btn" for="chatBgImgInput">
+                    📷 갤러리에서 배경 선택
+                    <input type="file" id="chatBgImgInput" accept="image/*" style="display:none" onchange="setChatBgImg(this)">
+                  </label>
+                  <button class="crs-reset-btn" onclick="setChatBg('')">↺ 배경 초기화</button>
+                </div>
+                <div class="crs-section">
+                  <div class="crs-section-title">🎵 배경 음악</div>
+                  <div class="crs-bgm-status" id="crsBgmStatus">기본 음악 사용 중</div>
+                  <label class="crs-file-btn" for="chatBgmInput">
+                    🎵 내 음악 파일 선택
+                    <input type="file" id="chatBgmInput" accept="audio/*" style="display:none" onchange="setCustomBgm(this)">
+                  </label>
+                  <button class="crs-reset-btn" onclick="resetBgm()">↺ 기본 음악으로</button>
+                </div>
+              </div>
+            </aside>
+
+            <main class="chat-main retro-window">
+              <header class="chat-hdr">
+                <div class="ch-info">
+                  <span class="ch-title-txt" id="chatRoomTitle">방</span>
+                  <span class="ch-online-badge" id="chatOnlineCount">1명</span>
+                  <span class="ch-code-badge" id="chatRoomCode">—</span>
+                  <span class="ch-conn hidden" id="chatConnState">● 재연결 중…</span>
+                </div>
+                <div class="ch-acts">
+                  <button class="ch-btn ch-bgm-btn" id="bgmToggleBtn" onclick="toggleBgm()" title="배경음악 켜기/끄기">🔊</button>
+                  <button class="ch-btn" id="searchToggleBtn">🔍 검색</button>
+                  <button class="ch-btn ch-hamburger-btn" id="chatHamburgerBtn" title="멤버 목록 열기/닫기">≡</button>
+                </div>
+              </header>
+
+              <div class="notice-bar hidden" id="noticeBar">
+                <span class="notice-pin">📌</span>
+                <span class="notice-txt" id="noticeText"></span>
+                <button class="notice-x" id="noticeClose">✕</button>
+              </div>
+
+              <div class="search-bar hidden" id="searchBar">
+                <input type="text" id="searchInput" class="search-inp" placeholder="메시지 검색…">
+                <button id="searchCloseBtn" class="search-x">✕</button>
+              </div>
+
+              <div class="alone-invite-banner hidden" id="aloneInviteBanner">
+                <span class="aib-text">👀 혼자 계시네요! 친구를 초대해볼까요?</span>
+                <button class="aib-btn" onclick="openRoomInviteModal()">🤝 친구 초대하기</button>
+              </div>
+
+              <div class="messages-area" id="messagesArea">
+                <div class="msg-empty" id="messagesEmpty">
+                  <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
+                  <p>아직 대화가 없어요.<br>첫 메시지를 보내보세요!</p>
+                </div>
+              </div>
+
+              <button class="new-msg-jump hidden" id="newMsgJump">새 메시지 ↓</button>
+
+              <div class="typing-bar" id="typingBar"></div>
+
+              <div class="reply-preview hidden" id="replyPreview">
+                <div class="rp-body">
+                  <span class="rp-label">답장</span>
+                  <span class="rp-user" id="rpUser"></span>
+                  <span class="rp-text" id="rpText"></span>
+                </div>
+                <button class="rp-x" id="replyCancel">✕</button>
+              </div>
+
+              <div class="chat-input-zone">
+                <div class="es-pop hidden" id="esPop">
+                  <div class="ep-tabs" id="epTabs"></div>
+                  <div class="ep-grid" id="epGrid"></div>
+                </div>
+                <div class="ci-row">
+                  <label class="ci-img-btn" for="imageFileInput" title="사진 첨부">📷</label>
+                  <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+                  <button class="ci-emoji-btn" id="emojiBtn" title="이모지/이모티콘">😊</button>
+                  <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요…" maxlength="2000" autocomplete="off" inputmode="none" readonly>
+                  <button class="ci-send" id="sendBtn">전송</button>
+                </div>
+              </div>
+              <div class="ck-wrap" id="customKb"></div>
+            </main>
+
+          </div><!-- /#chatApp -->
+        </div><!-- /.rooms-split-right -->
+      </div><!-- /.rooms-split-layout -->
     </section>
 
     <section id="page-ai" class="page hidden" style="position:relative;overflow:hidden">
       <div class="page-header">
         <span class="page-eyebrow">AI ASSISTANT</span>
         <h2 class="page-title">아나나스 AI 어시스턴트</h2>
-        <p class="page-sub">질문 · 번역 · 아이디어 — 아지트 안의 똑똑한 친구</p>
+        <p class="page-sub">질문 · 번역 · 아이디어 — 방 안의 똑똑한 친구</p>
       </div>
 
       <!-- AI 배경 픽셀 -->
@@ -632,23 +725,13 @@
         <div class="ai-sidebar">
           <div class="ai-tips retro-window">
             <div class="rw-titlebar rw-mini">
-              <span class="rw-title">💡 활용 팁</span>
-              <span class="rw-btns"><i class="rw-x"></i></span>
+              <span class="rw-title">⚡ 무료 한도 안내</span>
             </div>
-            <ul class="ai-tips-list">
-              <li>아지트 사용법 · 기능 질문</li>
-              <li>한국어 ↔ 영어 · 일어 · 독일어 번역</li>
-              <li>사진 속 글자 인식 · 번역</li>
-              <li>방명록 · 상태메시지 문구 작성</li>
-              <li>아이디어 브레인스토밍</li>
-              <li>일반 지식 · 검색 대화</li>
-            </ul>
-            <div class="ai-quota-info">
-              <b>⚡ 무료 한도 안내</b>
-              <ul class="ai-quota-list">
-                <li><span class="ql-label">분당 최대</span><span class="ql-val">15회</span></li>
-                <li><span class="ql-label">하루 최대</span><span class="ql-val">1,500회</span></li>
-                <li><span class="ql-label">월 최대</span><span class="ql-val">100만 토큰</span></li>
+            <div class="ai-quota-info-clean">
+              <ul class="ai-use-list">
+                <li>분당 최대 <strong>15회</strong></li>
+                <li>하루 최대 <strong>1,500회</strong></li>
+                <li>월 최대 <strong>100만 토큰</strong></li>
               </ul>
               <p class="ai-quota-note">한도 초과 시 잠시 후 다시 시도해주세요.</p>
             </div>
@@ -706,55 +789,12 @@
         <p class="about-desc">미니홈피 방명록에 한 줄을 남기던 마음, 친구 접속 알림에 설레던 그 감각.<br>파인애플(Ananas)은 겉은 거칠어도 속은 달콤하죠 —<br>아나나스는 그 시절의 따뜻함을 지금의 메신저로 다시 빚었습니다.</p>
       </div>
 
-      <!-- 브랜드 가치 3열 -->
-      <div class="story-vals fade-up fade-up-delay-1">
-        <div class="sv-item">
-          <canvas class="px" data-sprite="heart" data-scale="4"></canvas>
-          <strong>흔적</strong>
-          <p>방명록처럼, 다녀간 마음이 남는 공간</p>
-        </div>
-        <div class="sv-item">
-          <canvas class="px" data-sprite="wave" data-scale="4"></canvas>
-          <strong>우연</strong>
-          <p>파도타기처럼, 뜻밖의 만남이 있는 공간</p>
-        </div>
-        <div class="sv-item">
-          <canvas class="px" data-sprite="pine" data-scale="4"></canvas>
-          <strong>온기</strong>
-          <p>파인애플빛처럼, 밝고 따뜻한 연결</p>
-        </div>
-      </div>
-
-      <div class="about-btns fade-up fade-up-delay-2" style="text-align:center;margin-bottom:48px">
-        <button class="cta-primary" onclick="openModal()">아지트 만들기</button>
-        <button class="cta-secondary" onclick="switchPage('home')">기능 살펴보기</button>
-      </div>
-
-      <!-- 타임라인 -->
-      <div class="tl-section" id="about-timeline">
-        <h3 class="tl-title">아나나스의 탄생</h3>
-        <div class="tl">
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-body"><span class="tl-year">CONCEPT</span>
-            <p>"우리만의 공간에서 자유롭게" — 미니홈피와 버디버디 감성에서 출발</p></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-body"><span class="tl-year">DESIGN</span>
-            <p>픽셀아트 파인애플 캐릭터와 레트로 메신저 창으로 브랜드 세계관 구축</p></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div class="tl-body"><span class="tl-year">BUILD</span>
-            <p>Socket.IO 위에 방명록 · 파도타기 · 공감 · 답장 · AI 어시스턴트 구현</p></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot tl-active"></div>
-            <div class="tl-body"><span class="tl-year">NOW</span>
-            <p>1,000명 규모 보안 설계 완료. 지금 바로 아지트를 열어보세요!</p></div>
-          </div>
-        </div>
+      <!-- 코드·링크 초대 -->
+      <div class="ci-text-section fade-up">
+        <span class="page-eyebrow">INVITE</span>
+        <h2 class="ci-text-title">코드 · 링크로 초대</h2>
+        <p class="ci-text-body">6자리 초대 코드 또는 URL 링크로 원하는 사람만 아지트에 부를 수 있어요.<br>카카오톡에 붙여넣기 한 번이면 충분 — 설치 없이 바로 입장합니다.</p>
+        <p class="ci-text-how"><span class="ci-pill">초대 코드</span> ANA-927 &nbsp;·&nbsp; <span class="ci-pill">링크</span> ananas.chat/r/927</p>
       </div>
 
       <!-- 개발자 한마디 (포트폴리오용) -->
@@ -764,10 +804,17 @@
             <canvas class="px" data-sprite="pineWink" data-scale="2" style="vertical-align:middle;margin-right:6px"></canvas>
             개발자 한마디
           </span>
-          <span class="rw-btns"><i class="rw-x"></i></span>
         </div>
         <div class="adn-body">
           <p>아나나스는 <strong>Socket.IO 실시간 통신</strong>과 <strong>픽셀아트 캔버스 엔진</strong>을 처음부터 직접 구현한 개인 프로젝트입니다. 레트로 감성을 살리면서도 현대적인 보안(helmet · rate-limit · XSS escape)을 갖춘 채팅 플랫폼을 목표로 했어요.</p>
+          <!-- 타임라인 -->
+          <div class="adn-tl">
+            <div class="adn-tl-item"><span class="adn-tl-year">2026.05.26</span><p>아나나스 구상 시작 — "우리만의 공간, 다시 따뜻하게"</p></div>
+            <div class="adn-tl-item"><span class="adn-tl-year">CONCEPT</span><p>"우리만의 공간에서 자유롭게" — 미니홈피와 버디버디 감성에서 출발</p></div>
+            <div class="adn-tl-item"><span class="adn-tl-year">DESIGN</span><p>픽셀아트 파인애플 캐릭터와 레트로 메신저 창으로 브랜드 세계관 구축</p></div>
+            <div class="adn-tl-item"><span class="adn-tl-year">BUILD</span><p>Socket.IO 위에 방명록 · 파도타기 · 공감 · 답장 · AI 어시스턴트 구현</p></div>
+            <div class="adn-tl-item adn-tl-now"><span class="adn-tl-year">NOW</span><p>1,000명 규모 보안 설계 완료. 지금 바로 아지트를 열어보세요!</p></div>
+          </div>
           <div class="adn-tags">
             <span>Node.js</span><span>Socket.IO</span><span>Express</span>
             <span>Canvas API</span><span>Google Gemini</span><span>픽셀 아트</span>
@@ -781,6 +828,63 @@
         </div>
       </div>
     </section>
+
+    <!-- ━━━━━━━━ PROFILE (카카오톡 스타일) ━━━━━━━━ -->
+    <section id="page-profile" class="page hidden">
+      <div class="kf-page">
+
+        <!-- ① 내 프로필 배너 -->
+        <div class="kf-my-banner">
+          <div class="kf-my-avatar" id="kfMyAvatar">
+            <canvas class="px prf-canvas" data-sprite="pine" data-scale="4" id="prfMainCanvas"></canvas>
+            <img class="prf-photo-img" id="prfMainPhotoImg" src="" alt="">
+            <input type="file" id="prfMainPhotoInput" accept="image/*" style="display:none" onchange="setPrfPhoto('main',this)">
+          </div>
+          <div class="kf-my-info">
+            <div class="kf-my-name" id="kfMyName">—</div>
+            <div class="kf-my-code">코드: <span id="prfCidDisplay">—</span></div>
+          </div>
+          <div class="kf-my-btns">
+            <button class="kf-icon-btn" onclick="openAccount()" title="프로필 편집">✏️<span>편집</span></button>
+            <button class="kf-icon-btn kf-add-btn" onclick="openFriendAddPopup()" title="친구코드로 추가">👤+<span>친구코드 추가</span></button>
+          </div>
+        </div>
+
+        <!-- ② 친구 요청 배지 -->
+        <div class="friend-req-section kf-req-section" id="friendReqSection" style="display:none">
+          <div class="kf-req-header">📬 친구 요청 <span class="req-badge" id="reqBadge">0</span></div>
+          <div id="friendReqList" class="friend-req-list"></div>
+        </div>
+
+        <!-- ③ 친구 목록 -->
+        <div class="kf-section-header">
+          <span class="kf-section-label">친구</span>
+          <span class="kf-section-count" id="friendCount">0</span>
+        </div>
+        <div id="friendList" class="kf-friend-list">
+          <p class="friend-empty" id="friendEmpty">아직 친구가 없어요.<br>친구코드 추가 버튼을 눌러보세요!</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 친구코드 추가 팝업 -->
+    <div class="fc-overlay hidden" id="friendAddPopup" onclick="if(event.target===this)closeFriendAddPopup()">
+      <div class="fc-popup retro-window">
+        <div class="rw-titlebar">
+          <span class="rw-title">👤 친구코드로 추가</span>
+          <span class="rw-btns" onclick="closeFriendAddPopup()"><i class="rw-x"></i></span>
+        </div>
+        <div class="fc-popup-body">
+          <p class="fc-popup-desc">상대방의 <b>고유 코드</b>를 입력하면<br>친구 요청을 보냅니다.</p>
+          <input type="text" id="friendCodeInput" class="fc-popup-input" placeholder="코드 입력 (예: abc123de)" maxlength="32" onkeydown="if(event.key==='Enter')sendFriendReq()">
+          <div class="fc-popup-actions">
+            <button class="prf-btn" onclick="closeFriendAddPopup()">취소</button>
+            <button class="prf-btn prf-save" onclick="sendFriendReq()">요청 보내기</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
 
@@ -798,9 +902,9 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <img class="logo-mark" src="/images/logo.png" alt="">
-        <span class="footer-logo">Ananas</span>
+        <span class="footer-logo">Ananas Talk</span>
       </div>
-      <p class="footer-copy">© 2026 Ananas Messenger · 우리만의 아지트</p>
+      <p class="footer-copy">© 2026 Ananas Talk · 우리만의 아지트</p>
       <div class="footer-links">
         <a href="#" onclick="switchPage('home');return false;">홈</a>
         <a href="#" onclick="switchPage('ai');return false;">AI</a>
@@ -816,51 +920,27 @@
 <div class="modal-overlay hidden" id="talkModal">
   <div class="modal-card retro-window" id="talkModalCard">
     <div class="rw-titlebar">
-      <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt="">ANANAS LOGIN</span>
+      <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt="">방 입장</span>
       <span class="rw-btns"><button class="rw-x rw-x-btn" id="modalClose" aria-label="닫기"></button></span>
     </div>
     <div class="modal-inner">
 
-      <!-- STEP 1: 프로필 -->
+      <!-- STEP 1: 프로필 선택 -->
       <div class="modal-step" id="step1">
         <div class="mh">
-          <h2>아지트 프로필</h2>
-          <p>프로필과 오늘의 기분을 정해주세요</p>
+          <h2>프로필 선택</h2>
+          <p>방에서 사용할 프로필을 고르세요</p>
         </div>
-        <div class="enter-guide">
-          <span class="eg-step"><b>1</b> 프로필·닉네임</span>
-          <span class="eg-arrow">→</span>
-          <span class="eg-step"><b>2</b> 아지트 만들기/참여</span>
-          <span class="eg-arrow">→</span>
-          <span class="eg-step"><b>3</b> 코드 공유 후 함께 톡!</span>
+        <!-- 프로필 카드 선택 -->
+        <div class="ps-cards" id="psCards">
+          <!-- JS로 동적 렌더링 -->
         </div>
-        <div class="av-picker">
-          <label class="fl">프로필</label>
-          <div class="av-grid">
-            <button class="av-btn active" data-emoji="A" onclick="selectAvatar(this)"><canvas class="px" data-sprite="pine"      data-scale="3"></canvas></button>
-            <button type="button" class="av-btn av-upload" id="profileUploadBtn" title="내 갤러리·폴더에서 사진 올리기">
-              <span class="av-up-ico">＋</span><span class="av-up-txt">내 사진</span>
-            </button>
-          </div>
-          <input type="file" id="profileFileInput" accept="image/png,image/jpeg,image/webp" style="display:none">
-          <p class="av-hint">🔒 내 갤러리·폴더의 사진을 프로필로 쓸 수 있어요. 사진은 <b>서버에 저장되지 않고</b> 같은 아지트 친구에게만 잠깐 보이며, 위치 등 사진 속 개인정보는 자동 제거됩니다.</p>
+        <!-- 프로필 없을 때 -->
+        <div class="ps-empty hidden" id="psEmpty">
+          <p>저장된 프로필이 없어요.<br>프로필 페이지에서 먼저 만들어주세요!</p>
+          <button class="mb mb-y" onclick="closeModal();switchPage('profile')">프로필 만들러 가기 →</button>
         </div>
-        <div class="fg">
-          <label class="fl">오늘의 기분</label>
-          <div class="mood-grid">
-            <button class="mood active" data-mood="happy"   onclick="selectMood(this)">😊 행복</button>
-            <button class="mood" data-mood="excited" onclick="selectMood(this)">🤩 신남</button>
-            <button class="mood" data-mood="soso"    onclick="selectMood(this)">😶 그냥</button>
-            <button class="mood" data-mood="sleepy"  onclick="selectMood(this)">😪 졸림</button>
-            <button class="mood" data-mood="blue"    onclick="selectMood(this)">🌧 우울</button>
-            <button class="mood" data-mood="love"    onclick="selectMood(this)">💛 설렘</button>
-          </div>
-        </div>
-        <div class="fg">
-          <label class="fl" for="nicknameInput">닉네임</label>
-          <input type="text" id="nicknameInput" class="fi" placeholder="사용할 닉네임 (최대 10자)" maxlength="10" autocomplete="off">
-        </div>
-        <button class="mb mb-y" id="toStep2Btn">다음 →</button>
+        <button class="mb mb-y" id="toStep2Btn" style="display:none" onclick="goToStep2()">다음 →</button>
         <p class="sh">코드 있나요? <a href="#" onclick="goToJoinStep();return false;">바로 참여하기</a></p>
       </div>
 
@@ -872,7 +952,7 @@
           <button class="s2t" id="tabJoin" onclick="switchTab('join')">코드 참여</button>
         </div>
         <div id="createPanel">
-          <div class="fg"><label class="fl" for="roomNameInput">아지트 이름</label><input type="text" id="roomNameInput" class="fi" placeholder="우리 아지트 이름" maxlength="30" autocomplete="off"></div>
+          <div class="fg"><label class="fl" for="roomNameInput">방 이름</label><input type="text" id="roomNameInput" class="fi" placeholder="우리 방 이름" maxlength="30" autocomplete="off"></div>
           <div class="fg"><label class="fl" for="roomDescInput">설명 (선택)</label><input type="text" id="roomDescInput" class="fi" placeholder="어떤 이야기를 나누나요?" maxlength="60" autocomplete="off"></div>
           <div class="fg">
             <label class="fl">카테고리</label>
@@ -886,12 +966,20 @@
               <button class="cat" data-cat="etc"   onclick="selectCat(this)">기타</button>
             </div>
           </div>
-          <label class="public-toggle">
-            <input type="checkbox" id="publicToggle">
-            <span class="pt-box"></span>
-            <span class="pt-label">공개 아지트로 등록 <small>· 파도타기와 아지트 목록에 노출됩니다</small></span>
-          </label>
-          <button class="mb mb-y" id="createRoomBtn">아지트 개설하기</button>
+          <!-- 공개/비공개 선택 -->
+          <div class="fg">
+            <label class="fl">공개 설정</label>
+            <div class="vis-toggle-row">
+              <button class="vis-btn active" id="visBtnPublic" onclick="setRoomVis('public')">
+                🌊 공개 <span class="vis-desc">파도타기·목록 노출</span>
+              </button>
+              <button class="vis-btn" id="visBtnPrivate" onclick="setRoomVis('private')">
+                🔒 비공개 <span class="vis-desc">초대 코드로만 입장</span>
+              </button>
+            </div>
+          </div>
+          <input type="hidden" id="publicToggle" value="public">
+          <button class="mb mb-y" id="createRoomBtn">방 개설하기</button>
         </div>
         <div id="joinPanel" class="hidden">
           <div class="fg"><label class="fl" for="roomCodeInput">초대 코드</label><input type="text" id="roomCodeInput" class="fi fi-code" placeholder="XXXXXX" maxlength="6" autocomplete="off"></div>
@@ -904,7 +992,7 @@
       <div class="modal-step hidden" id="step3">
         <div class="mh">
           <div class="mh-pixel mh-bounce"><canvas class="px" data-sprite="pineHappy" data-scale="4"></canvas></div>
-          <h2>아지트가 열렸어요!</h2>
+          <h2>방이 열렸어요!</h2>
           <p id="createdRoomNameDisplay"></p>
         </div>
         <div class="ic-box">
@@ -913,7 +1001,7 @@
             <span id="inviteCodeDisplay" class="ic-code">------</span>
             <button class="ic-copy" id="copyCodeBtn" onclick="copyCode()">복사</button>
           </div>
-          <p class="ic-desc">이 코드를 친구에게 공유하면 같은 아지트에 들어올 수 있어요</p>
+          <p class="ic-desc">이 코드를 친구에게 공유하면 같은 방에 들어올 수 있어요</p>
         </div>
         <div class="ic-box">
           <label class="fl">초대 링크</label>
@@ -922,136 +1010,55 @@
             <button class="ic-copy" onclick="copyLink()">복사</button>
           </div>
         </div>
-        <button class="mb mb-y" id="enterRoomBtn">아지트 입장하기 →</button>
+        <button class="mb mb-y" id="enterRoomBtn">방 입장하기 →</button>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- ════════════════ CHAT APP ════════════════ -->
-<div class="chat-app hidden" id="chatApp">
-  <aside class="chat-sb">
-    <div class="csb-logo">
-      <img class="logo-mark" src="/images/logo.png" alt="">
-      <span>Ananas</span>
-    </div>
+<!-- chatApp moved inside #page-rooms .rooms-split-right -->
 
-    <!-- 미니홈피 프로필 카드 -->
-    <div class="csb-profile retro-window">
-      <div class="rw-titlebar rw-mini"><span class="rw-title">MY 미니프로필</span><span class="rw-btns"><i class="rw-x"></i></span></div>
-      <div class="csb-profile-body">
-        <div class="csb-av" id="myAvatarDisplay"><canvas class="px" data-sprite="pine" data-scale="3"></canvas></div>
-        <div class="csb-pinfo">
-          <div class="csb-name" id="myNicknameDisplay">—</div>
-          <button class="csb-mood" id="myMoodBtn" title="기분 바꾸기">😊 행복</button>
-        </div>
-      </div>
-      <div class="csb-mood-pop hidden" id="moodPop"></div>
-    </div>
+<!-- ─── 미디어 뷰어 ─── -->
+<div class="mv-overlay hidden" id="mediaViewer">
+  <button class="mv-close" id="mvClose">✕</button>
+  <div class="mv-content" id="mvContent"></div>
+  <div class="mv-toolbar">
+    <button class="mv-save-btn" id="mvSaveBtn">💾 저장하기</button>
+  </div>
+</div>
 
-    <div class="csb-section">
-      <p class="csb-label">현재 아지트</p>
-      <div class="csb-room-card">
-        <div class="csb-rname" id="currentRoomDisplay">—</div>
-        <div class="csb-rcode" id="currentCodeDisplay">코드: —</div>
-        <div class="csb-online"><span class="csb-dot"></span><span id="onlineCount">1명 접속</span></div>
-      </div>
-    </div>
-
-    <div class="csb-tabs">
-      <button class="csb-tab active" id="tabMembers" onclick="switchSbTab('members')"><span class="tab-ico">👥</span><span id="myTabName">멤버</span> <span class="tab-cnt" id="memberCnt"></span></button>
-      <button class="csb-tab" id="tabGuestbook" onclick="switchSbTab('guestbook')"><span class="tab-ico">📮</span>방명록</button>
-    </div>
-    <div class="csb-panel" id="membersPanel"></div>
-    <div class="csb-panel hidden" id="guestbookPanel">
-      <div class="gb-list" id="gbList">
-        <p class="gb-empty">아직 방명록이 비어 있어요.<br>첫 흔적을 남겨보세요!</p>
-      </div>
-      <div class="gb-input-row">
-        <input type="text" id="gbInput" class="gb-input" placeholder="한 줄 남기기…" maxlength="120">
-        <button class="gb-send" id="gbSendBtn">남기기</button>
+<!-- ─── 이미지 크롭 모달 (카카오톡 스타일) ─── -->
+<div class="crop-overlay hidden" id="cropOverlay">
+  <div class="crop-header">
+    <button class="crop-hdr-cancel" id="cropCancelBtn">취소</button>
+    <span class="crop-hdr-title">사진 편집</span>
+    <label class="crop-aspect-label">
+      <input type="checkbox" id="cropAspect1to1"> 1:1
+    </label>
+  </div>
+  <div class="crop-canvas-area">
+    <div class="crop-canvas-wrap">
+      <canvas id="cropCanvas"></canvas>
+      <div class="crop-selection" id="cropSel">
+        <div class="crop-handle" data-handle="tl"></div>
+        <div class="crop-handle" data-handle="tr"></div>
+        <div class="crop-handle" data-handle="bl"></div>
+        <div class="crop-handle" data-handle="br"></div>
+        <div class="crop-guide crop-guide-h1"></div>
+        <div class="crop-guide crop-guide-h2"></div>
+        <div class="crop-guide crop-guide-v1"></div>
+        <div class="crop-guide crop-guide-v2"></div>
       </div>
     </div>
-
-    <div class="csb-actions">
-      <button class="csb-btn csb-list" onclick="openMyChats()">내 채팅 목록</button>
-      <button class="csb-btn csb-home" id="toHomeBtn">홈으로</button>
-      <button class="csb-btn csb-out" id="chatLogoutBtn">아지트 나가기</button>
+  </div>
+  <div class="crop-footer">
+    <span class="crop-dim" id="cropDim"></span>
+    <div class="crop-foot-btns">
+      <button class="crop-foot-skip" id="cropSkip">원본 전송</button>
+      <button class="crop-foot-ok" id="cropOk">잘라서 전송</button>
     </div>
-  </aside>
-
-  <main class="chat-main retro-window">
-    <div class="rw-titlebar">
-      <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt=""><span id="chatRoomTitle">아지트</span><button class="rw-invite-btn" id="titleInviteBtn" onclick="copyText(location.origin+'/?room='+state.room,'초대 링크')" title="초대 링크 복사">🔗</button></span>
-      <span class="rw-btns"><button class="rw-x rw-x-btn" id="chatHomeBtn" aria-label="홈으로"></button></span>
-    </div>
-
-    <header class="chat-hdr">
-      <div class="ch-info">
-        <div class="ch-meta">
-          <span class="ch-code" id="chatRoomCode">—</span>
-          <span class="ch-online-badge" id="chatOnlineCount">1명</span>
-          <span class="ch-conn hidden" id="chatConnState">● 재연결 중…</span>
-        </div>
-      </div>
-      <div class="ch-acts">
-        <button class="ch-btn ch-bgm-btn" id="bgmToggleBtn" onclick="toggleBgm()" title="배경음악 켜기/끄기">🔊</button>
-        <button class="ch-btn" id="searchToggleBtn">🔍 검색</button>
-      </div>
-    </header>
-
-    <div class="notice-bar hidden" id="noticeBar">
-      <span class="notice-pin">📌</span>
-      <span class="notice-txt" id="noticeText"></span>
-      <button class="notice-x" id="noticeClose">✕</button>
-    </div>
-
-    <div class="search-bar hidden" id="searchBar">
-      <input type="text" id="searchInput" class="search-inp" placeholder="메시지 검색…">
-      <button id="searchCloseBtn" class="search-x">✕</button>
-    </div>
-
-    <!-- 혼자 남으면 친구 초대 유도 배너 -->
-    <div class="alone-invite-banner hidden" id="aloneInviteBanner">
-      <span>아직 아무도 없어요! 친구를 초대해볼까요?</span>
-      <button class="aib-btn" onclick="copyText(location.origin+'/?room='+state.room,'초대 링크')">🔗 초대 링크 복사</button>
-    </div>
-
-    <div class="messages-area" id="messagesArea">
-      <div class="msg-empty" id="messagesEmpty">
-        <canvas class="px" data-sprite="pineSleep" data-scale="6"></canvas>
-        <p>아직 대화가 없어요.<br>첫 메시지를 보내보세요!</p>
-      </div>
-    </div>
-
-    <button class="new-msg-jump hidden" id="newMsgJump">새 메시지 ↓</button>
-
-    <div class="typing-bar" id="typingBar"></div>
-
-    <!-- 답장 미리보기 -->
-    <div class="reply-preview hidden" id="replyPreview">
-      <div class="rp-body">
-        <span class="rp-label">답장</span>
-        <span class="rp-user" id="rpUser"></span>
-        <span class="rp-text" id="rpText"></span>
-      </div>
-      <button class="rp-x" id="replyCancel">✕</button>
-    </div>
-
-    <!-- 이모지 피커 -->
-    <div class="emoji-pop hidden" id="emojiPop"></div>
-
-    <div class="chat-input-zone">
-      <div class="ci-row">
-        <label class="ci-img-btn" for="imageFileInput" title="사진 첨부">📷</label>
-        <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-        <button class="ci-emoji-btn" id="emojiBtn" title="이모티콘">😊</button>
-        <input type="text" id="msgInput" class="ci-text" placeholder="메시지를 입력하세요…" maxlength="2000" autocomplete="off">
-        <button class="ci-send" id="sendBtn">전송</button>
-      </div>
-    </div>
-  </main>
+  </div>
 </div>
 
 <!-- 메시지 컨텍스트 메뉴 -->
@@ -1069,23 +1076,23 @@
       <span class="rw-title"><img class="rw-logo" src="/images/logo.png" alt="">내 채팅</span>
       <span class="rw-btns"><button class="rw-x rw-x-btn" id="myChatsClose" aria-label="닫기"></button></span>
     </div>
-    <div class="mychats-sub">내가 들어갔던 아지트 · 눌러서 다시 입장</div>
+    <div class="mychats-sub">내가 들어갔던 방 · 눌러서 다시 입장</div>
     <div class="mychats-list" id="myChatsList"></div>
     <div class="mychats-empty hidden" id="myChatsEmpty">
       <canvas class="px" data-sprite="pineSleep" data-scale="5"></canvas>
-      <p>아직 들어간 아지트가 없어요.<br>새 아지트를 열거나 코드로 입장해보세요!</p>
+      <p>아직 들어간 방이 없어요.<br>새 방을 열거나 코드로 입장해보세요!</p>
     </div>
   </div>
 </div>
 
-<!-- 아지트 나가기 확인 팝업 -->
+<!-- 방 나가기 확인 팝업 -->
 <div class="confirm-overlay hidden" id="leaveConfirm">
   <div class="confirm-box retro-window">
-    <div class="rw-titlebar"><span class="rw-title">아지트 나가기</span><span class="rw-btns"><i class="rw-x"></i></span></div>
+    <div class="rw-titlebar"><span class="rw-title">방 나가기</span><span class="rw-btns"><i class="rw-x"></i></span></div>
     <div class="confirm-body">
       <div class="confirm-pixel"><canvas class="px" data-sprite="pineSleep" data-scale="4"></canvas></div>
       <h3>정말 방을 나가시겠습니까?</h3>
-      <p>“예”를 누르면 이 아지트에서 나가고,<br>아무도 없으면 방이 완전히 삭제돼요.</p>
+      <p>“예”를 누르면 이 방에서 나가고,<br>아무도 없으면 방이 완전히 삭제돼요.</p>
       <div class="confirm-btns">
         <button class="cf-btn cf-yes" id="leaveYes">예, 나갈게요</button>
         <button class="cf-btn cf-no" id="leaveNo">아니오</button>

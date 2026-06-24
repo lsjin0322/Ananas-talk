@@ -183,25 +183,31 @@ function checkSocketRate(socketId, weight = 1) {
 }
 
 /* ─── 공개 아지트 목록 직렬화 ──────────────── */
-function publicRoomList() {
+function publicRoomList(socketCid, socketId) {
   const list = [];
   for (const [code, r] of rooms) {
     if (!r.isPublic) continue;
+    const creatorCid = r.creatorCid || '';
+    const isCreator = !!(socketCid && creatorCid && creatorCid === socketCid)
+      || (!creatorCid && socketId && r.host === socketId);
     list.push({
       code, name: r.name, desc: r.desc, category: r.category,
-      users: r.users.size, createdAt: r.createdAt,
+      users: r.users.size, createdAt: r.createdAt, creatorCid,
+      isCreator,
     });
     if (list.length >= 60) break;
   }
-  // 인원 많은 순
   return list.sort((a, b) => b.users - a.users);
 }
 let roomListDirty = false;
 function markRoomListDirty() { roomListDirty = true; }
-setInterval(() => {            // 3초마다 묶어서 브로드캐스트 (1000명 트래픽 절감)
+setInterval(() => {
   if (!roomListDirty) return;
   roomListDirty = false;
-  io.emit('roomList', publicRoomList());
+  // 개인별로 isCreator 포함해서 전송
+  for (const [, socket] of io.sockets.sockets) {
+    socket.emit('roomList', publicRoomList(socket.cid, socket.id));
+  }
 }, 3000);
 
 /* ─── 소켓 이벤트 ──────────────────────────── */
@@ -215,13 +221,14 @@ io.on('connection', (socket) => {
 
   bumpVisit();
   socket.emit('visitStats', { today: visitStats.today, total: visitStats.total });
-  socket.emit('roomList', publicRoomList());
+  socket.emit('roomList', publicRoomList(socket.cid, socket.id));
 
   /* ── 클라이언트 식별자 등록(친구/파도타기용) ── */
   socket.on('hello', (cid) => {
     if (!isValidCid(cid)) return;
     socket.cid = cid;
-    socket.emit('friendList', social.list(cid));   // 내 친구 목록 동기화
+    socket.emit('friendList', social.list(cid));
+    socket.emit('roomList', publicRoomList(socket.cid, socket.id));
   });
 
   /* ── 관리자 인증 ── */
@@ -271,20 +278,31 @@ io.on('connection', (socket) => {
     const avatar   = sanitize(data?.avatar, 4);
     const mood     = ALLOWED_MOODS.includes(data?.mood) ? data.mood : 'happy';
     const isPublic = data?.isPublic === true;
+    const clientCid = (typeof data?.cid === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(data.cid)) ? data.cid : '';
 
     if (!nickname || !roomName) return;
+
+    /* 연타 방지: 같은 소켓이 5초 내 방을 이미 만들었으면 차단 */
+    const now = Date.now();
+    if (socket._lastRoomCreate && now - socket._lastRoomCreate < 5000) {
+      return socket.emit('errorMsg', '방을 너무 빠르게 만들고 있어요. 잠시 후 다시 시도하세요.');
+    }
+    socket._lastRoomCreate = now;
 
     let code, attempts = 0;
     do { code = genCode(); attempts++; } while (rooms.has(code) && attempts < 20);
     if (rooms.has(code)) return socket.emit('errorMsg', '방 생성에 실패했습니다. 다시 시도하세요.');
 
-    const createdAt = Date.now();
+    const createdAt = now;
+    const creatorCid = socket.cid || clientCid || '';
     rooms.set(code, {
       name: roomName, desc: roomDesc, category: category || 'daily',
-      isPublic, host: socket.id, createdAt, creatorCid: socket.cid || '',
+      isPublic, host: socket.id, createdAt, creatorCid,
       notice: '', messages: [], guestbook: [], users: new Set(),
+      members: new Map(),   // cid → { nickname, avatar, profileImage, lastSeen, online }
+      firstEntries: new Set(), // 최초 입장 CID 추적
     });
-    db.saveRoom({ code, name: roomName, desc: roomDesc, category: category || 'daily', isPublic, notice: '', createdAt, creatorCid: socket.cid || '' });
+    db.saveRoom({ code, name: roomName, desc: roomDesc, category: category || 'daily', isPublic, notice: '', createdAt, creatorCid });
 
     socket.nickname = nickname;
     socket.room     = code;
@@ -293,7 +311,12 @@ io.on('connection', (socket) => {
     socket.profileImage = validProfileImage(data?.profileImage) ? data.profileImage : '';
 
     socket.join(code);
-    rooms.get(code).users.add(socket.id);
+    const newRoom = rooms.get(code);
+    newRoom.users.add(socket.id);
+    if (creatorCid) {
+      newRoom.firstEntries.add(creatorCid);
+      newRoom.members.set(creatorCid, { nickname, avatar: socket.avatar, profileImage: socket.profileImage, lastSeen: Date.now(), online: true });
+    }
 
     addClientAzit(socket.cid, code);
 
@@ -333,18 +356,35 @@ io.on('connection', (socket) => {
     socket.join(code);
     room.users.add(socket.id);
 
-    /* 재시작 등으로 방장이 비어 있으면 첫 입장자에게 위임 */
-    if (!room.host) room.host = socket.id;
+    /* 개설자 CID이면 방장 복원, 없으면 현재 호스트 유지 */
+    if (socket.cid && socket.cid === room.creatorCid) {
+      room.host = socket.id;
+    } else if (!room.host) {
+      room.host = socket.id; // fallback: 방장 없을 때만
+    }
 
     if (room.isPublic) addClientAzit(socket.cid, code);
 
-    socket.emit('roomJoined', { code, roomName: room.name, isHost: room.host === socket.id });
+    /* 최초 입장 여부 확인 */
+    if (!room.firstEntries) room.firstEntries = new Set();
+    const isFirstEntry = !socket.cid || !room.firstEntries.has(socket.cid);
+    if (socket.cid) room.firstEntries.add(socket.cid);
+
+    /* 멤버 로스터 갱신 */
+    if (!room.members) room.members = new Map();
+    if (socket.cid) {
+      room.members.set(socket.cid, { nickname, avatar: socket.avatar, profileImage: socket.profileImage, lastSeen: Date.now(), online: true });
+    }
+
+    const isHost = room.host === socket.id;
+    socket.emit('roomJoined', { code, roomName: room.name, isHost });
     const history = room.messages.slice(-100);
     if (history.length) socket.emit('messageHistory', history);
     if (room.notice)    socket.emit('notice', room.notice);
     socket.emit('guestbook', room.guestbook.slice(-50));
 
-    if (!data?.silent) pushSystem(code, `${nickname}님이 입장하였습니다.`);
+    /* 최초 입장만 시스템 메시지 */
+    if (!data?.silent && isFirstEntry) pushSystem(code, `${nickname}님이 입장하였습니다.`);
     broadcastOnline(code);
     if (room.isPublic) markRoomListDirty();
     log(`방 참여: ${code} — ${nickname}`);
@@ -357,8 +397,9 @@ io.on('connection', (socket) => {
     const room = rooms.get(socket.room);
     if (!room) return;
 
-    const raw     = (typeof payload === 'string') ? payload : payload?.text;
-    const isImage = typeof raw === 'string' && raw.startsWith('data:image/');
+    const raw       = (typeof payload === 'string') ? payload : payload?.text;
+    const isImage   = typeof raw === 'string' && raw.startsWith('data:image/');
+    const isSticker = !isImage && payload?.isSticker === true;
     let text;
 
     if (isImage) {
@@ -378,7 +419,7 @@ io.on('connection', (socket) => {
       if (orig) {
         replyTo = {
           id: orig.id, user: orig.user,
-          text: orig.isImage ? '(사진)' : String(orig.text).slice(0, 60),
+          text: orig.isImage ? '(사진)' : orig.isSticker ? '(스티커)' : String(orig.text).slice(0, 60),
         };
       }
     }
@@ -386,7 +427,7 @@ io.on('connection', (socket) => {
     const msgData = {
       id: crypto.randomUUID(),
       user: socket.nickname, avatar: socket.avatar, mood: socket.mood,
-      text, time: Date.now(), isImage, replyTo, reactions: {},
+      text, time: Date.now(), isImage, isSticker, replyTo, reactions: {},
     };
 
     room.messages.push(msgData);
@@ -474,6 +515,16 @@ io.on('connection', (socket) => {
     io.to(socket.room).emit('guestbookEntry', entry);
   });
 
+  socket.on('deleteGuestbook', ({ id }) => {
+    if (!socket.room || !socket.nickname) return;
+    const room = rooms.get(socket.room);
+    if (!room) return;
+    const idx = room.guestbook.findIndex(e => e.id === id && e.user === socket.nickname);
+    if (idx === -1) return;
+    room.guestbook.splice(idx, 1);
+    io.to(socket.room).emit('guestbookDeleted', { id });
+  });
+
   /* ── 기분(무드) 변경 ── */
   socket.on('setMood', (mood) => {
     if (!checkSocketRate(socket.id)) return;
@@ -508,7 +559,9 @@ io.on('connection', (socket) => {
     if (!isValidCode(code)) return;
     const room = rooms.get(code);
     if (!room) return socket.emit('errorMsg', '이미 삭제된 아지트입니다.');
-    if (!room.creatorCid || room.creatorCid !== socket.cid) {
+    const canDelete = (room.creatorCid && room.creatorCid === socket.cid)
+      || (!room.creatorCid && room.host === socket.id);
+    if (!canDelete) {
       return socket.emit('errorMsg', '내가 만든 아지트만 삭제할 수 있어요.');
     }
     destroyRoom(code, '개설자가 아지트를 삭제했습니다.');
@@ -539,8 +592,45 @@ io.on('connection', (socket) => {
 
   /* 아지트 목록 수동 요청 (페이지 진입 시) */
   socket.on('requestRoomList', () => {
-    socket.emit('roomList', publicRoomList());
+    socket.emit('roomList', publicRoomList(socket.cid, socket.id));
   });
+  /* ─── 친구 요청 중계 ─── */
+  socket.on('friendRequest', ({ toCid, fromNick, fromCid }) => {
+    if (!toCid || !fromCid || fromCid === toCid) return;
+    io.sockets.sockets.forEach(s => {
+      if (s.data && s.data.cid && (s.data.cid === toCid || s.data.cid.startsWith(toCid))) {
+        s.emit('friendRequest', { fromNick: String(fromNick).slice(0,20), fromCid });
+      }
+    });
+  });
+  socket.on('friendAccept', ({ toCid, fromNick }) => {
+    if (!toCid) return;
+    io.sockets.sockets.forEach(s => {
+      if (s.data && s.data.cid && (s.data.cid === toCid || s.data.cid.startsWith(toCid))) {
+        s.emit('friendAccept', { fromNick: String(fromNick).slice(0,20) });
+      }
+    });
+  });
+
+  /* ── 방 초대 릴레이 ── */
+  socket.on('sendRoomInvite', ({ targetCid, roomCode, roomName }) => {
+    if (!targetCid || !roomCode) return;
+    let sent = false;
+    for (const [, s] of io.sockets.sockets) {
+      if (s.cid === targetCid) {
+        s.emit('roomInvite', {
+          fromNickname: socket.nickname || '익명',
+          fromCid: socket.cid || '',
+          roomCode,
+          roomName: roomName || roomCode,
+        });
+        sent = true;
+        break;
+      }
+    }
+    socket.emit('roomInviteSent', { targetCid, sent });
+  });
+
   socket.on('disconnect', () => {
     doLeave(socket);
     socketRateMap.delete(socket.id);
@@ -570,30 +660,24 @@ function doLeave(socket, silent = false, immediate = false) {
     room.users.delete(socket.id);
     socket.leave(code);
 
-    if (!silent && socket.nickname) {
-      pushSystem(code, `${socket.nickname}님이 퇴장하였습니다.`);
+    /* 멤버 로스터에서 offline 표시 (삭제 안 함 - 영구 보존) */
+    if (room.members && socket.cid) {
+      const m = room.members.get(socket.cid);
+      if (m) { m.online = false; m.lastSeen = Date.now(); }
     }
 
-    /* 방장 승계: 방장이 나가면 남은 사람 중 첫 번째에게 위임 */
-    if (room.host === socket.id && room.users.size > 0) {
-      const nextId = room.users.values().next().value;
-      room.host = nextId;
-      const next = io.sockets.sockets.get(nextId);
-      if (next) {
-        next.emit('hostGranted');
-        if (next.nickname) pushSystem(code, `${next.nickname}님이 새 방장이 되었습니다.`);
-      }
+    /* 방장 ref 초기화 (creatorCid 보존 - 재입장 시 복원) */
+    if (room.host === socket.id) room.host = null;
+
+    /* 방장이 명시적으로 나가면 인원에 관계없이 즉시 삭제 */
+    if (immediate && room.creatorCid && socket.cid && socket.cid === room.creatorCid) {
+      destroyRoom(code, '방장이 나가 방이 닫혔습니다.');
+      socket.room = null;
+      return;
     }
 
     if (room.users.size === 0) {
-      room.host = null;
-      if (immediate) {
-        /* 명시적 나가기로 아무도 없게 되면 즉시 완전 삭제 */
-        destroyRoom(code, '아무도 없어 아지트가 닫혔습니다.');
-        socket.room = null;
-        return;
-      }
-      scheduleEmptyCleanup(code);   // 연결 끊김 등은 유예 후 정리
+      scheduleEmptyCleanup(code);
     }
 
     broadcastOnline(code);
@@ -632,11 +716,27 @@ function scheduleEmptyCleanup(code) {
 function broadcastOnline(code) {
   const room = rooms.get(code);
   if (!room) return;
+
+  /* 현재 온라인 유저 */
+  const onlineCids = new Set();
   const users = [...room.users].map(id => {
     const s = io.sockets.sockets.get(id);
-    return s ? { nickname: s.nickname, avatar: s.avatar, mood: s.mood, isHost: room.host === id, cid: s.cid || '', profileImage: s.profileImage || '' } : null;
+    if (!s) return null;
+    if (s.cid) onlineCids.add(s.cid);
+    return { nickname: s.nickname, avatar: s.avatar, mood: s.mood,
+      isHost: s.cid === room.creatorCid || room.host === id,
+      cid: s.cid || '', profileImage: s.profileImage || '', online: true };
   }).filter(Boolean);
   io.to(code).emit('onlineUsers', users);
+
+  /* 전체 멤버 로스터 (온라인 + 오프라인) */
+  const roster = [];
+  if (room.members) {
+    for (const [cid, m] of room.members) {
+      roster.push({ ...m, cid, isHost: cid === room.creatorCid, online: onlineCids.has(cid) });
+    }
+  }
+  if (roster.length) io.to(code).emit('memberRoster', roster);
 }
 
 function log(msg) {

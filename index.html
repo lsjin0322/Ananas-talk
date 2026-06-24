@@ -257,10 +257,6 @@
             <button class="cta-primary" onclick="openModal()">방 만들기</button>
             <button class="cta-wave" id="heroWaveBtn">🌊 파도타기</button>
           </div>
-          <div class="recent-wrap" id="recentRoomsWrap" style="display:none">
-            <p class="recent-label">최근 방문한 방 <button class="recent-all-btn" onclick="openMyChats()">내 채팅 목록 →</button></p>
-            <div id="recentRoomsList" class="recent-list"></div>
-          </div>
         </div>
 
         <!-- 시그니처: 레트로 메신저 창 라이브 데모 -->
@@ -860,6 +856,14 @@
         </div>
         <div id="friendList" class="kf-friend-list">
           <p class="friend-empty" id="friendEmpty">아직 친구가 없어요.<br>친구코드 추가 버튼을 눌러보세요!</p>
+        </div>
+
+        <!-- ④ 대화 목록 -->
+        <div class="kf-section-header kf-chat-history-header">
+          <span class="kf-section-label">대화 목록</span>
+        </div>
+        <div id="chatHistoryList" class="kf-chat-history-list">
+          <p class="friend-empty" id="chatHistoryEmpty">아직 방문한 방이 없어요.</p>
         </div>
 
       </div>

@@ -474,7 +474,7 @@ function escHtml(s) {
 const _origSwitchPage = window.switchPage;
 window.switchPage = function(name) {
   _origSwitchPage(name);
-  if (name === 'profile') loadPrfPage();
+  if (name === 'profile') { loadPrfPage(); renderRecent(); }
 };
 
 /* 소켓: 친구 요청 수신 */
@@ -1501,25 +1501,29 @@ function removeRecent(code) {
 }
 const RECENT_SPRITES = ['pine', 'pineWink', 'pineCool', 'pineHappy'];
 function renderRecent() {
-  const wrap = $('#recentRoomsWrap'), list = $('#recentRoomsList');
-  if (!wrap || !list) return;
   const rec = getRecent();
-  wrap.style.display = rec.length ? '' : 'none';
-  list.innerHTML = '';
-  rec.forEach((r, i) => {
-    const row = document.createElement('button');
-    row.className = 'recent-item';
-    row.innerHTML = `
-      <span class="ri-av"><canvas class="px" data-sprite="${RECENT_SPRITES[i % RECENT_SPRITES.length]}" data-scale="2"></canvas></span>
-      <span class="ri-info">
-        <span class="ri-name">${escHtml(r.name)}</span>
-        <span class="ri-code">코드 ${escHtml(r.code)}</span>
-      </span>
-      <span class="ri-enter">다시 입장 →</span>`;
-    row.addEventListener('click', () => quickJoin(r.code));
-    list.appendChild(row);
-  });
-  renderAllSprites(list);
+
+  /* 프로필 페이지 대화 목록 */
+  const histList = $('#chatHistoryList');
+  const histEmpty = $('#chatHistoryEmpty');
+  if (histList) {
+    $$('.ch-room-card', histList).forEach(el => el.remove());
+    if (histEmpty) histEmpty.style.display = rec.length ? 'none' : '';
+    rec.forEach((r, i) => {
+      const card = document.createElement('div');
+      card.className = 'ch-room-card';
+      card.innerHTML = `
+        <span class="ch-av"><canvas class="px" data-sprite="${RECENT_SPRITES[i % RECENT_SPRITES.length]}" data-scale="2"></canvas></span>
+        <span class="ch-info">
+          <span class="ch-name">${escHtml(r.name)}</span>
+          <span class="ch-code">코드 ${escHtml(r.code)}</span>
+        </span>
+        <button class="ch-enter-btn">입장 →</button>`;
+      card.querySelector('.ch-enter-btn').addEventListener('click', () => quickJoin(r.code));
+      histList.appendChild(card);
+    });
+    renderAllSprites(histList);
+  }
 }
 renderRecent();
 

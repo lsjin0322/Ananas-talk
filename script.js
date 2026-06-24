@@ -3791,6 +3791,14 @@ window.switchAiMode = switchAiMode;
     if (charCnt) charCnt.textContent = input.value.length;
   });
 
+  /* Enter → 번역 (Shift+Enter는 줄바꿈) */
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      doTranslate();
+    }
+  });
+
   /* 이미지 업로드 */
   imgInput && imgInput.addEventListener('change', () => {
     const file = imgInput.files[0];

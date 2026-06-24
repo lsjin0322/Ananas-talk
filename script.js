@@ -512,7 +512,13 @@ function escHtml(s) {
 const _origSwitchPage = window.switchPage;
 window.switchPage = function(name) {
   _origSwitchPage(name);
-  if (name === 'profile') { loadPrfPage(); renderRecent(); }
+  if (name === 'profile') {
+    loadPrfPage();
+    renderRecent();
+    /* 서버에 현재 목록의 방 존재 여부 검증 요청 */
+    const codes = getRecent().map(r => r.code);
+    if (codes.length) socket.emit('checkRooms', codes);
+  }
 };
 
 /* 소켓: 친구 요청 수신 */
@@ -1666,6 +1672,14 @@ $('#myChatsScreen') && $('#myChatsScreen').addEventListener('click', e => {
   if (e.target.id === 'myChatsScreen') closeMyChats();
 });
 
+/* 방 존재 검증 응답: 삭제된 방 목록에서 제거 */
+socket.on('roomsExist', ({ deleted }) => {
+  if (!Array.isArray(deleted) || !deleted.length) return;
+  const pruned = getRecent().filter(r => !deleted.includes(r.code));
+  localStorage.setItem('ananas_recent', JSON.stringify(pruned));
+  renderRecent();
+});
+
 /* 방 삭제 결과 동기화 */
 socket.on('roomDeleteOk', ({ code }) => {
   removeRecent(code);
@@ -2103,7 +2117,11 @@ function showLeaveConfirm() {
 }
 function hideLeaveConfirm() { $('#leaveConfirm') && $('#leaveConfirm').classList.add('hidden'); }
 $('#chatLogoutBtn') && $('#chatLogoutBtn').addEventListener('click', showLeaveConfirm);
-$('#leaveYes') && $('#leaveYes').addEventListener('click', () => { hideLeaveConfirm(); exitChat(true); });
+$('#leaveYes') && $('#leaveYes').addEventListener('click', () => {
+  hideLeaveConfirm();
+  if (state.room) removeRecent(state.room); /* 명시적 나가기만 목록에서 삭제 */
+  exitChat(true);
+});
 $('#leaveNo')  && $('#leaveNo').addEventListener('click',  () => { hideLeaveConfirm(); goHomeKeepChat(); });
 $('#leaveConfirm') && $('#leaveConfirm').addEventListener('click', e => { if (e.target.id === 'leaveConfirm') hideLeaveConfirm(); });
 $('#leaveConfirm') && $('#leaveConfirm').querySelector('.rw-x') && $('#leaveConfirm').querySelector('.rw-x').addEventListener('click', hideLeaveConfirm);

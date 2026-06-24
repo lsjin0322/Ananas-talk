@@ -594,6 +594,13 @@ io.on('connection', (socket) => {
   socket.on('requestRoomList', () => {
     socket.emit('roomList', publicRoomList(socket.cid, socket.id));
   });
+
+  /* 방 존재 여부 일괄 확인 (대화목록 검증용) */
+  socket.on('checkRooms', (codes) => {
+    if (!Array.isArray(codes)) return;
+    const deleted = codes.filter(c => !rooms.has(c));
+    socket.emit('roomsExist', { deleted });
+  });
   /* ─── 친구 요청 중계 ─── */
   socket.on('friendRequest', ({ toCid, fromNick, fromCid }) => {
     if (!toCid || !fromCid || fromCid === toCid) return;

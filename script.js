@@ -2126,7 +2126,7 @@ function renderMembers(users) {
     }
     return `
     <div class="member-row">
-      <span class="member-av">${avatarMarkup(u.avatar, u.profileImage, 2)}</span>
+      <span class="member-av">${avatarMarkup(u.avatar, isMe ? state.profileImage : u.profileImage, 2)}</span>
       <span class="member-name">${u.nickname}${u.isHost ? ' <span class="host-badge">👑</span>' : ''}${isMe ? ' <span class="member-me">나</span>' : ''}</span>
       <span class="member-mood">${MOOD_EMOJI[u.mood] || '😊'}</span>
       ${action}
@@ -2163,8 +2163,9 @@ function renderRoster(roster) {
   panel.innerHTML = roster.map(u => {
     const isMe = u.cid && u.cid === myCid;
     const isOnline = u.online !== false;
-    const photoHtml = u.profileImage
-      ? `<img src="${u.profileImage}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    const effectivePhoto = isMe ? (state.profileImage || u.profileImage) : u.profileImage;
+    const photoHtml = effectivePhoto
+      ? `<img src="${effectivePhoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
       : avatarMarkup(u.avatar || 'A', '', 2);
     return `<div class="roster-item">
       <div class="roster-av">${photoHtml}<span class="roster-dot ${isOnline ? 'online' : 'offline'}"></span></div>

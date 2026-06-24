@@ -797,6 +797,36 @@ app.post('/api/ai', aiLimiter, async (req, res) => {
   }
 });
 
+/* ─── 번역 전용 프록시 (시스템 프롬프트 없이 순수 번역) ─── */
+app.post('/api/translate', aiLimiter, async (req, res) => {
+  try {
+    if (!runtimeAiKey) return res.json({ reply: '아직 AI가 활성화되지 않았어요.' });
+    const { text, tgtLang } = req.body || {};
+    if (!text || !tgtLang) return res.status(400).json({ error: '파라미터 누락' });
+    const prompt = `Translate the following text to ${tgtLang}. Output ONLY the translated text, no explanations:\n${text}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(runtimeAiKey)}`;
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 2000, temperature: 0.2 },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      const msg = data?.error?.message || '';
+      if (r.status === 429) return res.json({ reply: '요청이 많아요. 잠시 후 다시 시도해주세요.' });
+      return res.status(502).json({ error: '번역 연결 오류: ' + msg });
+    }
+    const reply = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '번역 실패';
+    res.json({ reply });
+  } catch (err) {
+    console.error('[Translate]', err.message);
+    res.status(502).json({ error: '번역 연결이 원활하지 않습니다.' });
+  }
+});
+
 /* ─── AI 이미지 번역 프록시 ─── */
 app.post('/api/ai-vision', aiLimiter, async (req, res) => {
   try {

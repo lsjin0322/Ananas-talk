@@ -3843,11 +3843,11 @@ window.switchAiMode = switchAiMode;
         const data = await res.json();
         reply = data.reply || data.error || '번역 실패';
       } else {
-        const prompt = `${srcHint}다음 텍스트를 ${tgtName}로만 번역해줘. 설명 없이 번역문만 출력해:\n${text}`;
-        const res = await fetch('/api/ai', {
+        const fullText = srcLang !== 'auto' ? `[${srcName}] ${text}` : text;
+        const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+          body: JSON.stringify({ text: fullText, tgtLang: tgtName }),
         });
         const data = await res.json();
         reply = data.reply || data.error || '번역 실패';

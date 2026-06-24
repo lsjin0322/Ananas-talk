@@ -1731,11 +1731,16 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   box-shadow:var(--shadow-px-sm);transition:transform .15s,box-shadow .15s}
 .ch-room-card:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
 .ch-av{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ch-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.ch-name{font-size:.92rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ch-code{font-family:var(--pxfont);font-size:.72rem;color:var(--br)}
+.ch-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+.ch-name{font-size:.92rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.ch-code{font-family:var(--pxfont);font-size:.72rem;color:var(--br);text-align:left}
+.ch-btns{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.ch-del-btn{padding:4px 10px;border:1.5px solid var(--ink);border-radius:var(--rs);
+  background:#fff;font-size:.74rem;font-weight:700;cursor:pointer;
+  transition:background .12s,transform .12s}
+.ch-del-btn:hover{background:#ff4d4d;color:#fff;transform:translate(-1px,-1px)}
 .ch-enter-btn{padding:6px 14px;border:2px solid var(--ink);border-radius:var(--rs);
-  background:var(--y);font-size:.8rem;font-weight:700;flex-shrink:0;
+  background:var(--y);font-size:.8rem;font-weight:700;
   box-shadow:2px 2px 0 var(--ink);cursor:pointer;transition:transform .12s,box-shadow .12s}
 .ch-enter-btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
 .kf-friend-item{

@@ -1518,8 +1518,12 @@ function renderRecent() {
           <span class="ch-name">${escHtml(r.name)}</span>
           <span class="ch-code">코드 ${escHtml(r.code)}</span>
         </span>
-        <button class="ch-enter-btn">입장 →</button>`;
+        <span class="ch-btns">
+          <button class="ch-del-btn">삭제</button>
+          <button class="ch-enter-btn">입장 →</button>
+        </span>`;
       card.querySelector('.ch-enter-btn').addEventListener('click', () => quickJoin(r.code));
+      card.querySelector('.ch-del-btn').addEventListener('click', () => removeRecent(r.code));
       histList.appendChild(card);
     });
     renderAllSprites(histList);

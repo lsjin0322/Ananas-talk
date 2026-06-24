@@ -282,12 +282,10 @@ io.on('connection', (socket) => {
 
     if (!nickname || !roomName) return;
 
-    /* 연타 방지: 같은 소켓이 5초 내 방을 이미 만들었으면 차단 */
     const now = Date.now();
-    if (socket._lastRoomCreate && now - socket._lastRoomCreate < 5000) {
-      return socket.emit('errorMsg', '방을 너무 빠르게 만들고 있어요. 잠시 후 다시 시도하세요.');
-    }
-    socket._lastRoomCreate = now;
+
+    /* 이미 다른 방에 있으면 먼저 깨끗하게 퇴장 (각 방 독립성 유지) */
+    if (socket.room) doLeave(socket, true);
 
     let code, attempts = 0;
     do { code = genCode(); attempts++; } while (rooms.has(code) && attempts < 20);

@@ -512,13 +512,7 @@ function escHtml(s) {
 const _origSwitchPage = window.switchPage;
 window.switchPage = function(name) {
   _origSwitchPage(name);
-  if (name === 'profile') {
-    loadPrfPage();
-    renderRecent();
-    /* 서버에 현재 목록의 방 존재 여부 검증 요청 */
-    const codes = getRecent().map(r => r.code);
-    if (codes.length) socket.emit('checkRooms', codes);
-  }
+  if (name === 'profile') { loadPrfPage(); renderRecent(); }
 };
 
 /* 소켓: 친구 요청 수신 */
@@ -1546,6 +1540,11 @@ function removeRecent(code) {
 const RECENT_SPRITES = ['pine', 'pineWink', 'pineCool', 'pineHappy'];
 function renderRecent() {
   const rec = getRecent();
+
+  /* 서버에 존재 여부 검증 — 응답(roomsExist)이 오면 사라진 방을 자동 제거 후 재렌더 */
+  if (rec.length && typeof socket !== 'undefined') {
+    socket.emit('checkRooms', rec.map(r => r.code));
+  }
 
   /* 프로필 페이지 대화 목록 */
   const histList = $('#chatHistoryList');

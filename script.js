@@ -2111,6 +2111,13 @@ window.switchSbTab = switchSbTab;
 })();
 
 /* 접속자 목록 */
+function memberAvatarHtml(photo) {
+  if (photo && /^data:image\//.test(photo)) {
+    return `<img class="av-photo" src="${photo}" alt="프로필" draggable="false">`;
+  }
+  return `<img class="av-photo av-default" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23F5E6C8'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%23C8A96E'/%3E%3Cellipse cx='20' cy='34' rx='11' ry='8' fill='%23C8A96E'/%3E%3C/svg%3E" alt="기본" draggable="false">`;
+}
+
 function renderMembers(users) {
   if (!Array.isArray(users)) return;
   const panel = $('#membersPanel');
@@ -2118,6 +2125,7 @@ function renderMembers(users) {
   panel.innerHTML = users.map(u => {
     const isMe     = u.cid && u.cid === CLIENT_ID;
     const isFriend = u.cid && state.friends.has(u.cid);
+    const photo    = isMe ? state.profileImage : u.profileImage;
     let action = '';
     if (u.cid && !isMe) {
       action = isFriend
@@ -2126,13 +2134,12 @@ function renderMembers(users) {
     }
     return `
     <div class="member-row">
-      <span class="member-av">${avatarMarkup(u.avatar, isMe ? state.profileImage : u.profileImage, 2)}</span>
+      <span class="member-av">${memberAvatarHtml(photo)}</span>
       <span class="member-name">${u.nickname}${u.isHost ? ' <span class="host-badge">👑</span>' : ''}${isMe ? ' <span class="member-me">나</span>' : ''}</span>
       <span class="member-mood">${MOOD_EMOJI[u.mood] || '😊'}</span>
       ${action}
     </div>`;
   }).join('');
-  renderAllSprites(panel);
 }
 
 socket.on('onlineUsers', users => {
@@ -2164,9 +2171,7 @@ function renderRoster(roster) {
     const isMe = u.cid && u.cid === myCid;
     const isOnline = u.online !== false;
     const effectivePhoto = isMe ? (state.profileImage || u.profileImage) : u.profileImage;
-    const photoHtml = effectivePhoto
-      ? `<img src="${effectivePhoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-      : avatarMarkup(u.avatar || 'A', '', 2);
+    const photoHtml = memberAvatarHtml(effectivePhoto);
     return `<div class="roster-item">
       <div class="roster-av">${photoHtml}<span class="roster-dot ${isOnline ? 'online' : 'offline'}"></span></div>
       <div class="roster-info">
@@ -2178,7 +2183,6 @@ function renderRoster(roster) {
       </div>
     </div>`;
   }).join('');
-  renderAllSprites(panel);
 }
 
 /* ── 방 내 설정 패널 ── */

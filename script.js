@@ -2930,15 +2930,6 @@ function hideEmojiPop() {
 
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    if (pop.classList.contains('hidden')) {
-      const r = btn.getBoundingClientRect();
-      const popW = Math.min(360, window.innerWidth - 24);
-      let left = r.left;
-      if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
-      pop.style.left = left + 'px';
-      pop.style.bottom = (window.innerHeight - r.top + 8) + 'px';
-      pop.style.top = '';
-    }
     pop.classList.toggle('hidden');
   });
 

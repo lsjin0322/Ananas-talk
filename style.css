@@ -843,6 +843,12 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 /* 햄버거 버튼 */
 .ch-hamburger-btn{font-size:1.3rem;line-height:1;padding:4px 10px;font-weight:900;
   letter-spacing:0;font-family:var(--pxfont)}
+/* 멤버 팝업 상단 닫기 버튼 */
+.csb-top-bar{display:flex;align-items:center;padding:2px 0 6px;border-bottom:1.5px dashed var(--line);margin-bottom:2px}
+.csb-collapse-btn{font-size:0.76rem;font-weight:700;padding:4px 10px;
+  border:1.5px solid var(--ink);border-radius:99px;background:#FFFEF8;
+  color:var(--ink);cursor:pointer;transition:background .13s,transform .1s}
+.csb-collapse-btn:hover{background:var(--ys);transform:translate(-1px,-1px)}
 .csb-logo{display:flex;align-items:center;gap:9px;font-family:var(--pxfont);font-size:1.2rem;padding:4px 2px}
 .csb-profile-body{display:flex;align-items:center;gap:12px;padding:13px 14px}
 .csb-av{width:48px;height:48px;border:2px solid var(--ink);border-radius:11px;background:var(--ys);
@@ -1505,7 +1511,7 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 .rw-invite-btn:hover{opacity:1}
 
 /* ── 통합 이모지/이모티콘 피커 ───────────── */
-.es-pop{position:fixed;z-index:9200;
+.es-pop{position:absolute;bottom:calc(100% + 6px);left:0;z-index:9200;
   width:min(360px, calc(100vw - 24px));display:flex;flex-direction:column;
   background:#FFFEF8;border:2px solid var(--ink);border-radius:var(--rs);
   box-shadow:3px 3px 0 var(--ink);overflow:hidden}

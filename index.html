@@ -857,6 +857,28 @@
       </div>
     </section>
 
+    <!-- 멤버 프로필 팝업 -->
+    <div class="mp-overlay hidden" id="memberProfilePopup" onclick="if(event.target===this)closeMemberProfile()">
+      <div class="mp-popup retro-window">
+        <div class="rw-titlebar rw-mini">
+          <span class="rw-title">프로필</span>
+          <button class="rw-x rw-x-btn" onclick="closeMemberProfile()"></button>
+        </div>
+        <div class="mp-body">
+          <div class="mp-av" id="mpAvatar"></div>
+          <div class="mp-info">
+            <div class="mp-name" id="mpName">—</div>
+            <div class="mp-mood" id="mpMood"></div>
+          </div>
+        </div>
+        <div class="mp-actions">
+          <button class="mp-btn mp-edit-btn hidden" id="mpEditBtn" onclick="closeMemberProfile();openAccount()">✏️ 프로필 편집</button>
+          <button class="mp-btn mp-add-btn hidden" id="mpAddBtn">👤 친구 추가</button>
+          <button class="mp-btn mp-already-btn hidden" id="mpAlreadyBtn" disabled>🤝 이미 친구</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 친구코드 추가 팝업 -->
     <div class="fc-overlay hidden" id="friendAddPopup" onclick="if(event.target===this)closeFriendAddPopup()">
       <div class="fc-popup retro-window">

@@ -1793,6 +1793,24 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 .fc-popup-input:focus{box-shadow:3px 3px 0 var(--ys)}
 .fc-popup-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
 
+/* ─ 멤버 프로필 팝업 ─ */
+.mp-overlay{position:fixed;inset:0;background:rgba(31,27,19,.55);z-index:9500;display:flex;align-items:center;justify-content:center}
+.mp-overlay.hidden{display:none}
+.mp-popup{width:min(300px,88vw);background:#FFFEF8}
+.mp-body{display:flex;align-items:center;gap:16px;padding:20px 18px 14px}
+.mp-av{width:64px;height:64px;border-radius:50%;overflow:hidden;border:2px solid var(--ink);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff}
+.mp-av img,.mp-av canvas{width:100%;height:100%;object-fit:cover;display:block}
+.mp-info{flex:1;min-width:0}
+.mp-name{font-weight:800;font-size:1.05rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-mood{font-size:.85rem;margin-top:4px}
+.mp-actions{display:flex;gap:8px;padding:0 18px 18px;flex-wrap:wrap}
+.mp-btn{flex:1;padding:8px 10px;border:2px solid var(--ink);border-radius:var(--rs);font-weight:700;font-size:.82rem;cursor:pointer;background:#fff;box-shadow:2px 2px 0 var(--ink);transition:transform .1s}
+.mp-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.mp-edit-btn{background:var(--ys)}
+.mp-add-btn{background:#E8F4E8}
+.mp-already-btn{background:#eee;color:var(--gray);cursor:default}
+.mp-btn.hidden{display:none}
+
 /* 아바타·버튼 공통 (프로필 편집창 — 기존 유지) */
 .prf-tabs{display:flex;gap:6px;margin-bottom:14px}
 .prf-tab{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:var(--rs);

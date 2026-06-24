@@ -247,6 +247,45 @@ function closeFriendAddPopup() {
   if (popup) popup.classList.add('hidden');
 }
 
+/* ─── 멤버 프로필 팝업 ─── */
+function openMemberProfile(u) {
+  const overlay = $('#memberProfilePopup');
+  if (!overlay) return;
+  const isMe = u.cid && u.cid === CLIENT_ID;
+  const isFriend = u.cid && state.friends.has(u.cid);
+  const photo = isMe ? state.profileImage : u.profileImage;
+
+  /* 아바타 */
+  const avEl = $('#mpAvatar');
+  avEl.innerHTML = memberAvatarHtml(photo, u.avatar);
+  renderAllSprites(avEl);
+
+  /* 닉네임·기분 */
+  $('#mpName').textContent = u.nickname || '—';
+  $('#mpMood').textContent = (MOOD_EMOJI[u.mood] || '😊') + ' ' + (u.mood || '');
+
+  /* 버튼 표시 */
+  const editBtn  = $('#mpEditBtn');
+  const addBtn   = $('#mpAddBtn');
+  const alrdyBtn = $('#mpAlreadyBtn');
+  editBtn.classList.toggle('hidden', !isMe);
+  addBtn.classList.toggle('hidden', isMe || isFriend);
+  alrdyBtn.classList.toggle('hidden', isMe || !isFriend);
+
+  /* 친구 추가 버튼 이벤트 */
+  addBtn.onclick = () => {
+    if (u.cid) socket.emit('sendFriendReq', { toCid: u.cid });
+    showToast('친구 요청을 보냈어요!', 'success');
+    closeMemberProfile();
+  };
+
+  overlay.classList.remove('hidden');
+}
+function closeMemberProfile() {
+  const overlay = $('#memberProfilePopup');
+  if (overlay) overlay.classList.add('hidden');
+}
+
 function loadPrfPhoto(type) {
   const data = localStorage.getItem('ananas_' + type + '_photo');
   const imgEl = document.getElementById(type === 'main' ? 'prfMainPhotoImg' : 'prfSubPhotoImg');
@@ -2124,23 +2163,21 @@ function renderMembers(users) {
   if (!panel) return;
   panel.innerHTML = users.map(u => {
     const isMe     = u.cid && u.cid === CLIENT_ID;
-    const isFriend = u.cid && state.friends.has(u.cid);
     const photo    = isMe ? state.profileImage : u.profileImage;
-    let action = '';
-    if (u.cid && !isMe) {
-      action = isFriend
-        ? `<span class="member-friend" title="이미 친구예요">🤝 친구</span>`
-        : `<button class="member-add" data-cid="${u.cid}" title="친구 추가">+ 친구</button>`;
-    }
+    const uData    = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: photo, isHost: u.isHost }));
     return `
-    <div class="member-row">
+    <div class="member-row" style="cursor:pointer" data-uinfo="${uData}">
       <span class="member-av">${memberAvatarHtml(photo, u.avatar)}</span>
       <span class="member-name">${u.nickname}${u.isHost ? ' <span class="host-badge">👑</span>' : ''}${isMe ? ' <span class="member-me">나</span>' : ''}</span>
       <span class="member-mood">${MOOD_EMOJI[u.mood] || '😊'}</span>
-      ${action}
     </div>`;
   }).join('');
   renderAllSprites(panel);
+  panel.onclick = e => {
+    const row = e.target.closest('.member-row[data-uinfo]');
+    if (!row) return;
+    openMemberProfile(JSON.parse(decodeURIComponent(row.dataset.uinfo)));
+  };
 }
 
 socket.on('onlineUsers', users => {
@@ -2173,7 +2210,8 @@ function renderRoster(roster) {
     const isOnline = u.online !== false;
     const effectivePhoto = isMe ? (state.profileImage || u.profileImage) : u.profileImage;
     const photoHtml = memberAvatarHtml(effectivePhoto, u.avatar);
-    return `<div class="roster-item">
+    const uData = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: effectivePhoto, isHost: u.isHost }));
+    return `<div class="roster-item" style="cursor:pointer" data-uinfo="${uData}">
       <div class="roster-av">${photoHtml}<span class="roster-dot ${isOnline ? 'online' : 'offline'}"></span></div>
       <div class="roster-info">
         <div class="roster-nick">${escHtml(u.nickname || '—')}${isMe ? ' <span style="font-size:.62rem;color:var(--gray)">(나)</span>' : ''}</div>
@@ -2184,6 +2222,12 @@ function renderRoster(roster) {
       </div>
     </div>`;
   }).join('');
+  renderAllSprites(panel);
+  panel.onclick = e => {
+    const row = e.target.closest('.roster-item[data-uinfo]');
+    if (!row) return;
+    openMemberProfile(JSON.parse(decodeURIComponent(row.dataset.uinfo)));
+  };
 }
 
 /* ── 방 내 설정 패널 ── */

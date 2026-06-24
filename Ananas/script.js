@@ -247,6 +247,44 @@ function closeFriendAddPopup() {
   if (popup) popup.classList.add('hidden');
 }
 
+/* ─── 멤버 프로필 팝업 ─── */
+function openMemberProfile(u) {
+  const overlay = $('#memberProfilePopup');
+  if (!overlay) return;
+  const isMe = u.cid && u.cid === CLIENT_ID;
+  const isFriend = u.cid && state.friends.has(u.cid);
+  const photo = isMe ? state.profileImage : u.profileImage;
+
+  /* 아바타 */
+  const avEl = $('#mpAvatar');
+  avEl.innerHTML = memberAvatarHtml(photo, u.nickname);
+
+  /* 닉네임·기분 */
+  $('#mpName').textContent = u.nickname || '—';
+  $('#mpMood').textContent = (MOOD_EMOJI[u.mood] || '😊') + ' ' + (u.mood || '');
+
+  /* 버튼 표시 */
+  const editBtn  = $('#mpEditBtn');
+  const addBtn   = $('#mpAddBtn');
+  const alrdyBtn = $('#mpAlreadyBtn');
+  editBtn.classList.toggle('hidden', !isMe);
+  addBtn.classList.toggle('hidden', isMe || isFriend);
+  alrdyBtn.classList.toggle('hidden', isMe || !isFriend);
+
+  /* 친구 추가 버튼 이벤트 */
+  addBtn.onclick = () => {
+    if (u.cid) socket.emit('sendFriendReq', { toCid: u.cid });
+    showToast('친구 요청을 보냈어요!', 'success');
+    closeMemberProfile();
+  };
+
+  overlay.classList.remove('hidden');
+}
+function closeMemberProfile() {
+  const overlay = $('#memberProfilePopup');
+  if (overlay) overlay.classList.add('hidden');
+}
+
 function loadPrfPhoto(type) {
   const data = localStorage.getItem('ananas_' + type + '_photo');
   const imgEl = document.getElementById(type === 'main' ? 'prfMainPhotoImg' : 'prfSubPhotoImg');
@@ -316,28 +354,16 @@ function deletePrfProfile(type) {
 }
 
 /* ── 친구 시스템 (localStorage) ── */
-(function seedTestFriends() {
-  const TEST_FRIENDS = [
-    { cid: 'test-friend-001', nickname: '테스트친구1', photo: '', addedAt: Date.now() - 86400000 },
-    { cid: 'test-friend-002', nickname: '테스트친구2', photo: '', addedAt: Date.now() - 3600000 },
-  ];
-  try {
-    const existing = JSON.parse(localStorage.getItem('ananas_friends') || '[]');
-    let changed = false;
-    TEST_FRIENDS.forEach(tf => {
-      if (!existing.some(f => f.cid === tf.cid)) {
-        existing.push(tf);
-        changed = true;
-      }
-    });
-    if (changed) localStorage.setItem('ananas_friends', JSON.stringify(existing));
-  } catch(e) {}
-})();
-
 function getFriends()   { try { return JSON.parse(localStorage.getItem('ananas_friends') || '[]'); } catch(e) { return []; } }
 function getFriendReqs(){ try { return JSON.parse(localStorage.getItem('ananas_friend_reqs') || '[]'); } catch(e) { return []; } }
 function saveFriends(list)   { localStorage.setItem('ananas_friends', JSON.stringify(list)); }
 function saveFriendReqs(list){ localStorage.setItem('ananas_friend_reqs', JSON.stringify(list)); }
+
+/* 기존 테스트 친구 데이터 일회 정리 */
+(function() {
+  const cleaned = getFriends().filter(f => !String(f.cid||'').startsWith('test-friend-'));
+  if (cleaned.length !== getFriends().length) saveFriends(cleaned);
+})();
 
 function renderFriendList() {
   const list = getFriends();
@@ -486,7 +512,7 @@ function escHtml(s) {
 const _origSwitchPage = window.switchPage;
 window.switchPage = function(name) {
   _origSwitchPage(name);
-  if (name === 'profile') loadPrfPage();
+  if (name === 'profile') { loadPrfPage(); renderRecent(); }
 };
 
 /* 소켓: 친구 요청 수신 */
@@ -1408,39 +1434,26 @@ socket.on('roomList', list => {
 function renderRooms() {
   const grid = $('#roomsGrid'), empty = $('#roomsEmpty');
   if (!grid) return;
-  $$('.room-card', grid).forEach(c => c.remove());
+  $$('.room-list-item', grid).forEach(c => c.remove());
   const rooms = state.publicRooms.filter(r => roomFilter === 'all' || r.category === roomFilter);
   if (empty) empty.style.display = rooms.length ? 'none' : '';
-  const sprites = ['pine', 'pineWink', 'pineCool', 'pineHappy'];
-  rooms.forEach((r, idx) => {
-    const card = document.createElement('div');
-    card.className = 'room-card';
-    card.innerHTML = `
-      ${r.isCreator ? `<button class="rc-del-btn" title="방 삭제" data-code="${escHtml(r.code)}">✕</button>` : ''}
-      <div class="rc-img"><canvas class="px" data-sprite="${sprites[idx % 4]}" data-scale="4"></canvas></div>
-      <div class="rc-body">
-        <div class="rc-top">
-          <span class="rc-tag">${CAT_LABEL[r.category] || '수다'}</span>
-          <span class="rc-users">👥 ${r.users}명</span>
-        </div>
-        <h3>${r.name}</h3>
-        <p>${r.desc || '설명이 없는 방이에요.'}</p>
-        <div class="rc-foot">
-          <span class="rc-code">${escHtml(r.code)}</span>
-          <span class="rc-join">입장하기 →</span>
-        </div>
-      </div>`;
+  rooms.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'room-list-item' + (state.room === r.code ? ' active' : '');
+    item.innerHTML = `
+      <span class="rli-name" title="${escHtml(r.name)}">${escHtml(r.name)}</span>
+      <span class="rli-users">👥${r.users}</span>
+      ${r.isCreator ? `<span class="rli-host-badge">방장</span><button class="rli-del-btn" title="방 삭제">✕</button>` : ''}`;
     if (r.isCreator) {
-      const delBtn = card.querySelector('.rc-del-btn');
+      const delBtn = item.querySelector('.rli-del-btn');
       delBtn && delBtn.addEventListener('click', e => {
         e.stopPropagation();
         confirmDeleteRoom(r.code, r.name);
       });
     }
-    card.addEventListener('click', () => quickJoin(r.code));
-    grid.appendChild(card);
+    item.addEventListener('click', () => quickJoin(r.code));
+    grid.appendChild(item);
   });
-  renderAllSprites(grid);
 }
 
 function filterRooms(cat, btn) {
@@ -1526,25 +1539,38 @@ function removeRecent(code) {
 }
 const RECENT_SPRITES = ['pine', 'pineWink', 'pineCool', 'pineHappy'];
 function renderRecent() {
-  const wrap = $('#recentRoomsWrap'), list = $('#recentRoomsList');
-  if (!wrap || !list) return;
   const rec = getRecent();
-  wrap.style.display = rec.length ? '' : 'none';
-  list.innerHTML = '';
-  rec.forEach((r, i) => {
-    const row = document.createElement('button');
-    row.className = 'recent-item';
-    row.innerHTML = `
-      <span class="ri-av"><canvas class="px" data-sprite="${RECENT_SPRITES[i % RECENT_SPRITES.length]}" data-scale="2"></canvas></span>
-      <span class="ri-info">
-        <span class="ri-name">${escHtml(r.name)}</span>
-        <span class="ri-code">코드 ${escHtml(r.code)}</span>
-      </span>
-      <span class="ri-enter">다시 입장 →</span>`;
-    row.addEventListener('click', () => quickJoin(r.code));
-    list.appendChild(row);
-  });
-  renderAllSprites(list);
+
+  /* 서버에 존재 여부 검증 — 응답(roomsExist)이 오면 사라진 방을 자동 제거 후 재렌더 */
+  if (rec.length && typeof socket !== 'undefined') {
+    socket.emit('checkRooms', rec.map(r => r.code));
+  }
+
+  /* 프로필 페이지 대화 목록 */
+  const histList = $('#chatHistoryList');
+  const histEmpty = $('#chatHistoryEmpty');
+  if (histList) {
+    $$('.ch-room-card', histList).forEach(el => el.remove());
+    if (histEmpty) histEmpty.style.display = rec.length ? 'none' : '';
+    rec.forEach((r, i) => {
+      const card = document.createElement('div');
+      card.className = 'ch-room-card';
+      card.innerHTML = `
+        <span class="ch-av"><canvas class="px" data-sprite="${RECENT_SPRITES[i % RECENT_SPRITES.length]}" data-scale="2"></canvas></span>
+        <span class="ch-info">
+          <span class="ch-name">${escHtml(r.name)}</span>
+          <span class="ch-code">코드 ${escHtml(r.code)}</span>
+        </span>
+        <span class="ch-btns">
+          <button class="ch-del-btn">삭제</button>
+          <button class="ch-enter-btn">입장 →</button>
+        </span>`;
+      card.querySelector('.ch-enter-btn').addEventListener('click', () => quickJoin(r.code));
+      card.querySelector('.ch-del-btn').addEventListener('click', () => removeRecent(r.code));
+      histList.appendChild(card);
+    });
+    renderAllSprites(histList);
+  }
 }
 renderRecent();
 
@@ -1645,6 +1671,14 @@ $('#myChatsScreen') && $('#myChatsScreen').addEventListener('click', e => {
   if (e.target.id === 'myChatsScreen') closeMyChats();
 });
 
+/* 방 존재 검증 응답: 삭제된 방 목록에서 제거 */
+socket.on('roomsExist', ({ deleted }) => {
+  if (!Array.isArray(deleted) || !deleted.length) return;
+  const pruned = getRecent().filter(r => !deleted.includes(r.code));
+  localStorage.setItem('ananas_recent', JSON.stringify(pruned));
+  renderRecent();
+});
+
 /* 방 삭제 결과 동기화 */
 socket.on('roomDeleteOk', ({ code }) => {
   removeRecent(code);
@@ -1677,9 +1711,7 @@ function showChatPopup(m) {
     <span class="cn-msg"><b>${m.user}</b> ${m.isImage ? '(사진)' : m.text}</span>`;
   el.addEventListener('click', () => {
     if ($('#chatApp').classList.contains('hidden')) {
-      $('#siteWrapper').style.display = 'none';
-      $('#chatApp').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
+      resumeChat();
     }
     closeMyChats();
     scrollBottom();
@@ -1987,10 +2019,15 @@ function toggleBgm() {
 window.toggleBgm = toggleBgm;
 
 function launchChatApp() {
-  $('#siteWrapper').style.display = 'none';
+  /* 방목록 페이지로 이동 후 채팅 패널 표시 */
+  switchPage('rooms');
   const app = $('#chatApp');
   app.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  const noRoom = $('#roomsNoRoom');
+  if (noRoom) noRoom.style.display = 'none';
+  /* 멤버 팝업 닫힌 상태로 시작 */
+  const sb = $('#chatSb');
+  if (sb) sb.classList.add('hidden');
   startBgm();
 
   /* 내 프로필 */
@@ -2040,10 +2077,10 @@ function exitChat(toHome) {
   socket.emit('leaveRoom');
   state.room = null; state.roomName = ''; state.isHost = false;
   $('#chatApp').classList.add('hidden');
-  const w = $('#siteWrapper');
-  w.style.display = '';
-  w.classList.add('visible');
-  document.body.style.overflow = '';
+  const noRoom = $('#roomsNoRoom');
+  if (noRoom) noRoom.style.display = '';
+  const sb = $('#chatSb');
+  if (sb) sb.classList.add('hidden');
   if (toHome) switchPage('home');
   renderRecent();
 }
@@ -2051,20 +2088,25 @@ function exitChat(toHome) {
 function goHomeKeepChat() {
   if (!state.room) return exitChat(true);
   stopBgm();
-  $('#chatApp').classList.add('hidden');
-  const w = $('#siteWrapper');
-  w.style.display = '';
-  w.classList.add('visible');
-  document.body.style.overflow = '';
   switchPage('home');
 }
 function resumeChat() {
   if (!state.room) return;
-  $('#siteWrapper').style.display = 'none';
+  switchPage('rooms');
   $('#chatApp').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  const noRoom = $('#roomsNoRoom');
+  if (noRoom) noRoom.style.display = 'none';
   scrollBottom();
 }
+
+/* 멤버 팝업 토글 (≡ 햄버거 버튼) */
+function toggleChatSb() {
+  const sb = $('#chatSb');
+  if (!sb) return;
+  sb.style.bottom = '0';
+  sb.classList.toggle('hidden');
+}
+window.toggleChatSb = toggleChatSb;
 
 /* 나가기 확인 팝업 */
 function showLeaveConfirm() {
@@ -2074,7 +2116,11 @@ function showLeaveConfirm() {
 }
 function hideLeaveConfirm() { $('#leaveConfirm') && $('#leaveConfirm').classList.add('hidden'); }
 $('#chatLogoutBtn') && $('#chatLogoutBtn').addEventListener('click', showLeaveConfirm);
-$('#leaveYes') && $('#leaveYes').addEventListener('click', () => { hideLeaveConfirm(); exitChat(true); });
+$('#leaveYes') && $('#leaveYes').addEventListener('click', () => {
+  hideLeaveConfirm();
+  if (state.room) removeRecent(state.room); /* 명시적 나가기만 목록에서 삭제 */
+  exitChat(true);
+});
 $('#leaveNo')  && $('#leaveNo').addEventListener('click',  () => { hideLeaveConfirm(); goHomeKeepChat(); });
 $('#leaveConfirm') && $('#leaveConfirm').addEventListener('click', e => { if (e.target.id === 'leaveConfirm') hideLeaveConfirm(); });
 $('#leaveConfirm') && $('#leaveConfirm').querySelector('.rw-x') && $('#leaveConfirm').querySelector('.rw-x').addEventListener('click', hideLeaveConfirm);
@@ -2120,28 +2166,40 @@ window.switchSbTab = switchSbTab;
 })();
 
 /* 접속자 목록 */
+const AV_COLORS = ['#F6C94E','#7EC8A4','#7BB8E8','#E89A7B','#C4A8E2','#E8C87B','#85C9C9'];
+function memberAvatarHtml(photo, nickname) {
+  if (photo && /^data:image\//.test(photo)) {
+    return `<img class="av-photo" src="${photo}" alt="프로필" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  }
+  const ch  = (nickname || '?').trim()[0].toUpperCase();
+  const idx = [...(nickname || '?')].reduce((s, c) => s + c.charCodeAt(0), 0) % AV_COLORS.length;
+  const bg  = AV_COLORS[idx];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" style="width:100%;height:100%;border-radius:50%;display:block">
+    <circle cx="20" cy="20" r="20" fill="${bg}"/>
+    <text x="20" y="27" text-anchor="middle" font-size="18" font-weight="bold" font-family="sans-serif" fill="#fff">${ch}</text>
+  </svg>`;
+}
+
 function renderMembers(users) {
   if (!Array.isArray(users)) return;
   const panel = $('#membersPanel');
   if (!panel) return;
   panel.innerHTML = users.map(u => {
     const isMe     = u.cid && u.cid === CLIENT_ID;
-    const isFriend = u.cid && state.friends.has(u.cid);
-    let action = '';
-    if (u.cid && !isMe) {
-      action = isFriend
-        ? `<span class="member-friend" title="이미 친구예요">🤝 친구</span>`
-        : `<button class="member-add" data-cid="${u.cid}" title="친구 추가">+ 친구</button>`;
-    }
+    const photo    = isMe ? state.profileImage : u.profileImage;
+    const uData    = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: photo, isHost: u.isHost }));
     return `
-    <div class="member-row">
-      <span class="member-av">${avatarMarkup(u.avatar, u.profileImage, 2)}</span>
+    <div class="member-row" style="cursor:pointer" data-uinfo="${uData}">
+      <span class="member-av">${memberAvatarHtml(photo, u.nickname)}</span>
       <span class="member-name">${u.nickname}${u.isHost ? ' <span class="host-badge">👑</span>' : ''}${isMe ? ' <span class="member-me">나</span>' : ''}</span>
       <span class="member-mood">${MOOD_EMOJI[u.mood] || '😊'}</span>
-      ${action}
     </div>`;
   }).join('');
-  renderAllSprites(panel);
+  panel.onclick = e => {
+    const row = e.target.closest('.member-row[data-uinfo]');
+    if (!row) return;
+    openMemberProfile(JSON.parse(decodeURIComponent(row.dataset.uinfo)));
+  };
 }
 
 socket.on('onlineUsers', users => {
@@ -2149,7 +2207,7 @@ socket.on('onlineUsers', users => {
   state.onlineUsers = users;
   const n = users.length;
   const oc = $('#onlineCount'); if (oc) oc.textContent = `${n}명 접속`;
-  const ocb = $('#chatOnlineCount'); if (ocb) ocb.textContent = `${n}명`;
+  const ocb = $('#chatOnlineCount'); if (ocb) ocb.textContent = `${n}`;
   const mc = $('#memberCnt'); if (mc) mc.textContent = n;
   /* 로스터가 없으면 onlineUsers로 렌더 */
   if (!state.memberRoster || state.memberRoster.length === 0) renderRoster(users.map(u => ({ ...u, online: true })));
@@ -2172,10 +2230,10 @@ function renderRoster(roster) {
   panel.innerHTML = roster.map(u => {
     const isMe = u.cid && u.cid === myCid;
     const isOnline = u.online !== false;
-    const photoHtml = u.profileImage
-      ? `<img src="${u.profileImage}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-      : avatarMarkup(u.avatar || 'A', '', 2);
-    return `<div class="roster-item">
+    const effectivePhoto = isMe ? (state.profileImage || u.profileImage) : u.profileImage;
+    const photoHtml = memberAvatarHtml(effectivePhoto, u.nickname);
+    const uData = encodeURIComponent(JSON.stringify({ cid: u.cid, nickname: u.nickname, avatar: u.avatar, mood: u.mood, profileImage: effectivePhoto, isHost: u.isHost }));
+    return `<div class="roster-item" style="cursor:pointer" data-uinfo="${uData}">
       <div class="roster-av">${photoHtml}<span class="roster-dot ${isOnline ? 'online' : 'offline'}"></span></div>
       <div class="roster-info">
         <div class="roster-nick">${escHtml(u.nickname || '—')}${isMe ? ' <span style="font-size:.62rem;color:var(--gray)">(나)</span>' : ''}</div>
@@ -2186,7 +2244,11 @@ function renderRoster(roster) {
       </div>
     </div>`;
   }).join('');
-  renderAllSprites(panel);
+  panel.onclick = e => {
+    const row = e.target.closest('.roster-item[data-uinfo]');
+    if (!row) return;
+    openMemberProfile(JSON.parse(decodeURIComponent(row.dataset.uinfo)));
+  };
 }
 
 /* ── 방 내 설정 패널 ── */
@@ -2481,9 +2543,7 @@ function renderMessage(m, isHistory) {
   const bubbleCls = m.isImage ? ' has-img' : m.isSticker ? ' has-sticker' : '';
 
   row.innerHTML = `
-    <span class="msg-av${grouped ? ' ghost' : ''}">
-      ${avatarMarkup(m.avatar, profileImageOf(m.user, m.avatar), 2)}
-    </span>
+    ${!mine ? `<span class="msg-av${grouped ? ' ghost' : ''}">${avatarMarkup(m.avatar, profileImageOf(m.user, m.avatar), 2)}</span>` : ''}
     <div class="msg-col">
       ${!grouped && !mine ? `<span class="msg-user">${m.user} <small>${MOOD_EMOJI[m.mood] || ''}</small></span>` : ''}
       <div class="msg-line">
@@ -2948,15 +3008,6 @@ function hideEmojiPop() {
 
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    if (pop.classList.contains('hidden')) {
-      const r = btn.getBoundingClientRect();
-      const popW = Math.min(360, window.innerWidth - 24);
-      let left = r.left;
-      if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
-      pop.style.left = left + 'px';
-      pop.style.bottom = (window.innerHeight - r.top + 8) + 'px';
-      pop.style.top = '';
-    }
     pop.classList.toggle('hidden');
   });
 
@@ -3327,6 +3378,7 @@ textarea, [contenteditable] {
 })();
 
 /* ─── 메시지 검색 ─── */
+$('#chatHamburgerBtn') && $('#chatHamburgerBtn').addEventListener('click', toggleChatSb);
 $('#searchToggleBtn') && $('#searchToggleBtn').addEventListener('click', () => {
   const bar = $('#searchBar');
   bar.classList.toggle('hidden');
@@ -3739,6 +3791,14 @@ window.switchAiMode = switchAiMode;
     if (charCnt) charCnt.textContent = input.value.length;
   });
 
+  /* Enter → 번역 (Shift+Enter는 줄바꿈) */
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      doTranslate();
+    }
+  });
+
   /* 이미지 업로드 */
   imgInput && imgInput.addEventListener('change', () => {
     const file = imgInput.files[0];
@@ -3791,11 +3851,11 @@ window.switchAiMode = switchAiMode;
         const data = await res.json();
         reply = data.reply || data.error || '번역 실패';
       } else {
-        const prompt = `${srcHint}다음 텍스트를 ${tgtName}로만 번역해줘. 설명 없이 번역문만 출력해:\n${text}`;
-        const res = await fetch('/api/ai', {
+        const fullText = srcLang !== 'auto' ? `[${srcName}] ${text}` : text;
+        const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+          body: JSON.stringify({ text: fullText, tgtLang: tgtName }),
         });
         const data = await res.json();
         reply = data.reply || data.error || '번역 실패';

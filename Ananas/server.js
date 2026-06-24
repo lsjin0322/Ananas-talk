@@ -282,12 +282,10 @@ io.on('connection', (socket) => {
 
     if (!nickname || !roomName) return;
 
-    /* 연타 방지: 같은 소켓이 5초 내 방을 이미 만들었으면 차단 */
     const now = Date.now();
-    if (socket._lastRoomCreate && now - socket._lastRoomCreate < 5000) {
-      return socket.emit('errorMsg', '방을 너무 빠르게 만들고 있어요. 잠시 후 다시 시도하세요.');
-    }
-    socket._lastRoomCreate = now;
+
+    /* 이미 다른 방에 있으면 먼저 깨끗하게 퇴장 (각 방 독립성 유지) */
+    if (socket.room) doLeave(socket, true);
 
     let code, attempts = 0;
     do { code = genCode(); attempts++; } while (rooms.has(code) && attempts < 20);
@@ -594,6 +592,13 @@ io.on('connection', (socket) => {
   socket.on('requestRoomList', () => {
     socket.emit('roomList', publicRoomList(socket.cid, socket.id));
   });
+
+  /* 방 존재 여부 일괄 확인 (대화목록 검증용) */
+  socket.on('checkRooms', (codes) => {
+    if (!Array.isArray(codes)) return;
+    const deleted = codes.filter(c => !rooms.has(c));
+    socket.emit('roomsExist', { deleted });
+  });
   /* ─── 친구 요청 중계 ─── */
   socket.on('friendRequest', ({ toCid, fromNick, fromCid }) => {
     if (!toCid || !fromCid || fromCid === toCid) return;
@@ -787,6 +792,36 @@ app.post('/api/ai', aiLimiter, async (req, res) => {
   } catch (err) {
     console.error('[AI Proxy]', err.message);
     res.status(502).json({ error: 'AI 연결이 원활하지 않습니다.' });
+  }
+});
+
+/* ─── 번역 전용 프록시 (시스템 프롬프트 없이 순수 번역) ─── */
+app.post('/api/translate', aiLimiter, async (req, res) => {
+  try {
+    if (!runtimeAiKey) return res.json({ reply: '아직 AI가 활성화되지 않았어요.' });
+    const { text, tgtLang } = req.body || {};
+    if (!text || !tgtLang) return res.status(400).json({ error: '파라미터 누락' });
+    const prompt = `Translate the following text to ${tgtLang}. Output ONLY the translated text, no explanations:\n${text}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(runtimeAiKey)}`;
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 2000, temperature: 0.2 },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      const msg = data?.error?.message || '';
+      if (r.status === 429) return res.json({ reply: '요청이 많아요. 잠시 후 다시 시도해주세요.' });
+      return res.status(502).json({ error: '번역 연결 오류: ' + msg });
+    }
+    const reply = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '번역 실패';
+    res.json({ reply });
+  } catch (err) {
+    console.error('[Translate]', err.message);
+    res.status(502).json({ error: '번역 연결이 원활하지 않습니다.' });
   }
 });
 

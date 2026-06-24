@@ -476,6 +476,63 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .feb-img{width:100%;display:block}
 
 /* ═════════════ ROOMS ═════════════ */
+/* ── 방목록 스플릿 레이아웃 ── */
+#page-rooms{padding:0!important;overflow:hidden}
+.rooms-split-layout{display:flex;height:calc(100vh - var(--hh));overflow:hidden}
+
+/* 왼쪽 사이드바 */
+.rooms-split-left{width:240px;min-width:240px;display:flex;flex-direction:column;
+  border-right:2px solid var(--ink);background:#FFFEF8;overflow:hidden}
+.rooms-split-top{display:flex;flex-direction:row;gap:6px;padding:10px 10px 10px;
+  border-bottom:2px solid var(--line)}
+.rooms-split-top .rooms-new-btn,.rooms-split-top .rooms-wave-btn{flex:1;text-align:center;font-size:.78rem;padding:8px 6px}
+.rooms-wave-btn{padding:10px 14px;border:2px solid var(--ink);border-radius:var(--rs);
+  background:#E5F4FF;font-family:var(--pxfont);font-size:0.84rem;width:100%;text-align:left;
+  box-shadow:var(--shadow-px-sm);transition:transform 0.15s ease,box-shadow 0.15s ease}
+.rooms-wave-btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.rooms-new-btn{padding:10px 14px;border:2px solid var(--ink);border-radius:var(--rs);
+  background:var(--y);font-family:var(--pxfont);font-size:0.84rem;width:100%;text-align:left;
+  box-shadow:var(--shadow-px-sm);transition:transform 0.15s ease,box-shadow 0.15s ease}
+.rooms-new-btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.rooms-status{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--c2);font-size:.78rem;flex-shrink:0;border-bottom:1px solid var(--line)}
+.rs-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.rooms-status.connected .rs-dot{background:var(--leaf);animation:dotPing 1.4s infinite}
+.rooms-list{flex:1;overflow-y:auto;padding:6px 0}
+
+/* 방 목록 아이템 */
+.room-list-item{display:flex;align-items:center;gap:0;padding:10px 12px;cursor:pointer;
+  border-bottom:1px solid var(--line);transition:background 0.13s ease;position:relative}
+.room-list-item:hover{background:var(--c2)}
+.room-list-item.active{background:var(--ys)}
+.rli-name{flex:1;font-size:0.88rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rli-users{font-family:var(--pxfont);font-size:0.7rem;color:var(--leafD);margin-right:6px;flex-shrink:0}
+.rli-host-badge{font-size:0.65rem;font-weight:800;padding:2px 7px;border:1.5px solid var(--ink);
+  border-radius:99px;background:var(--y);color:var(--ink);flex-shrink:0;margin-right:4px}
+.rli-del-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink);
+  background:#fff;color:var(--ink);font-size:.65rem;font-weight:900;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .12s,transform .1s}
+.rli-del-btn:hover{background:#ff4d4d;color:#fff;transform:scale(1.1)}
+
+.rooms-empty{text-align:center;padding:40px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:12px}
+.rooms-empty p{color:var(--gray);font-size:.82rem;line-height:1.6}
+
+/* 오른쪽 패널 */
+.rooms-split-right{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* 방 미선택 플레이스홀더 */
+.rooms-no-room{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;height:100%;padding:32px;text-align:center}
+.rooms-no-room p{color:var(--gray);line-height:1.7}
+.rooms-direct{margin:0;padding:20px 24px;
+  background:var(--c2);border:2px solid var(--ink);border-radius:var(--r);width:100%;max-width:480px}
+.rd-inner{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.rd-inner h4{font-weight:800;margin:0 0 4px}
+.rd-inner p{color:var(--gray);font-size:.9rem;margin:0}
+
+/* bars */
 .rooms-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
   margin-bottom:26px;flex-wrap:wrap}
 .rooms-filters{display:flex;gap:7px;flex-wrap:wrap}
@@ -484,14 +541,6 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .rf:hover{background:var(--c2)}
 .rf.active{background:var(--ink);color:var(--y);box-shadow:2px 2px 0 rgba(31,27,19,0.25)}
 .rooms-bar-acts{display:flex;gap:10px}
-.rooms-wave-btn{padding:10px 18px;border:2px solid var(--ink);border-radius:var(--rs);
-  background:#E5F4FF;font-family:var(--pxfont);font-size:0.88rem;
-  box-shadow:var(--shadow-px-sm);transition:transform 0.15s ease,box-shadow 0.15s ease}
-.rooms-wave-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
-.rooms-new-btn{padding:10px 18px;border:2px solid var(--ink);border-radius:var(--rs);
-  background:var(--y);font-family:var(--pxfont);font-size:0.88rem;
-  box-shadow:var(--shadow-px-sm);transition:transform 0.15s ease,box-shadow 0.15s ease}
-.rooms-new-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
 .rooms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .room-card{border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;cursor:pointer;
   background:#FFFEF8;box-shadow:var(--shadow-px-sm);position:relative;
@@ -647,16 +696,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 @media(max-width:640px){.sgb-inner{padding:20px 16px}.sgb-step{padding:16px 14px}}
 
 
-.rooms-status{display:flex;align-items:center;gap:8px;padding:8px 14px;
-  background:var(--c2);border:1px solid var(--line);border-radius:20px;
-  font-size:.84rem;width:fit-content;margin:0 0 20px}
-.rs-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
-.rooms-status.connected .rs-dot{background:var(--leaf);animation:dotPing 1.4s infinite}
-.rooms-direct{margin:48px 0 0;padding:28px 32px;
-  background:var(--c2);border:2px solid var(--ink);border-radius:var(--r)}
-.rd-inner{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.rd-inner h4{font-weight:800;margin:0 0 4px}
-.rd-inner p{color:var(--gray);font-size:.9rem;margin:0}
+/* rooms-status and rooms-direct defined above in split layout section */
 .rd-input-row{display:flex;gap:8px;margin-left:auto}
 .rd-input{width:110px;padding:10px 14px;border:2px solid var(--ink);background:var(--c);
   border-radius:6px;font-family:var(--pxfont);font-size:1rem;
@@ -786,15 +826,30 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ic-desc{font-size:0.74rem;color:var(--gray);margin-top:9px}
 
 /* ═════════════ CHAT APP ═════════════ */
-.chat-app{position:fixed;inset:0;z-index:800;display:grid;grid-template-columns:288px 1fr;
-  gap:16px;padding:16px;background:
+.chat-app{position:absolute;inset:0;z-index:1;display:grid;
+  grid-template-columns:1fr;gap:0;padding:12px;background:
   linear-gradient(rgba(255,251,239,0.94),rgba(255,251,239,0.94)),
   radial-gradient(circle,rgba(31,27,19,0.07) 1.5px,transparent 1.5px);
-  background-size:auto,26px 26px;animation:chatIn 0.35s var(--ease) both}
+  background-size:auto,26px 26px;animation:chatIn 0.35s var(--ease) both;overflow:hidden}
 @keyframes chatIn{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}
 
-/* 사이드바 */
-.chat-sb{display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-right:2px;position:relative}
+/* 멤버 팝업 사이드바 */
+.chat-sb{position:absolute;top:0;right:0;bottom:0;width:276px;z-index:10;
+  display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding:14px 12px;
+  background:#FFFEF8;border-left:2px solid var(--ink);
+  box-shadow:-4px 0 16px rgba(31,27,19,0.12);
+  animation:sbSlideIn 0.22s var(--ease) both}
+@keyframes sbSlideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.chat-sb.hidden{display:none!important}
+/* 햄버거 버튼 */
+.ch-hamburger-btn{font-size:1.3rem;line-height:1;padding:4px 10px;font-weight:900;
+  letter-spacing:0;font-family:var(--pxfont)}
+/* 멤버 팝업 상단 닫기 버튼 */
+.csb-top-bar{display:flex;align-items:center;padding:2px 0 6px;border-bottom:1.5px dashed var(--line);margin-bottom:2px}
+.csb-collapse-btn{font-size:0.76rem;font-weight:700;padding:4px 10px;
+  border:1.5px solid var(--ink);border-radius:99px;background:#FFFEF8;
+  color:var(--ink);cursor:pointer;transition:background .13s,transform .1s}
+.csb-collapse-btn:hover{background:var(--ys);transform:translate(-1px,-1px)}
 .csb-logo{display:flex;align-items:center;gap:9px;font-family:var(--pxfont);font-size:1.2rem;padding:4px 2px}
 .csb-profile-body{display:flex;align-items:center;gap:12px;padding:13px 14px}
 .csb-av{width:48px;height:48px;border:2px solid var(--ink);border-radius:11px;background:var(--ys);
@@ -967,6 +1022,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ch-code{font-family:var(--pxfont);font-size:0.78rem;color:var(--br);letter-spacing:0.1em}
 .ch-online-badge{font-size:0.72rem;font-weight:700;padding:3px 10px;background:var(--leaf);
   color:#fff;border-radius:99px;border:1.5px solid var(--ink)}
+.ch-online-count{font-size:0.78rem;font-weight:600;color:var(--gray);flex-shrink:0}
 .ch-conn{font-size:0.72rem;font-weight:700;padding:3px 10px;background:#E8503A;
   color:#fff;border-radius:99px;border:1.5px solid var(--ink);animation:connBlink 1s ease-in-out infinite}
 @keyframes connBlink{0%,100%{opacity:1}50%{opacity:.45}}
@@ -1457,7 +1513,7 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 .rw-invite-btn:hover{opacity:1}
 
 /* ── 통합 이모지/이모티콘 피커 ───────────── */
-.es-pop{position:fixed;z-index:9200;
+.es-pop{position:absolute;bottom:calc(100% + 6px);left:0;z-index:9200;
   width:min(360px, calc(100vw - 24px));display:flex;flex-direction:column;
   background:#FFFEF8;border:2px solid var(--ink);border-radius:var(--rs);
   box-shadow:3px 3px 0 var(--ink);overflow:hidden}
@@ -1668,6 +1724,27 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 /* ─ 친구 목록 ─ */
 .kf-friend-list{display:flex;flex-direction:column}
 .friend-empty{font-size:.82rem;color:var(--gray);text-align:center;padding:28px 0;line-height:1.7}
+
+/* 대화 목록 (프로필 페이지) */
+.kf-chat-history-header{margin-top:28px}
+.kf-chat-history-list{display:flex;flex-direction:column;gap:8px;padding:4px 0 16px}
+.ch-room-card{display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border:2px solid var(--ink);border-radius:var(--r);background:#FFFEF8;
+  box-shadow:var(--shadow-px-sm);transition:transform .15s,box-shadow .15s}
+.ch-room-card:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.ch-av{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ch-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+.ch-name{font-size:.92rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.ch-code{font-family:var(--pxfont);font-size:.72rem;color:var(--br);text-align:left}
+.ch-btns{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.ch-del-btn{padding:4px 10px;border:1.5px solid var(--ink);border-radius:var(--rs);
+  background:#fff;font-size:.74rem;font-weight:700;cursor:pointer;
+  transition:background .12s,transform .12s}
+.ch-del-btn:hover{background:#ff4d4d;color:#fff;transform:translate(-1px,-1px)}
+.ch-enter-btn{padding:6px 14px;border:2px solid var(--ink);border-radius:var(--rs);
+  background:var(--y);font-size:.8rem;font-weight:700;
+  box-shadow:2px 2px 0 var(--ink);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.ch-enter-btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
 .kf-friend-item{
   display:flex;align-items:center;gap:12px;
   padding:10px 16px;border-bottom:1px solid var(--border);
@@ -1715,6 +1792,24 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
 }
 .fc-popup-input:focus{box-shadow:3px 3px 0 var(--ys)}
 .fc-popup-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+
+/* ─ 멤버 프로필 팝업 ─ */
+.mp-overlay{position:fixed;inset:0;background:rgba(31,27,19,.55);z-index:9500;display:flex;align-items:center;justify-content:center}
+.mp-overlay.hidden{display:none}
+.mp-popup{width:min(300px,88vw);background:#FFFEF8}
+.mp-body{display:flex;align-items:center;gap:16px;padding:20px 18px 14px}
+.mp-av{width:64px;height:64px;border-radius:50%;overflow:hidden;border:2px solid var(--ink);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff}
+.mp-av img,.mp-av canvas{width:100%;height:100%;object-fit:cover;display:block}
+.mp-info{flex:1;min-width:0}
+.mp-name{font-weight:800;font-size:1.05rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-mood{font-size:.85rem;margin-top:4px}
+.mp-actions{display:flex;gap:8px;padding:0 18px 18px;flex-wrap:wrap}
+.mp-btn{flex:1;padding:8px 10px;border:2px solid var(--ink);border-radius:var(--rs);font-weight:700;font-size:.82rem;cursor:pointer;background:#fff;box-shadow:2px 2px 0 var(--ink);transition:transform .1s}
+.mp-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.mp-edit-btn{background:var(--ys)}
+.mp-add-btn{background:#E8F4E8}
+.mp-already-btn{background:#eee;color:var(--gray);cursor:default}
+.mp-btn.hidden{display:none}
 
 /* 아바타·버튼 공통 (프로필 편집창 — 기존 유지) */
 .prf-tabs{display:flex;gap:6px;margin-bottom:14px}
@@ -2157,8 +2252,8 @@ body.is-admin .rw-statusbar.admin-only{display:inline !important}
   padding:0 14px;height:46px;border-bottom:2px solid var(--ink);
   background:var(--c2);gap:8px;flex-shrink:0;
 }
-.ch-info{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden}
-.ch-title-txt{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.chat-hdr .ch-info{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:0;overflow:hidden;flex:1}
+.ch-title-txt{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ch-code-badge{font-family:var(--pxfont);font-size:.72rem;background:var(--ink);color:#FFFEF8;
   padding:2px 7px;letter-spacing:.06em;flex-shrink:0;
   cursor:pointer;border-radius:3px;transition:opacity .1s;user-select:all;title:"클릭해서 복사"}

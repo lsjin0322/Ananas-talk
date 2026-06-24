@@ -2052,13 +2052,7 @@ function resumeChat() {
 function toggleChatSb() {
   const sb = $('#chatSb');
   if (!sb) return;
-  const willOpen = sb.classList.contains('hidden');
-  if (willOpen) {
-    /* 키보드 높이만큼 bottom 여백 설정 */
-    const kb = $('#customKb');
-    const kbH = kb ? kb.getBoundingClientRect().height : 0;
-    sb.style.bottom = kbH + 'px';
-  }
+  sb.style.bottom = '0';
   sb.classList.toggle('hidden');
 }
 window.toggleChatSb = toggleChatSb;

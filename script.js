@@ -2140,7 +2140,7 @@ socket.on('onlineUsers', users => {
   state.onlineUsers = users;
   const n = users.length;
   const oc = $('#onlineCount'); if (oc) oc.textContent = `${n}명 접속`;
-  const ocb = $('#chatOnlineCount'); if (ocb) ocb.textContent = `${n}명`;
+  const ocb = $('#chatOnlineCount'); if (ocb) ocb.textContent = `${n}`;
   const mc = $('#memberCnt'); if (mc) mc.textContent = n;
   /* 로스터가 없으면 onlineUsers로 렌더 */
   if (!state.memberRoster || state.memberRoster.length === 0) renderRoster(users.map(u => ({ ...u, online: true })));

@@ -1021,6 +1021,7 @@ img.rw-logo,img.logo-mark{object-fit:contain}
 .ch-code{font-family:var(--pxfont);font-size:0.78rem;color:var(--br);letter-spacing:0.1em}
 .ch-online-badge{font-size:0.72rem;font-weight:700;padding:3px 10px;background:var(--leaf);
   color:#fff;border-radius:99px;border:1.5px solid var(--ink)}
+.ch-online-count{font-size:0.78rem;font-weight:600;color:var(--gray);flex-shrink:0}
 .ch-conn{font-size:0.72rem;font-weight:700;padding:3px 10px;background:#E8503A;
   color:#fff;border-radius:99px;border:1.5px solid var(--ink);animation:connBlink 1s ease-in-out infinite}
 @keyframes connBlink{0%,100%{opacity:1}50%{opacity:.45}}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -c server.js)",
+      "Bash(node -e \"require\\('./social'\\);require\\('./db'\\)\")",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

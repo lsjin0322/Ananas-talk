@@ -1,5 +1,5 @@
 require('dotenv').config();
-const db = require('./Ananas/db');
+const db = require('./db');
 
 setTimeout(() => {
   const rooms = db.loadAll();

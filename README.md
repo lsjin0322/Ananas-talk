@@ -8,7 +8,11 @@
 [![License](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 
 ---
+ **이미지 미리보기**
+---
+ <img width="704" height="903" alt="image" src="https://github.com/user-attachments/assets/3348d4e2-3576-4e55-b2e8-7664cb6d1824" />
 
+---
 ## 📌 프로젝트 소개
 
 **Ananas Talk**은 실시간 채팅을 기반으로 방명록, 파도타기, AI 어시스턴트까지 갖춘 레트로 감성의 웹 메신저입니다.  

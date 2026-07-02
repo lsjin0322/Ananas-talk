@@ -9,6 +9,27 @@
 🔗 **배포 주소:** https://web-production-4bf0d.up.railway.app
 
 ---
+
+## 📌 프로젝트 배경
+
+### 왜 만들었나
+
+국내 메신저 시장은 카카오톡이 **MAU 4,819만 명, 국내 인터넷 사용자의 97.2%** 를 점유하는 독점 구조입니다.
+<br>대화는 가능하지만 "나만의 공간"을 가진 메신저는 없었습니다.
+<br>([출처: The Korea Times](https://www.koreatimes.co.kr/business/companies/20250924/kakaotalk-leads-in-users-tiktok-lite-in-usage-time-data))
+
+한편 Z세대를 중심으로 **Y2K · 뉴트로 감성**이 2024~2026년 주요 소비 트렌드로 자리잡았습니다.
+<br>"겪지도 않은 걸 마치 겪은 듯이 즐기는" 레트로 소비 패턴이 확산되고 있습니다.
+<br>([출처: KB Think](https://kbthink.com/main/living-finance/consumption-life/mz-consumption/retro.html) · [제일매거진](https://magazine.cheil.com/49544))
+
+싸이월드 미니홈피는 전성기 **회원 3,200만 명, 미니홈피 3,160만 개, 도토리 연 매출 1,000억 원**을 기록하며
+<br>한국 SNS 역사상 가장 큰 커뮤니티 문화를 만들어냈습니다.
+<br>([출처: 위키백과](https://ko.wikipedia.org/wiki/%EC%8B%B8%EC%9D%B4%EC%9B%94%EB%93%9C) · [이코노미스트](https://economist.co.kr/article/view/ecn202412110020))
+
+**아나나스는 이 두 가지를 결합합니다 —**
+레트로 감성의 "나만의 아지트" + 현대적 실시간 채팅 + 보안
+
+---
 ### PWA를 선택한 이유
 
 설치 없이 브라우저만으로 접근 가능한 PWA는 진입 장벽을 최소화합니다.
@@ -34,28 +55,6 @@
 | 메인 화면 | 채팅방 화면 |
 |:---:|:---:|
 | <img width="1178" height="943" alt="image" src="https://github.com/user-attachments/assets/026f0a56-de3f-4daa-a8f3-fa2ff4473c8a" /> |  <img width="704" height="903" alt="image" src="https://github.com/user-attachments/assets/3348d4e2-3576-4e55-b2e8-7664cb6d1824" />|
-
----
-
-
-## 📌 프로젝트 배경
-
-### 왜 만들었나
-
-국내 메신저 시장은 카카오톡이 **MAU 4,819만 명, 국내 인터넷 사용자의 97.2%** 를 점유하는 독점 구조입니다.
-<br>대화는 가능하지만 "나만의 공간"을 가진 메신저는 없었습니다.
-<br>([출처: The Korea Times](https://www.koreatimes.co.kr/business/companies/20250924/kakaotalk-leads-in-users-tiktok-lite-in-usage-time-data))
-
-한편 Z세대를 중심으로 **Y2K · 뉴트로 감성**이 2024~2026년 주요 소비 트렌드로 자리잡았습니다.
-<br>"겪지도 않은 걸 마치 겪은 듯이 즐기는" 레트로 소비 패턴이 확산되고 있습니다.
-<br>([출처: KB Think](https://kbthink.com/main/living-finance/consumption-life/mz-consumption/retro.html) · [제일매거진](https://magazine.cheil.com/49544))
-
-싸이월드 미니홈피는 전성기 **회원 3,200만 명, 미니홈피 3,160만 개, 도토리 연 매출 1,000억 원**을 기록하며
-<br>한국 SNS 역사상 가장 큰 커뮤니티 문화를 만들어냈습니다.
-<br>([출처: 위키백과](https://ko.wikipedia.org/wiki/%EC%8B%B8%EC%9D%B4%EC%9B%94%EB%93%9C) · [이코노미스트](https://economist.co.kr/article/view/ecn202412110020))
-
-**아나나스는 이 두 가지를 결합합니다 —**
-레트로 감성의 "나만의 아지트" + 현대적 실시간 채팅 + 보안
 
 ---
 

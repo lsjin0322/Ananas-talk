@@ -1,0 +1,47 @@
+<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" width="680" role="img" aria-label="PWA 도입 효과">
+  <title>Ananas Talk — PWA 도입 효과</title>
+  <rect width="680" height="260" fill="#0d1117" rx="12"/>
+  <text x="32" y="36" font-family="sans-serif" font-size="13" fill="#8b949e">PWA 도입 효과  |  Starbucks 2017 · Rakuten 2018</text>
+
+  <!-- DAU +100% -->
+  <text x="32" y="82" font-family="sans-serif" font-size="11" fill="#8b949e">일일 활성 사용자</text>
+  <rect x="200" y="68" width="0" height="18" fill="#1f6feb" rx="3">
+    <animate attributeName="width" from="0" to="72" dur="0.6s" begin="0.2s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+  </rect>
+  <text x="280" y="81" font-family="sans-serif" font-size="11" fill="#58a6ff" opacity="0">
+    +100%  (Starbucks, 2017)
+    <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="0.75s" fill="freeze"/>
+  </text>
+
+  <!-- 세션 +70% -->
+  <text x="32" y="122" font-family="sans-serif" font-size="11" fill="#8b949e">세션 길이</text>
+  <rect x="200" y="108" width="0" height="18" fill="#238636" rx="3">
+    <animate attributeName="width" from="0" to="50" dur="0.6s" begin="0.4s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+  </rect>
+  <text x="258" y="121" font-family="sans-serif" font-size="11" fill="#3fb950" opacity="0">
+    +70%
+    <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="0.95s" fill="freeze"/>
+  </text>
+
+  <!-- 페이지뷰 +20% -->
+  <text x="32" y="162" font-family="sans-serif" font-size="11" fill="#8b949e">페이지뷰</text>
+  <rect x="200" y="148" width="0" height="18" fill="#9e6a03" rx="3">
+    <animate attributeName="width" from="0" to="14" dur="0.6s" begin="0.6s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+  </rect>
+  <text x="222" y="161" font-family="sans-serif" font-size="11" fill="#d29922" opacity="0">
+    +20%
+    <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="1.15s" fill="freeze"/>
+  </text>
+
+  <!-- 방문자 유지율 +450% -->
+  <text x="32" y="202" font-family="sans-serif" font-size="11" fill="#8b949e">방문자 유지율</text>
+  <rect x="200" y="188" width="0" height="18" fill="#8957e5" rx="3">
+    <animate attributeName="width" from="0" to="198" dur="0.8s" begin="0.8s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+  </rect>
+  <text x="406" y="201" font-family="sans-serif" font-size="11" fill="#a371f7" opacity="0">
+    +450%  (Rakuten, 2018)
+    <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="1.55s" fill="freeze"/>
+  </text>
+
+  <text x="640" y="248" font-family="sans-serif" font-size="10" fill="#30363d" text-anchor="end">출처: Magenest PWA Statistics 2024 · pwastats.com</text>
+</svg>

@@ -9,6 +9,25 @@
 🔗 **배포 주소:** https://web-production-4bf0d.up.railway.app
 
 ---
+### PWA를 선택한 이유
+
+설치 없이 브라우저만으로 접근 가능한 PWA는 진입 장벽을 최소화합니다.
+
+![RPS](charts/rps.svg)
+![Latency](charts/latency.svg)
+![PWA](charts/pwa.svg)
+
+| 지표 | 수치 |
+|------|------|
+| 일일 활성 사용자 | **2배 증가** (Starbucks PWA 도입 사례) |
+| 세션 길이 | **70% 증가** (모바일 웹 대비) |
+| 페이지뷰 | **20% 증가** (모바일 웹 대비) |
+| 방문자 유지율 | **450% 증가** (Rakuten 24 사례) |
+
+([출처: Magenest PWA Statistics](https://magenest.com/en/pwa-statistics/) · [PWA Stats](https://www.pwastats.com/))
+
+---
+
 ## 이미지 미리보기
 
 
@@ -37,25 +56,6 @@
 
 **아나나스는 이 두 가지를 결합합니다 —**
 레트로 감성의 "나만의 아지트" + 현대적 실시간 채팅 + 보안
-
----
-
-### PWA를 선택한 이유
-
-설치 없이 브라우저만으로 접근 가능한 PWA는 진입 장벽을 최소화합니다.
-
-![RPS](charts/rps.svg)
-![Latency](charts/latency.svg)
-![PWA](charts/pwa.svg)
-
-| 지표 | 수치 |
-|------|------|
-| 일일 활성 사용자 | **2배 증가** (Starbucks PWA 도입 사례) |
-| 세션 길이 | **70% 증가** (모바일 웹 대비) |
-| 페이지뷰 | **20% 증가** (모바일 웹 대비) |
-| 방문자 유지율 | **450% 증가** (Rakuten 24 사례) |
-
-([출처: Magenest PWA Statistics](https://magenest.com/en/pwa-statistics/) · [PWA Stats](https://www.pwastats.com/))
 
 ---
 
